@@ -60,7 +60,7 @@ public extension Physical {
 
 public func cos(_ number: Physical) -> Physical {
 	if number ~ 1.0.radians {
-		return cos(number.to_radians.value).constant.sigfigs(number.sigfigs)
+		return cos(number.to(.radians).value).constant.sigfigs(number.sigfigs)
 	}
 	
 	return .notAThing
@@ -68,7 +68,7 @@ public func cos(_ number: Physical) -> Physical {
 
 public func sin(_ number: Physical) -> Physical {
 	if number ~ 1.radians {
-		return sin(number.to_radians.value).constant.sigfigs(number.sigfigs)
+		return sin(number.to(.radians).value).constant.sigfigs(number.sigfigs)
 	}
 	
 	return .notAThing
@@ -76,7 +76,7 @@ public func sin(_ number: Physical) -> Physical {
 
 public func tan(_ number: Physical) -> Physical {
 	if number ~ 1.radians {
-		return tan(number.to_radians.value).constant.sigfigs(number.sigfigs)
+		return tan(number.to(.radians).value).constant.sigfigs(number.sigfigs)
 	}
 	
 	return .notAThing
@@ -84,7 +84,7 @@ public func tan(_ number: Physical) -> Physical {
 
 public func cosh(_ number: Physical) -> Physical {
 	if number ~ 1.radians {
-		return cosh(number.to_radians.value).constant.sigfigs(number.sigfigs)
+		return cosh(number.to(.radians).value).constant.sigfigs(number.sigfigs)
 	}
 	
 	return .notAThing
@@ -92,7 +92,7 @@ public func cosh(_ number: Physical) -> Physical {
 
 public func sinh(_ number: Physical) -> Physical {
 	if number ~ 1.radians {
-		return sinh(number.to_radians.value).constant.sigfigs(number.sigfigs)
+		return sinh(number.to(.radians).value).constant.sigfigs(number.sigfigs)
 	}
 	
 	return .notAThing
@@ -100,7 +100,7 @@ public func sinh(_ number: Physical) -> Physical {
 
 public func tanh(_ number: Physical) -> Physical {
 	if number ~ 1.radians {
-		return tanh(number.to_radians.value).constant.sigfigs(number.sigfigs)
+		return tanh(number.to(.radians).value).constant.sigfigs(number.sigfigs)
 	}
 	
 	return .notAThing
