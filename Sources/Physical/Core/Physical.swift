@@ -468,6 +468,9 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		if let lvs = left.values {
 			if let rvs = right.values {
 				if lvs.count != rvs.count { return false }
+				
+				// next line needs to be fixed, using ≐ equivalent
+				
 				if lvs != rvs { return false }
 			}
 			else {
@@ -893,14 +896,11 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 			return Int(round(Double(abs(p.value)) * a)) * Int(p.value < 0 ? -1 : 1)
 		}
 		
-		/*
-			Core problem with this technique:
-			Converting to fundamental units, which is necessary,
-			can *cause* a spurious discrepancy in the last digit.
-			But we can't give leaway here, because the last digit
-		    might be the whole point of the comparison, and it may
-			also be exaggerated since the signature chops off all
-			trailing zeros.
+		/* Core problem with this technique:
+			
+		 Converting to fundamental units, which is necessary, can *cause* a spurious discrepancy in the last digit.
+			
+		But we can't give leaway here, because the last digit might be the whole point of the comparison, and it may also be exaggerated since the signature chops off all trailing zeros.
 		*/
 		
 		return valueSignature(left) == valueSignature(right)
@@ -1280,6 +1280,16 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		
 		for (baseUnit, (unit, exponent)) in left.units {
 			newUnits[baseUnit] = (unit, power * exponent)
+		}
+		
+		if var values = left.values {
+			var powers = [Double](repeating: right, count: values.count)
+			var newValues = [Double](repeating: 0, count: values.count)
+			var count = Int32(left.count)
+			
+			vvpow(&newValues, &powers, &values, &count)
+			
+			return Physical(values: newValues, units: newUnits, sigfigs: left.sigfigs)
 		}
 		
 		return Physical(

@@ -92,22 +92,22 @@ public extension Array where Element == Double {
 	
 	//________________________________________________________/ the old way:
 	
-	var eV: [Physical] {
-		map { Physical(value: $0, unit: UnitEnergy.electronvolts) }
+	var eV: Physical {
+		Physical(values: self, unit: UnitEnergy.electronvolts)
 	}
-	var miles: [Physical] {
-		map { Physical(value: $0, unit: UnitLength.miles) }
+	var miles: Physical {
+		Physical(values: self, unit: UnitLength.miles)
 	}
 	
 	//	var m³: [Physical] {
 	//		map { Physical(value: $0, unit: UnitVolume.cubicMeters) }
 	//	}
-	var squareMeters: [Physical] {
-		map { Physical(value: $0, unit: UnitArea.squareMeters) }
+	var squareMeters: Physical {
+		Physical(values: self, unit: UnitArea.squareMeters)
 	}
 	
-	var Ga: [Physical] {
-		map { Physical(value: $0, unit: UnitDuration.gigaannum) }
+	var Ga: Physical {
+		Physical(values: self, unit: UnitDuration.gigaannum)
 	}
 	var kg: Physical {
 		Physical(values: self, unit: UnitMass.kilograms)

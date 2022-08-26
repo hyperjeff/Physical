@@ -158,6 +158,12 @@ final class PhysicalTests: XCTestCase {
 //		XCTAssert(F == [121.3, 556.8, 883.8].N)
 	}
 	
+	/*func testPowers() {
+		let a = [12.1, 3.6, -1.2, 0].miles
+		
+		XCTAssert((a ^ 2) == [146, 13, 1.44, 0].miles)
+	} */
+	
 	// MARK: - Physics -
 	
 	func testLong43() {
