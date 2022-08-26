@@ -290,6 +290,8 @@ final class PhysicalTests: XCTestCase {
 		let Δt = sunEarthDistance / lightMinute
 		
 		XCTAssert((Δt → .s).sigfigs(3) == 8.32.s)
+		XCTAssert(Δt.to(.s).sigfigs(3) == 8.32.s)
+		XCTAssert(Δt.to(UnitDuration.seconds).sigfigs(3) == 8.32.s)
 	}
 	
 	// MARK: - Fluid Mechanics -
