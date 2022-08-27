@@ -15,6 +15,20 @@ final class PhysicalTests: XCTestCase {
 		XCTAssert(b == c)
 	}
 	
+	func testPerMethods() {
+		let a = 15.metersPerSecond
+		let b = 15.meters.seconds(-1)
+		let c = 15.m/.s
+		let d = 15.meters.perSecond
+		
+		XCTAssert(a == b)
+		XCTAssert(a == c)
+		XCTAssert(a == d)
+		XCTAssert(b == c)
+		XCTAssert(b == d)
+		XCTAssert(c == d)
+	}
+	
     func testAdditionSigfigs() {
 		XCTAssert((3.4.mm + 10.mm.sigfigs(2)) == 13.mm)
 
