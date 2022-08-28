@@ -29,6 +29,14 @@ final class PhysicalTests: XCTestCase {
 		XCTAssert(c == d)
 	}
 	
+	func testTranscendentalDoubles() {
+		XCTAssert(4.pi == 4 * Double.pi)
+		XCTAssert(4.e == 4 * exp(1.0))
+		
+		XCTAssert(1.345 * .pi == 1.345 * Double.pi)
+		XCTAssert(1.345.e == 1.345 * exp(1.0))
+	}
+	
     func testAdditionSigfigs() {
 		XCTAssert((3.4.mm + 10.mm.sigfigs(2)) == 13.mm)
 

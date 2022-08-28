@@ -74,12 +74,20 @@ public func ± (left: Int, right: Physical) -> Physical {
 
 
 public extension Int {
+	var pi: Double {
+		Double(self) * .pi
+	}
+	
 	var π: Double {
 		Double(self) * .pi
 	}
 	
 	var π²: Double {
 		Double(self) * .pi * .pi
+	}
+	
+	var e: Double {
+		Double(self) * exp(1.0)
 	}
 	
 	var constant: Physical {
@@ -154,6 +162,10 @@ public extension Double {
 	}
 	var π²: Double {
 		self * .pi * .pi
+	}
+	
+	var e: Double {
+		Double(self) * exp(1.0)
 	}
 	
 	var constant: Physical {
