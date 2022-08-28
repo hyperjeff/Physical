@@ -159,6 +159,11 @@ final class PhysicalTests: XCTestCase {
 		XCTAssert(((1.kg + 1.s) / 1.m).isNotAThing)
 	}
 	
+	func testEmptyArrays() {
+		XCTAssert([].feet.sigfigs == 0)
+		XCTAssert([].feet.mean.value.isNaN)
+	}
+	
 	func testBasicVectorOfValues() {
 		let a = Physical.Constants.Earth.surfaceGravity
 		let m = [12.37, 56.78, 90.12].kg

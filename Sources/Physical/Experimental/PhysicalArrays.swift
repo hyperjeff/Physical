@@ -50,7 +50,7 @@ extension Array where Element == Double {
 
 public extension Array where Element == Double {
 	var sigfigs: Int {
-		self.map { $0.sigfigs }.max()!
+		self.map { $0.sigfigs }.max() ?? 0
 	}
 }
 

@@ -889,6 +889,10 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	public static func ≐ (left: Physical, right: Physical) -> Bool {
 		if left.value.isZero || right.value.isZero { return true }
 		
+		if left.value.isNaN || right.value.isNaN { return false }
+		
+		if left.values != nil || right.values != nil { return false }
+		
 		let lcs = Swift.min(left.sigfigs, right.sigfigs)
 		
 		func valueSignature(_ p: Physical) -> Int {
