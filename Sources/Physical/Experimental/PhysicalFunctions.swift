@@ -1,4 +1,5 @@
 import Foundation
+import Accelerate
 
 postfix operator °
 prefix operator √
@@ -9,6 +10,9 @@ infix operator ∓
 infix operator ±
 infix operator → : CastingPrecedence
 
+
+public typealias DoubleToDouble = (Double) -> (Double)
+public typealias VVDoubles = (UnsafeMutablePointer<Double>, UnsafePointer<Double>, UnsafePointer<Int32>) -> Void
 
 // additional custom operators
 public func sqrt(_ p: Physical) -> Physical {
@@ -56,62 +60,42 @@ public extension Physical {
 	}
 }
 
-// trig functions
+public func abs(_ number: Physical) -> Physical {
+	if let values = number.values {
+		var out = [Double](repeating: 0, count: values.count)
+		vDSP_vabsD(values, 1, &out, 1, vDSP_Length(values.count))
+		
+		return Physical(values: out, units: number.units, sigfigs: number.sigfigs)
+	}
+	
+	return Physical(value: abs(number.value), units: number.units, sigfigs: number.sigfigs)
+}
 
-public func cos(_ number: Physical) -> Physical {
+private func trigFunction(_ f: DoubleToDouble, _ g: VVDoubles, for number: Physical) -> Physical {
 	if number ~ 1.0.radians {
-		return cos(number.to(.radians).value).constant.sigfigs(number.sigfigs)
+		if var values = number.values {
+			var count = Int32(values.count)
+			var out = [Double](repeating: 0, count: values.count)
+			g(&out, &values, &count)
+			
+			return Physical(values: out, units: number.units, sigfigs: number.sigfigs)
+		}
+		
+		return f(number.to(.radians).value).constant.sigfigs(number.sigfigs)
 	}
 	
 	return .notAThing
 }
-
-public func sin(_ number: Physical) -> Physical {
-	if number ~ 1.radians {
-		return sin(number.to(.radians).value).constant.sigfigs(number.sigfigs)
-	}
-	
-	return .notAThing
-}
-
-public func tan(_ number: Physical) -> Physical {
-	if number ~ 1.radians {
-		return tan(number.to(.radians).value).constant.sigfigs(number.sigfigs)
-	}
-	
-	return .notAThing
-}
-
-public func cosh(_ number: Physical) -> Physical {
-	if number ~ 1.radians {
-		return cosh(number.to(.radians).value).constant.sigfigs(number.sigfigs)
-	}
-	
-	return .notAThing
-}
-
-public func sinh(_ number: Physical) -> Physical {
-	if number ~ 1.radians {
-		return sinh(number.to(.radians).value).constant.sigfigs(number.sigfigs)
-	}
-	
-	return .notAThing
-}
-
-public func tanh(_ number: Physical) -> Physical {
-	if number ~ 1.radians {
-		return tanh(number.to(.radians).value).constant.sigfigs(number.sigfigs)
-	}
-	
-	return .notAThing
-}
-
-// inverse trig
-
-public typealias InverseTrigFunction = (Double) -> Double
-
-public func inversionTrigFunction(_ f: InverseTrigFunction, for number: Physical) -> Physical {
+public func inversionTrigFunction(_ f: DoubleToDouble, _ g: VVDoubles, for number: Physical) -> Physical {
 	if number.units.count == 0 {
+		if var values = number.values {
+			var count = Int32(values.count)
+			var out = [Double](repeating: 0, count: values.count)
+			g(&out, &values, &count)
+			
+			return out.radians.sigfigs(number.sigfigs)
+		}
+		
 		let inverseValue = f(number.value)
 		
 		if !inverseValue.isNaN {
@@ -122,28 +106,41 @@ public func inversionTrigFunction(_ f: InverseTrigFunction, for number: Physical
 	return .notAThing
 }
 
+public func cos(_ number: Physical) -> Physical {
+	trigFunction(cos, vvcos, for: number)
+}
+public func sin(_ number: Physical) -> Physical {
+	trigFunction(sin, vvsin, for: number)
+}
+public func tan(_ number: Physical) -> Physical {
+	trigFunction(tan, vvtan, for: number)
+}
+public func cosh(_ number: Physical) -> Physical {
+	trigFunction(cosh, vvcosh, for: number)
+}
+public func sinh(_ number: Physical) -> Physical {
+	trigFunction(sinh, vvsinh, for: number)
+}
+public func tanh(_ number: Physical) -> Physical {
+	trigFunction(tanh, vvtanh, for: number)
+}
 public func acos(_ number: Physical) -> Physical {
-	inversionTrigFunction(acos, for: number)
+	inversionTrigFunction(acos, vvacos, for: number)
 }
-
 public func asin(_ number: Physical) -> Physical {
-	inversionTrigFunction(asin, for: number)
+	inversionTrigFunction(asin, vvasin, for: number)
 }
-
 public func atan(_ number: Physical) -> Physical {
-	inversionTrigFunction(atan, for: number)
+	inversionTrigFunction(atan, vvatan, for: number)
 }
-
 public func acosh(_ number: Physical) -> Physical {
-	inversionTrigFunction(acosh, for: number)
+	inversionTrigFunction(acosh, vvacosh, for: number)
 }
-
 public func asinh(_ number: Physical) -> Physical {
-	inversionTrigFunction(asinh, for: number)
+	inversionTrigFunction(asinh, vvasinh, for: number)
 }
-
 public func atanh(_ number: Physical) -> Physical {
-	inversionTrigFunction(atanh, for: number)
+	inversionTrigFunction(atanh, vvatanh, for: number)
 }
 
 // transcendental functions

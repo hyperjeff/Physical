@@ -189,6 +189,12 @@ final class PhysicalTests: XCTestCase {
 //		XCTAssert(F == [121.3, 556.8, 883.8].N)
 	}
 	
+	func testVectorFunctions() { // turn into real test
+		print(abs([1, -3.2, -0.0054, 2.4e-3].constant.sigfigs(2)))
+		print(cos(ramp(in: 0...1.pi, count: 27).radians.sigfigs(3)))
+		print(acos([1, 0.993, 0.971, 0.935, 0.885, 0.823, 0.749, 0.663, 0.568, 0.465, 0.355, 0.239, 0.121, 0, -0.121, -0.239, -0.355, -0.465, -0.568, -0.663, -0.749, -0.823, -0.885, -0.935, -0.971, -0.993, -1].constant.sigfigs(3)))
+	}
+	
 	/*func testPowers() {
 		let a = [12.1, 3.6, -1.2, 0].miles
 		
