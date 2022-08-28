@@ -731,6 +731,18 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		   base ~ dimension,
 		   unit.exponent == .integer(1) {
 			
+			if let values = values {
+				if let converter = dimension.converter as? UnitConverterLinear {
+					// FIXME: fix for non-zero-offset converters
+					
+					var out = [Double](repeating: 0, count: values.count)
+					
+					cblas_daxpy(Int32(values.count), 1 / converter.coefficient, values, 1, &out, 1)
+					
+					return Physical(values: out, unit: dimension, sigfigs: sigfigs)
+				}
+			}
+			
 			let v = Measurement(value: value, unit: unit.unit).converted(to: dimension)
 			
 			return Physical(value: v.value, unit: dimension, sigfigs: sigfigs)

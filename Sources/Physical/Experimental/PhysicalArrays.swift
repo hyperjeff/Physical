@@ -112,5 +112,11 @@ public extension Array where Element == Double {
 	var kg: Physical {
 		Physical(values: self, unit: UnitMass.kilograms)
 	}
+	var poundsMass: Physical {
+		Physical(values: self, unit: UnitMass.pounds)
+	}
+	var fahrenheit: Physical {
+		Physical(values: self, unit: UnitTemperature.fahrenheit)
+	}
 }
 

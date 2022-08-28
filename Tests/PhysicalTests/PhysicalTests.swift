@@ -182,6 +182,10 @@ final class PhysicalTests: XCTestCase {
 		XCTAssert(F[1] == 556.8.newtons)
 		XCTAssert(F[2] == 883.8.newtons)
 		
+		let mLbs = m → .pounds
+		
+		XCTAssert(mLbs[0] == 27.27.poundsMass)
+		
 //		XCTAssert(F == [121.3, 556.8, 883.8].N)
 	}
 	
