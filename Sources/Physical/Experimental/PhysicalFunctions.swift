@@ -78,7 +78,7 @@ private func trigFunction(_ f: DoubleToDouble, _ g: VVDoubles, for number: Physi
 			var out = [Double](repeating: 0, count: values.count)
 			g(&out, &values, &count)
 			
-			return Physical(values: out, units: number.units, sigfigs: number.sigfigs)
+			return Physical(values: out, units: [:], sigfigs: number.sigfigs)
 		}
 		
 		return f(number.to(.radians).value).constant.sigfigs(number.sigfigs)
