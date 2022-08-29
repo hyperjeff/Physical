@@ -941,14 +941,14 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	///   - right: Physical quantity
 	public static func * (left: Physical, right: Physical) -> Physical {
 		if left.isNotAThing || right.isNotAThing {
-			return .notAThing
+			return notAThing(logging: "\(left).isNotAThing || \(right).isNotAThing", elements: [left, right])
 		}
 		
 		// probably should be refactored:
 		
 		// We can multiply non-zero-offset units, but only if they are the same ones
 		if !(left ⧦ right) && !(left ⧗ right) {
-			return .notAThing
+			return notAThing(logging: "!(left ⧦ right) && !(left ⧗ right) → !\(left ⧦ right) && !\(left ⧗ right)", elements: [left, right])
 		}
 		
 		// Only units which have a common set of units will be decomposed,
@@ -1084,7 +1084,7 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	}
 	
 	public static func / (left: Self, right: Self) -> Self {
-		if left.isNotAThing || right.isNotAThing { return .notAThing }
+		if left.isNotAThing || right.isNotAThing { return notAThing(logging: "\(left).isNotAThing || \(right).isNotAThing", elements: [left, right]) }
 		
 		// FIXME: This is not correct if right doesn't transform via a simple rescaling
 		//        right must be transformed first into the base unit which is purely scalar (has 0 crossing)
