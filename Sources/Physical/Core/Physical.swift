@@ -648,6 +648,7 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	
 	public mutating func convertToFundamentalUnits(unitsToConvert: [Dimension] = []) {
 		var newValue = value
+		var newValues = values
 		var newUnits: DimensionDictionary = [:]
 		
 		let hasNonZeroOffsets = units.containsNonZeroOffsetUnits()
@@ -674,6 +675,8 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				// and milesPerImperialGallon & milesPerGallon use same units!
 				
 				if hasNonZeroOffsets {
+					// FIXME: add array version
+					
 					newValue = Measurement(value: value, unit: unit).converted(to: base).value
 				}
 				else {
@@ -684,7 +687,16 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 						unitValue = 12
 					}
 					
-					newValue *= pow(Measurement(value: unitValue, unit: unit).converted(to: base).value, Double(exponent.realValue))
+					let scaling = pow(Measurement(value: unitValue, unit: unit).converted(to: base).value, Double(exponent.realValue))
+					
+					if let values = values {
+						var result = [Double](repeating: 0, count: values.count)
+						cblas_daxpy(Int32(values.count), scaling, values, 1, &result, 1)
+						
+						newValues = result
+					}
+					
+					newValue *= scaling
 				}
 				
 				if newUnits.keys.contains(base),
@@ -700,6 +712,7 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		if !newUnits.isEmpty {
 			units = newUnits
 			value = newValue
+			values = newValues
 		}
 	}
 	

@@ -195,6 +195,16 @@ final class PhysicalTests: XCTestCase {
 		print(acos([1, 0.993, 0.971, 0.935, 0.885, 0.823, 0.749, 0.663, 0.568, 0.465, 0.355, 0.239, 0.121, 0, -0.121, -0.239, -0.355, -0.465, -0.568, -0.663, -0.749, -0.823, -0.885, -0.935, -0.971, -0.993, -1].constant.sigfigs(3)))
 	}
 	
+	func testByteArrays() {
+		let fileSizes = [1, 3, 4, -2].gigabytes.sigfigs(3)
+		let dataRate = 1.megabits.perSecond.sigfigs(3)
+		
+		let times = fileSizes / dataRate → .minutes
+		
+		XCTAssert(times[0] == 133.3.minutes) // why 4 sigfigs here?
+		XCTAssert(times[2] == 533.3.minutes)
+	}
+	
 	/*func testPowers() {
 		let a = [12.1, 3.6, -1.2, 0].miles
 		
