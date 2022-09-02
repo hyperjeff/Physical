@@ -27,7 +27,22 @@ Physical is released under the MIT license.
 
 If using Xcode, open a workspace or project and: File → Add Packages... → put in the URL of this project.
 
-To use, just `import Physical` atop any file that could use it.
+If editing your `Package.swift` by hand, add in this `let`:
+
+```swift
+let package = Package(
+    ...
+    targets: [
+        .target(name: "YourAwesomeProject", dependencies: ["Physical"]),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/hyperjeff/Physical.git", .branch("main")),
+    ],
+    ...
+)
+```
+
+Once you have either of the above set, just `import Physical` atop any file that you would like.
 
 ## Examples:
 
