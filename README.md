@@ -1,5 +1,7 @@
 # Physical
 
+![Physical Swift](logo.png "Logo")
+
 Physical is a Units of Measurement system for the Swift programming language, built on top of ('s) Foundation's Measurement framework.
 
 The project aims to make use of the developments in Dimensional Analysis and Unit/Measurement research to make writing code more appropriate for both trivial and complex real world calculations. Even if you don't think you are making such calculations in your code, you probably are. This can be your friend to help maintain readable, debuggable code.
