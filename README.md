@@ -1,6 +1,6 @@
 # Physical
 
-![Physical Swift](logo.png "Logo")
+<img align="right" src="logo.png">
 
 Physical is a Units of Measurement system for the Swift programming language, built on top of ('s) Foundation's Measurement framework.
 
