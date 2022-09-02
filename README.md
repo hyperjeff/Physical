@@ -27,6 +27,8 @@ Physical is released under the MIT license.
 
 If using Xcode, open a workspace or project and: File → Add Packages... → put in the URL of this project.
 
+To use, just `import Physical` atop any file that could use it.
+
 ## Examples:
 
 ### Basic Idea: Extending numbers
@@ -34,6 +36,8 @@ If using Xcode, open a workspace or project and: File → Add Packages... → pu
 Simple creation and composition of units. One can then convert results into a more appropriate unit.
 
 ```swift
+import Physical
+
 let distance1 = 10.5.centimeters
 let distance2 =  3.3.feet
 
@@ -60,6 +64,7 @@ aForce → .newtons
 6.meters/.seconds
 
 12.meters/.seconds/.seconds
+12.m/.s(2)
 ```
 
 ### Various means of expression
@@ -109,7 +114,9 @@ mass * acceleration * 37.feet → .joules
 
 ### Angles and Trig
 
-Trig functions use units, contrary to what you might think. Physical provides both trig and inverse trig functions (normal and hyperbolic) that both wipe out a whole class of bugs, but also make your code and reasoning about them greatly improve.
+Trig functions use units, contrary to what you might think. Physical provides both trig and inverse trig functions (normal and hyperbolic) that both wipe out a whole class of bugs, but also make your code and reasoning about them greatly improve. This are in addition to the standard trig functions and do not conflict with them.
+
+Currently the result of a trig function is a Physical object of unitless type. If you need to use the Double value, grab its value. E.g., `sin(φ).value`. This allows inverse trig functions to return Physical objects with units radian, without overriding existing trig functions in the Swift standard library.
 
 ```swift
 75°
@@ -159,7 +166,7 @@ x^5
 
 let y = x ^ (3.0/7)
 
-y^7                   // exactly y^3 results
+y^7                   // exactly x^3 results
 y^7 → .cubicInches
 
 x^π
@@ -206,4 +213,27 @@ func orbitalPeriod(height: Length) -> Duration {
 
 let periodISS = orbitalPeriod(height: Length(254, unit: .miles)).physical
 periodISS → .minutes
+```
+
+### Extensions to regular numbers
+
+A number of enhancements to float point numbers have been included.
+
+```swift
+14.0 ^ 2           // instead of pow(14.0, 2)
+
+√14
+√(x + y)           // longer expressions need parentheses
+
+∛14                // silly but available
+∜14
+
+8√14               // 8th root of 14. can be any integer.
+n√14
+
+6.pi
+2.π
+3.e
+
+47%                // 0.47
 ```
