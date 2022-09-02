@@ -119,20 +119,20 @@ Trig functions use units, contrary to what you might think. Physical provides bo
 Currently the result of a trig function is a Physical object of unitless type. If you need to use the Double value, grab its value. E.g., `sin(φ).value`. This allows inverse trig functions to return Physical objects with units radian, without overriding existing trig functions in the Swift standard library.
 
 ```swift
-75°
-sin(75°)
-asin(sin(75°))
-75° → .radians
-asin(sin(75°)) → .degrees      // 75°
+75°                            // 75 °
+sin(75°)                       // 0.96593
+asin(sin(75°))                 // 1.309 rad
+75° → .radians                 // 1.309 rad
+asin(sin(75°)) → .degrees      // 75 °
 
 
-let θ1 = (2.π/5).radians
-let θ2 = θ1 → .degrees
-let θ3 = θ1 → .revolutions
+let θ₁ = (2.π/5).radians       // 1.2566 rad
+let θ₂ = θ1 → .degrees         // 72 °
+let θ₃ = θ1 → .revolutions     // 0.2 rev
 
-sin(θ1)               // All 3 give 0.95106
-sin(θ2)
-sin(θ3)
+sin(θ₁)                        // 0.95106
+sin(θ₂)                        // 0.95106
+sin(θ₃)                        // 0.95106
 ```
 
 ### Arrays, Ramps, Indices
@@ -140,18 +140,18 @@ sin(θ3)
 Physical can work to describe whole arrays at once, also providing acceleration on calculations done on them for free. As well, a `ramp` function is included, akin to Numpy's `linspace` function.
 
 ```swift
-let fileSizes = [1, 3, 14, -2].gigabytes
-let dataRate = 1.megabits.perSecond
+let fileSizes = [1, 3, 14, -2].gigabytes      // [1, 3, 14, -2] GB
+let dataRate = 1.megabits.perSecond           // 1 Mb / s
 
-(fileSizes / dataRate → .hours)
+(fileSizes / dataRate → .hours)               // [2.2222, 6.6667, 31.111, -4.4444] hr
 
 
-ramp(in: 0...1.pi, count: 27)
+ramp(in: 0...1.pi, count: 27)                 // [0, 0.1208304866765305, ...]
 
 let angles = ramp(in: 0...1.pi, count: 27).radians.sigfigs(3)
 
-angles[7]          // 0.84581 rad
-sin(angles)[7]     // 0.74851
+angles[7]                                     // 0.84581 rad
+sin(angles)[7]                                // 0.74851
 ```
 
 ### Unit exponents
