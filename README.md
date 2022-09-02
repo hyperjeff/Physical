@@ -31,6 +31,8 @@ If using Xcode, open a workspace or project and: File → Add Packages... → pu
 
 ### Basic Idea: Extending numbers
 
+Simple creation and composition of units. One can then convert results into a more appropriate unit.
+
 ```swift
 let distance1 = 10.5.centimeters
 let distance2 =  3.3.feet
@@ -48,6 +50,8 @@ _Note:_ That's a real unicode arrow character → (U+2192), not ->. It's utterly
 
 ### Chaining units
 
+To create a Physical object with any dimension, just daisy chain units, possibly with exponents. As well, one can force a unit to be in the denominator via `/` as below.
+
 ```swift
 let aForce = 1.kilograms.meters.seconds(-2)
 aForce → .newtons
@@ -59,6 +63,8 @@ aForce → .newtons
 ```
 
 ### Various means of expression
+
+There are several (hopefully just the right amount of) ways to write a complicated set of units, and one can choose the ones that fit the situation and readability demands.
 
 ```swift
 var density = 27.grams.centimeters(-3)
@@ -72,6 +78,10 @@ density → .gramsPerLiter
 ```
 
 ### Mixing dimensions
+
+One can compose new kinds of Physical objects through standard algebra.
+
+The `~` operator can be used to test commensurability. `x ~ y` means: Is `x` of the same dimension as `y`.
 
 ```swift
 let force = 4.5.newtons
@@ -99,6 +109,8 @@ mass * acceleration * 37.feet → .joules
 
 ### Angles and Trig
 
+Trig functions use units, contrary to what you might think. Physical provides both trig and inverse trig functions (normal and hyperbolic) that both wipe out a whole class of bugs, but also make your code and reasoning about them greatly improve.
+
 ```swift
 75°
 sin(75°)
@@ -118,6 +130,8 @@ sin(θ3)
 
 ### Arrays, Ramps, Indices
 
+Physical can work to describe whole arrays at once, also providing acceleration on calculations done on them for free. As well, a `ramp` function is included, akin to Numpy's `linspace` function.
+
 ```swift
 let fileSizes = [1, 3, 14, -2].gigabytes
 let dataRate = 1.megabits.perSecond
@@ -133,6 +147,8 @@ let angle27 = angles[26]
 ```
 
 ### Unit exponents
+
+Exponents are of a special `TieredNumber` type, that is alternately an integer, a rational or of floating point value, and will gracefully degrade as needed. This allows equations to recover integer or rational exponents, providing better unit matching and accuracy of results.
 
 ```swift
 let x = 4.76.meters
@@ -153,6 +169,10 @@ x^π
 
 ### Strong typing
 
+One can optionally (a pun!) us strong typing. If one wraps a Physical object with a strong type, the result is an optional. If one creates a literal strong type, then the type of the object created is guaranteed (producing a compile-time error if the type is selected incorrectly).
+
+To use a strongly typed object with a dynamically-typed Physical object, one need only extract the `physical` content. (There is room for improvement here.)
+
 ```swift
 Length(45.feet)         // optionals, akin to Int("test")
 Length(45.hectares)     // nil
@@ -164,6 +184,8 @@ sailHeight.physical                        // retrieve dynamic Physical type
 ```
 
 ### Constants and formulas
+
+Physical has a rich set of constants with both their units and presently known precision.
 
 ```swift
 let G = Physical.Constants.gravitation
