@@ -1,6 +1,6 @@
 # Physical
 
-<img align="right" src="logo.png">
+<img align="right" src="logo.png" style="margin: 0 0 20px 20px">
 
 Physical is a Units of Measurement system for the Swift programming language, built on top of ('s) Foundation's Measurement framework.
 
@@ -89,27 +89,27 @@ One can compose new kinds of Physical objects through standard algebra.
 The `~` operator can be used to test commensurability. `x ~ y` means: Is `x` of the same dimension as `y`.
 
 ```swift
-let force = 4.5.newtons
-let mass = 17.poundsMass
+let force = 4.5.newtons                    // 4.5 N
+let mass = 17.poundsMass                   // 17 lb
 
-force + mass
-(force + mass) / 7.feet
+force + mass                               // Not a Thing
+(force + mass) / 7.feet                    // Not a Thing
 
-force.dimensionalDescription
-mass.dimensionalDescription
+force.dimensionalDescription               // L¹ M¹ T⁻²
+mass.dimensionalDescription                // M¹
 
-let acceleration = force / mass
-acceleration → .gravity
+let acceleration = force / mass            // works
+acceleration → .gravity                    // works
 
-acceleration ~ 1.gravity
+acceleration ~ 1.gravity                   // true
 
-1.gravity.withBasicUnits
-force.withBasicUnits
+1.gravity.withBasicUnits                   // 9.81 m / s²
+force.withBasicUnits                       // 4.5 kg m / s²
 
-mass * acceleration
-mass * acceleration → .newtons
-mass * acceleration → .joules
-mass * acceleration * 37.feet → .joules
+mass * acceleration                        // 9.9208 lb m / s²
+mass * acceleration → .newtons             // works ✔︎
+mass * acceleration → .joules              // Not a Thing
+mass * acceleration * 37.feet → .joules    // works ✔︎
 ```
 
 ### Angles and Trig
@@ -150,7 +150,8 @@ ramp(in: 0...1.pi, count: 27)
 
 let angles = ramp(in: 0...1.pi, count: 27).radians.sigfigs(3)
 
-let angle27 = angles[26]
+angles[7]          // 0.84581 rad
+sin(angles)[7]     // 0.74851
 ```
 
 ### Unit exponents
@@ -160,19 +161,21 @@ Exponents are of a special `TieredNumber` type, that is alternately an integer, 
 ```swift
 let x = 4.76.meters
 
-x^5
-(x^5) ^ 0.2
-(x^5) ^ 0.2 → .yards
+x^5                       // 2,443.6 m⁵
+(x^5) ^ 0.2               // 4.76 m
+(x^5) ^ 0.2 → .yards      // 5.2056 yd
 
-let y = x ^ (3.0/7)
+let y = x ^ (3.0/7)       // 1.9517 m^(3/7)
 
-y^7                   // exactly x^3 results
-y^7 → .cubicInches
+y^7                       // 107.85 m³
+y^7 → .cubicInches        // 6.5814e6 in³
 
-x^π
-(x^π) ^ (1/π)
-(x^π) ^ (1/π) → .yards
+x^π                       // 134.51 m^3.141592653589793
+(x^π) ^ (1/π)             // 4.76 m^1.0
+(x^π) ^ (1/π) → .yards    // Not a Thing
 ```
+
+(Note in the last example that the Double exponent value meant that m^1.0 wasn't exact, and so wasn't commensurate with length.)
 
 ### Strong typing
 
@@ -181,13 +184,13 @@ One can optionally (a pun!) us strong typing. If one wraps a Physical object wit
 To use a strongly typed object with a dynamically-typed Physical object, one need only extract the `physical` content. (There is room for improvement here.)
 
 ```swift
-Length(45.feet)         // optionals, akin to Int("test")
-Length(45.hectares)     // nil
+Length(45.feet)                             // optionals, akin to Int("test")
+Length(45.hectares)                         // nil
 
-Length(45, unit: .hectares)  // Compile-time error!
+Length(45, unit: .hectares)                 // Compile-time error!
 
-let sailHeight = Length(45, unit: .feet)   // guaranteed type-correct
-sailHeight.physical                        // retrieve dynamic Physical type
+let sailHeight = Length(45, unit: .feet)    // guaranteed type-correct
+sailHeight.physical                         // retrieve dynamic Physical type
 ```
 
 ### Constants and formulas
@@ -220,6 +223,10 @@ periodISS → .minutes
 A number of enhancements to float point numbers have been included.
 
 ```swift
+6.pi               // sugar
+2.π                // greek letter π
+3.e                // 3 * natural number
+
 14.0 ^ 2           // instead of pow(14.0, 2)
 
 √14
@@ -230,10 +237,6 @@ A number of enhancements to float point numbers have been included.
 
 8√14               // 8th root of 14. can be any integer.
 n√14
-
-6.pi
-2.π
-3.e
 
 47%                // 0.47
 ```
