@@ -43,6 +43,8 @@ distance2 / speed
 distance2 / speed → .milliseconds
 ```
 
+_Note:_ That's a real unicode arrow character → (U+2192), not ->. It's utterly unnecessary if you don't want to use it or use a keyboard layout that doesn't include it. Use the `.to()` function instead. It's there for elegance and convenience, if desired.
+
 ### Chaining units
 
 ```swift
