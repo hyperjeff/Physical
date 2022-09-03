@@ -27,7 +27,7 @@ Physical is released under the MIT license.
 
 If using Xcode, open a workspace or project and: File → Add Packages... → put in the URL of this project.
 
-If editing your `Package.swift` by hand, add in this `let`:
+If editing your `Package.swift` by hand, add in this dependency info:
 
 ```swift
 let package = Package(
@@ -101,6 +101,8 @@ density → .gramsPerLiter
 
 One can compose new kinds of Physical objects through standard algebra.
 
+If the combination of items is impossible, the result is a `Physical.notAThing`, in analogy to `NaN` when such an impossible math result happens for floating point numbers. Any further use of this object in more equations infect those results in turn. You can check its status using `.isNotAThing` just as float point numbers have `.isNaN`. To find out _why_ a variable has become not a thing, you can check its `.errorStack` which contains a history of its bad fortune since the first moment it became not a thing.
+
 The `~` operator can be used to test commensurability. `x ~ y` means: Is `x` of the same dimension as `y`.
 
 ```swift
@@ -109,6 +111,9 @@ let mass = 17.poundsMass                   // 17 lb
 
 force + mass                               // Not a Thing
 (force + mass) / 7.feet                    // Not a Thing
+
+(force + mass).isNotAThing                 // true
+(force + mass).errorStack                  // ["4.5 N + 17 lb"]
 
 force.dimensionalDescription               // L¹ M¹ T⁻²
 mass.dimensionalDescription                // M¹
