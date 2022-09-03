@@ -44,8 +44,31 @@ let package = Package(
 
 Once you have either of the above set, just `import Physical` atop any file that you would like.
 
-## Examples:
+## Dimensions
 
+Physical extends the units supported by the Measurement framework's dimension set:
+
+```
+Acceleration, Angle, Area, ConcentrationMass,
+Dispersion, Duration, ElectricCharge, ElectricCurrent,
+ElectricPotentialDifference, ElectricResistance, Energy,
+Frequency, FuelEfficiency, InformationStorage, Length,
+Mass, Power, Pressure, Speed, Temperature, Volume
+```
+
+and adds these dimensions as well:
+
+```
+Activity, Amount, AngularSpeed, ElectricCapacitance,
+ElectricConductance, ElectricInductance, Force,
+IonizingRadiation, LuminousIntensity, LuminousFlux,
+MagneticFlux, MagneticFluxDensity, SolidAngle
+```
+
+In addition, the entire system is customizable and expandable.
+
+
+## Examples
 ### Basic Idea: Extending numbers
 
 Simple creation and composition of units. One can then convert results into a more appropriate unit.
