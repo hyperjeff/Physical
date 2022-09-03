@@ -6,6 +6,8 @@ Physical is a Units of Measurement system for the Swift programming language, bu
 
 The project aims to make use of the developments in Dimensional Analysis and Unit/Measurement research to make writing code more appropriate for both trivial and complex real world calculations. Even if you don't think you are making such calculations in your code, you probably are. This can be your friend to help maintain readable, debuggable code.
 
+The more real-world code that uses this package, the better we can optimize the whole system. Please file requests, ideally with real code, submit pull requests, and bring up areas that could improvement.
+
 ### Highlights:
 
 * Elegant syntax
@@ -224,7 +226,9 @@ x^π                       // 134.51 m^3.141592653589793
 
 ### Strong typing
 
-One can optionally (a pun!) us strong typing. If one wraps a Physical object with a strong type, the result is an optional. If one creates a literal strong type, then the type of the object created is guaranteed (producing a compile-time error if the type is selected incorrectly).
+One can optionally (a pun!) use strong typing. If one wraps a Physical object with a strong type, the result is an optional. This is done with analogy to how `Int(...)` and `Double(...)` etc are optionals in the Swift standard library.
+
+One can create a literal strong type, using the two argument init, `Length(value, unit: .meters)` (etc) which guarantees unit-correctness and does not produce an optional. A compile-time error will result if the type is selected incorrectly.
 
 To use a strongly typed object with a dynamically-typed Physical object, one need only extract the `physical` content. (There is room for improvement here.)
 
