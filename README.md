@@ -178,6 +178,8 @@ sin(θ₂)                        // 0.95106
 sin(θ₃)                        // 0.95106
 ```
 
+_Note:_ The degree symbol is `°` (`⇧⌥8` on a US Qwerty keyboard) and not `º` (`⌥0`).
+
 ### Arrays, Ramps, Indices
 
 Physical can work to describe whole arrays at once, also providing acceleration on calculations done on them for free. As well, a `ramp` function is included, akin to Numpy's `linspace` function.
@@ -283,3 +285,7 @@ n√14
 
 47%                // 0.47
 ```
+
+_Note:_ Both π and √ are typable on most keyboard layouts. (On a US Qwerty layout, they're `⌥p` and `⌥v`.)
+
+_Note:_ Non-ASCII characters all have ASCII equivalents, for those stuck on projects with 20th-century restrictions and Asciitarians.
