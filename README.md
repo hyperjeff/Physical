@@ -157,9 +157,9 @@ mass * acceleration * 37.feet → .joules    // 50.749 J
 
 ### Angles and Trig
 
-Trig functions use units, contrary to what you might think. Physical provides both trig and inverse trig functions (normal and hyperbolic) that both wipe out a whole class of bugs, but also make your code and reasoning about them greatly improve. This are in addition to the standard trig functions and do not conflict with them.
+Trig functions use units, contrary to what you might think. Physical provides both trig and inverse trig functions (normal and hyperbolic) that both wipe out a whole class of bugs ("do I multiply by π and divide by 180?"), but also makes your code, and reasoning about it, greatly improve. These functions are in addition to the standard trig functions and do not conflict with them.
 
-Currently the result of a trig function is a Physical object of unitless type. If you need to use the Double value, grab its value. E.g., `sin(φ).value`. This allows inverse trig functions to return Physical objects with units radian, without overriding existing trig functions in the Swift standard library.
+Currently the result of a trig function is a Physical object of unitless (`constant`) type. If you need to use the Double value, grab its value. E.g., `sin(φ).value`. This allows inverse trig functions to return Physical objects with units radian, without interferring with existing trig functions in the Swift standard library.
 
 ```swift
 75°                            // 75 °
