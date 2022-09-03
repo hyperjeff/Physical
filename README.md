@@ -88,7 +88,7 @@ distance2 / speed
 distance2 / speed → .milliseconds
 ```
 
-_Note:_ That's a real unicode arrow character → (U+2192), not ->. It's utterly unnecessary. If you don't want to use it or use a keyboard layout that doesn't include it, use the `.to()` function instead. It's there for elegance and convenience, if desired.
+_Note:_ That's a real unicode arrow character → (U+2192), not ->. It's utterly unnecessary. If you don't want to use it or if you use a keyboard layout that doesn't include it, then you can use the `.to()` function instead. It's there if you want it![]().
 
 ### Chaining units
 
@@ -141,8 +141,8 @@ force + mass                               // Not a Thing
 force.dimensionalDescription               // L¹ M¹ T⁻²
 mass.dimensionalDescription                // M¹
 
-let acceleration = force / mass            // works
-acceleration → .gravity                    // works
+let acceleration = force / mass            // 0.58358 m / s²
+acceleration → .gravity                    // 0.059488 g
 
 acceleration ~ 1.gravity                   // true
 
@@ -150,9 +150,9 @@ acceleration ~ 1.gravity                   // true
 force.withBasicUnits                       // 4.5 kg m / s²
 
 mass * acceleration                        // 9.9208 lb m / s²
-mass * acceleration → .newtons             // works ✔︎
+mass * acceleration → .newtons             // 4.5 N
 mass * acceleration → .joules              // Not a Thing
-mass * acceleration * 37.feet → .joules    // works ✔︎
+mass * acceleration * 37.feet → .joules    // 50.749 J
 ```
 
 ### Angles and Trig
