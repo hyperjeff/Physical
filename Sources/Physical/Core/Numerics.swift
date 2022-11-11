@@ -5,7 +5,7 @@ prefix operator √
 prefix operator ∛
 prefix operator ∜
 
-infix operator √
+infix operator √ : MultiplicationPrecedence
 
 postfix operator %
 
@@ -48,10 +48,7 @@ public extension Double {
 //___________________________/ Standard deviation via ±
 
 public func ± (left: Double, right: Double) -> Physical {
-	var out = left.constant
-	out.standardDeviation = right.constant
-	
-	return out
+	left ± right.constant
 }
 
 public func ± (left: Double, right: Physical) -> Physical {
@@ -70,6 +67,22 @@ public func ± (left: Double, right: Percentage) -> Physical {
 
 public func ± (left: Int, right: Physical) -> Physical {
 	Double(left) ± right
+}
+
+public func + (left: Double, right: Percentage) -> Double {
+	left * (1 + right.value / 100)
+}
+
+public func - (left: Double, right: Percentage) -> Double {
+	left * (1 - right.value / 100)
+}
+
+public func + (left: Int, right: Percentage) -> Double {
+	Double(left) + right
+}
+
+public func - (left: Int, right: Percentage) -> Double {
+	Double(left) - right
 }
 
 
