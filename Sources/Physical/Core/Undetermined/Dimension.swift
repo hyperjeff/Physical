@@ -56,6 +56,7 @@ public let fundamentalDimensions = [
 ]
 
 public let fundamentalSIDimensions = [
+	UnitAngle.self,
 	UnitLength.self,
 	UnitMass.self,
 	UnitDuration.self,
@@ -68,6 +69,7 @@ public let fundamentalSIDimensions = [
 extension Dimension {
 	public var dimensionSymbol: String {
 		switch self {
+			case is UnitAngle: return "A"
 			case is UnitLength: return "L"
 			case is UnitMass: return "M"
 			case is UnitDuration: return "T"
@@ -122,7 +124,7 @@ extension Int {
 		
 		switch a {
 			case 0: break
-			case 1: out += "¹"
+			case 1: out += self < 0 ? "¹" : ""
 			case 2: out += "²"
 			case 3: out += "³"
 			case 4: out += "⁴"
