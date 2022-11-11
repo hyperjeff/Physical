@@ -89,10 +89,11 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	public var standardDeviation: Physical {
 		get {
 			if let values = values {
-				
 				var mean: Double = 0
 				var stdDev: Double = 0
 				vDSP_normalizeD(values, 1, nil, 1, &mean, &stdDev, vDSP_Length(values.count))
+				
+				
 				
 				return Physical(value: stdDev, units: units, sigfigs: sigfigs)
 			}
@@ -313,6 +314,16 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		}
 		
 		return out.joined(separator: " ")
+	}
+	
+	public var errorStackDescription: String {
+		var out: [String] = []
+		
+		for (line, error) in errorStack.enumerated() {
+			out.append("\(line + 1): \(error)")
+		}
+		
+		return out.joined(separator: "\n")
 	}
 	
 	// TODO: fix this terrible hack:
@@ -941,7 +952,7 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	///   - right: Physical quantity
 	public static func * (left: Physical, right: Physical) -> Physical {
 		if left.isNotAThing || right.isNotAThing {
-			return notAThing(logging: "\(left).isNotAThing || \(right).isNotAThing", elements: [left, right])
+			return notAThing(logging: "\(left) || \(right)", elements: [left, right])
 		}
 		
 		// probably should be refactored:
@@ -1084,7 +1095,7 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	}
 	
 	public static func / (left: Self, right: Self) -> Self {
-		if left.isNotAThing || right.isNotAThing { return notAThing(logging: "\(left).isNotAThing || \(right).isNotAThing", elements: [left, right]) }
+		if left.isNotAThing || right.isNotAThing { return notAThing(logging: "\(left) || \(right)", elements: [left, right]) }
 		
 		// FIXME: This is not correct if right doesn't transform via a simple rescaling
 		//        right must be transformed first into the base unit which is purely scalar (has 0 crossing)
@@ -1381,10 +1392,11 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		var out: Physical = .notAThing
 		
 		out.errorStack.append(logging)
+		
 		for element in elements {
 			for error in element.errorStack {
 				if !out.errorStack.contains(error) {
-					out.errorStack.append(error)
+					out.errorStack.insert(error, at: 0)
 				}
 			}
 		}
