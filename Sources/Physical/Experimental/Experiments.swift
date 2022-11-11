@@ -70,3 +70,9 @@ extension Physical {
 	}
 }
 */
+
+func sleep(_ δt: Physical) {
+	if δt ~ 1.s {
+		usleep(useconds_t((δt → .microseconds).value))
+	}
+}
