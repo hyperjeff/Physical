@@ -18,6 +18,9 @@ public typealias VVDoubles = (UnsafeMutablePointer<Double>, UnsafePointer<Double
 public func sqrt(_ p: Physical) -> Physical {
 	p ^ (1.0/2)
 }
+public func pow(_ p: Physical, _ power: Double) -> Physical {
+	p ^ power
+}
 
 public extension Physical {
 	static func sqrt(right: Physical) -> Physical {
