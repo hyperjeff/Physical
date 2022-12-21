@@ -21,6 +21,8 @@ The more real-world code that uses this package, the better we can optimize the 
 * Customizable dimensions and units
 * Accelerated array operations
 
+For a recent overview of the project, see [this talk on the framework](https://www.youtube.com/watch?v=xmD8wUZ0egQ) given at 360iDev 2022.
+
 ## License
 
 Physical is released under the MIT license.
@@ -159,9 +161,11 @@ mass * acceleration * 37.feet → .joules    // 50.749 J
 
 ### Angles and Trig
 
-Trig functions use units, contrary to what you might think. Physical provides both trig and inverse trig functions (normal and hyperbolic) that both wipe out a whole class of bugs ("do I multiply by π and divide by 180?"), but also makes your code, and reasoning about it, greatly improve. These functions are in addition to the standard trig functions and do not conflict with them.
+Trig functions use units, contrary to what you might think [1]. Physical provides both trig and inverse trig functions (normal and hyperbolic) that both wipe out a whole class of bugs ("do I multiply by π and divide by 180?"), but also makes your code, and reasoning about it, greatly improve. These functions are in addition to the standard trig functions and do not conflict with them.
 
 Currently the result of a trig function is a Physical object of unitless (`constant`) type. If you need to use the Double value, grab its value. E.g., `sin(φ).value`. This allows inverse trig functions to return Physical objects with units radian, without interferring with existing trig functions in the Swift standard library.
+
+_[1] In fairness, other approaches are being considered, but for now this is the situation._
 
 ```swift
 75°                            // 75 °
