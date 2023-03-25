@@ -44,6 +44,18 @@ public extension Double {
 	}
 }
 
+public func * (left: Physical, right: Percentage) -> Physical {
+	if let values = left.values {
+		return Physical(values: values * right.value / 100, units: left.units, sigfigs: left.sigfigs)
+	}
+	
+	return Physical(value: left.value * right.value / 100, units: left.units, sigfigs: left.sigfigs)
+}
+
+public func * (left: Percentage, right: Physical) -> Physical {
+	right * left
+}
+
 
 //___________________________/ Standard deviation via ±
 
