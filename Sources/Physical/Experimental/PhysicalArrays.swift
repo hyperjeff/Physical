@@ -1,6 +1,8 @@
 import Foundation
 import Accelerate
 
+//____________________________________________________________/ NOT GENERATED
+
 extension Array where Element == Double {
 	static func * (left: Array, right: Double) -> Array {
 		var out = left
@@ -54,6 +56,15 @@ public extension Array where Element == Double {
 	}
 }
 
+public func vectorize(_ array: [Physical]) -> Physical? {
+	if let item = array.first,
+	   !item.isUnitless {
+		let values = array.map { $0.value }
+		return Physical(values: values, unit: item.units.values.first!.unit, sigfigs: item.sigfigs)
+	}
+	return nil
+}
+
 public extension Physical {
 	func mapp(_ transform: (Physical.ValuesType.Element) throws -> Physical) rethrows -> Physical {
 		do {
@@ -68,9 +79,19 @@ public extension Physical {
 			throw(error)
 		}
 	}
+	
+	func repeated(_ times: Int) -> Physical {
+		Physical(values: [Double](repeating: self.value, count: times), units: self.units, sigfigs: self.sigfigs)
+	}
 }
 
+//____________________________________________________________/ GENERATED
+
+
 public extension Array where Element == Double {
+	
+	//____________________________________________________________/ SPECIAL CASES
+	
 	var constant: Physical {
 		Physical(values: self, units: [:], sigfigs: 0)
 	}
@@ -93,6 +114,8 @@ public extension Array where Element == Double {
 	var kg: Physical {
 		Physical(values: self, unit: UnitMass.kilograms)
 	}
+	
+	//____________________________________________________________/ FROM APPLE'S TYPES
 	
 	var metersPerSecondSquared: Physical { Physical(values: self, unit: UnitAcceleration.metersPerSecondSquared) }
 	var gravity: Physical { Physical(values: self, unit: UnitAcceleration.gravity) }
@@ -297,6 +320,14 @@ public extension Array where Element == Double {
 	var imperialQuarts: Physical { Physical(values: self, unit: UnitVolume.imperialQuarts) }
 	var imperialGallons: Physical { Physical(values: self, unit: UnitVolume.imperialGallons) }
 	var metricCups: Physical { Physical(values: self, unit: UnitVolume.metricCups) }
-
+	
+	
+	//____________________________________________________________/ FROM EXTENSIONS TO APPLE'S UNITS
+	
+	//____________________________________________________________/ FROM ORIGINAL UNITS
+	
+	var particles: Physical { Physical(values: self, unit: UnitAmount.particles) }
+	var years: Physical { Physical(values: self, unit: UnitDuration.years) }
+	var pascals: Physical { Physical(values: self, unit: UnitPressure.pascals) }
 }
 
