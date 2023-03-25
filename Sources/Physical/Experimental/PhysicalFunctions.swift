@@ -74,6 +74,8 @@ public func abs(_ number: Physical) -> Physical {
 	return Physical(value: abs(number.value), units: number.units, sigfigs: number.sigfigs)
 }
 
+// trigonometric functions _________________________________________________________________________________________
+
 private func trigFunction(_ f: DoubleToDouble, _ g: VVDoubles, for number: Physical) -> Physical {
 	if number ~ 1.0.radians {
 		if var values = number.values {
@@ -109,99 +111,61 @@ public func inversionTrigFunction(_ f: DoubleToDouble, _ g: VVDoubles, for numbe
 	return .notAThing
 }
 
-public func cos(_ number: Physical) -> Physical {
-	trigFunction(cos, vvcos, for: number)
-}
-public func sin(_ number: Physical) -> Physical {
-	trigFunction(sin, vvsin, for: number)
-}
-public func tan(_ number: Physical) -> Physical {
-	trigFunction(tan, vvtan, for: number)
-}
-public func cosh(_ number: Physical) -> Physical {
-	trigFunction(cosh, vvcosh, for: number)
-}
-public func sinh(_ number: Physical) -> Physical {
-	trigFunction(sinh, vvsinh, for: number)
-}
-public func tanh(_ number: Physical) -> Physical {
-	trigFunction(tanh, vvtanh, for: number)
-}
-public func acos(_ number: Physical) -> Physical {
-	inversionTrigFunction(acos, vvacos, for: number)
-}
-public func asin(_ number: Physical) -> Physical {
-	inversionTrigFunction(asin, vvasin, for: number)
-}
-public func atan(_ number: Physical) -> Physical {
-	inversionTrigFunction(atan, vvatan, for: number)
-}
-public func acosh(_ number: Physical) -> Physical {
-	inversionTrigFunction(acosh, vvacosh, for: number)
-}
-public func asinh(_ number: Physical) -> Physical {
-	inversionTrigFunction(asinh, vvasinh, for: number)
-}
-public func atanh(_ number: Physical) -> Physical {
-	inversionTrigFunction(atanh, vvatanh, for: number)
-}
+public func cos(_ number: Physical) -> Physical { trigFunction(cos, vvcos, for: number) }
+public func sin(_ number: Physical) -> Physical { trigFunction(sin, vvsin, for: number) }
+public func tan(_ number: Physical) -> Physical { trigFunction(tan, vvtan, for: number) }
+public func cosh(_ number: Physical) -> Physical { trigFunction(cosh, vvcosh, for: number) }
+public func sinh(_ number: Physical) -> Physical { trigFunction(sinh, vvsinh, for: number) }
+public func tanh(_ number: Physical) -> Physical { trigFunction(tanh, vvtanh, for: number) }
+public func acos(_ number: Physical) -> Physical { inversionTrigFunction(acos, vvacos, for: number) }
+public func asin(_ number: Physical) -> Physical { inversionTrigFunction(asin, vvasin, for: number) }
+public func atan(_ number: Physical) -> Physical { inversionTrigFunction(atan, vvatan, for: number) }
+public func acosh(_ number: Physical) -> Physical { inversionTrigFunction(acosh, vvacosh, for: number) }
+public func asinh(_ number: Physical) -> Physical { inversionTrigFunction(asinh, vvasinh, for: number) }
+public func atanh(_ number: Physical) -> Physical { inversionTrigFunction(atanh, vvatanh, for: number) }
 
-// transcendental functions
 
-// TODO: we need support for arrays also
+// transcendental functions _________________________________________________________________________________________
 
 // math.h functions that take just a double argument:
-
 // manually removing: trig functions, sqrt, cbrt, fabs, ceil, floor, nearbyint, rint, round, __*, trunc, significand, gamma
 
-public func exp(_ number: Physical) -> Physical {
-	number.isDimensionless ? exp(number.value).constant : .notAThing
+private func transcendentalFunction(_ f: DoubleToDouble, _ g: VVDoubles, for number: Physical) -> Physical {
+	if number.isDimensionless {
+		if var values = number.values {
+			var count = Int32(values.count)
+			var out = [Double](repeating: 0, count: values.count)
+			g(&out, &values, &count)
+			
+			return Physical(values: out, units: [:], sigfigs: number.sigfigs)
+		}
+		
+		return f(number.value).constant.sigfigs(number.sigfigs)
+	}
+	
+	return .notAThing
 }
-public func exp2(_ number: Physical) -> Physical {
-	number.isDimensionless ? exp2(number.value).constant : .notAThing
-}
-public func expm1(_ number: Physical) -> Physical {
-	number.isDimensionless ? expm1(number.value).constant : .notAThing
-}
-public func log(_ number: Physical) -> Physical {
-	number.isDimensionless ? log(number.value).constant : .notAThing
-}
-public func log10(_ number: Physical) -> Physical {
-	number.isDimensionless ? log10(number.value).constant : .notAThing
-}
-public func log2(_ number: Physical) -> Physical {
-	number.isDimensionless ? log2(number.value).constant : .notAThing
-}
-public func log1p(_ number: Physical) -> Physical {
-	number.isDimensionless ? log1p(number.value).constant : .notAThing
-}
-public func logb(_ number: Physical) -> Physical {
-	number.isDimensionless ? logb(number.value).constant : .notAThing
-}
-public func erf(_ number: Physical) -> Physical {
-	number.isDimensionless ? erf(number.value).constant : .notAThing
-}
-public func erfc(_ number: Physical) -> Physical {
-	number.isDimensionless ? erfc(number.value).constant : .notAThing
-}
-public func lgamma(_ number: Physical) -> Physical {
-	number.isDimensionless ? lgamma(number.value).constant : .notAThing
-}
-public func tgamma(_ number: Physical) -> Physical {
-	number.isDimensionless ? tgamma(number.value).constant : .notAThing
-}
-public func j0(_ number: Physical) -> Physical {
-	number.isDimensionless ? j0(number.value).constant : .notAThing
-}
-public func j1(_ number: Physical) -> Physical {
-	number.isDimensionless ? j1(number.value).constant : .notAThing
-}
-public func y0(_ number: Physical) -> Physical {
-	number.isDimensionless ? y0(number.value).constant : .notAThing
-}
-public func y1(_ number: Physical) -> Physical {
-	number.isDimensionless ? y1(number.value).constant : .notAThing
-}
+
+public func exp(_ number: Physical) -> Physical { transcendentalFunction(exp, vvexp, for: number) }
+public func exp2(_ number: Physical) -> Physical { transcendentalFunction(exp2, vvexp2, for: number) }
+public func expm1(_ number: Physical) -> Physical { transcendentalFunction(expm1, vvexpm1, for: number) }
+public func log(_ number: Physical) -> Physical { transcendentalFunction(log, vvlog, for: number) }
+public func log10(_ number: Physical) -> Physical { transcendentalFunction(log10, vvlog10, for: number) }
+public func log2(_ number: Physical) -> Physical { transcendentalFunction(log2, vvlog2, for: number) }
+public func log1p(_ number: Physical) -> Physical { transcendentalFunction(log1p, vvlog1p, for: number) }
+public func logb(_ number: Physical) -> Physical { transcendentalFunction(logb, vvlogb, for: number) }
+
+// Non-vectorization options in Accelerate -- perhaps supplement from elsewhere?
+// Hand-roll loops as an option?
+
+public func erf(_ number: Physical) -> Physical { number.isDimensionless ? erf(number.value).constant : .notAThing }
+public func erfc(_ number: Physical) -> Physical { number.isDimensionless ? erfc(number.value).constant : .notAThing }
+public func lgamma(_ number: Physical) -> Physical { number.isDimensionless ? lgamma(number.value).constant : .notAThing }
+public func tgamma(_ number: Physical) -> Physical { number.isDimensionless ? tgamma(number.value).constant : .notAThing }
+public func j0(_ number: Physical) -> Physical { number.isDimensionless ? j0(number.value).constant : .notAThing }
+public func j1(_ number: Physical) -> Physical { number.isDimensionless ? j1(number.value).constant : .notAThing }
+public func y0(_ number: Physical) -> Physical { number.isDimensionless ? y0(number.value).constant : .notAThing }
+public func y1(_ number: Physical) -> Physical { number.isDimensionless ? y1(number.value).constant : .notAThing }
 
 // experiment:
 
