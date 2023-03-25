@@ -120,6 +120,26 @@ public extension Physical {
 		merge(with: Physical(value: 1, units: [(UnitAmount.particles, exponent)], sigfigs: sigfigs))
 	}
 	
+	var atoms: Physical { atoms(1) }
+	func atoms(_ exponent: Int) -> Physical {
+		merge(with: Physical(value: 1, units: [(UnitAmount.atoms, exponent)], sigfigs: sigfigs))
+	}
+	
+	var beings: Physical { beings(1) }
+	func beings(_ exponent: Int) -> Physical {
+		merge(with: Physical(value: 1, units: [(UnitAmount.beings, exponent)], sigfigs: sigfigs))
+	}
+	
+	var people: Physical { people(1) }
+	func people(_ exponent: Int) -> Physical {
+		merge(with: Physical(value: 1, units: [(UnitAmount.people, exponent)], sigfigs: sigfigs))
+	}
+	
+	var things: Physical { things(1) }
+	func things(_ exponent: Int) -> Physical {
+		merge(with: Physical(value: 1, units: [(UnitAmount.things, exponent)], sigfigs: sigfigs))
+	}
+	
 	var moles: Physical { moles(1) }
 	func moles(_ exponent: Int) -> Physical {
 		merge(with: Physical(value: 1, units: [(UnitAmount.moles, exponent)], sigfigs: sigfigs))
@@ -128,6 +148,11 @@ public extension Physical {
 	var revolutionsPerSecond: Physical { revolutionsPerSecond(1) }
 	func revolutionsPerSecond(_ exponent: Int) -> Physical {
 		merge(with: Physical(value: 1, units: [(UnitAngularSpeed.revolutionsPerSecond, exponent)], sigfigs: sigfigs))
+	}
+	
+	var revolutionsPerMinute: Physical { revolutionsPerMinute(1) }
+	func revolutionsPerMinute(_ exponent: Int) -> Physical {
+		merge(with: Physical(value: 1, units: [(UnitAngularSpeed.revolutionsPerMinute, exponent)], sigfigs: sigfigs))
 	}
 	
 	var radiansPerSecond: Physical { radiansPerSecond(1) }
@@ -1837,8 +1862,8 @@ public extension Physical {
 }
 
 public enum PhysicalConversionType {
-	case m, J, Hz, s, particles, moles, farads, siemens, henries, newtons, grays, sieverts, candelas, lumens, webers, teslas, gauss, barns, days, years, britishThermalUnits, electronvolts, angstroms, pascals, atmosphericPressure, rankine, metersPerSecondSquared, gravity, degrees, arcMinutes, arcSeconds, radians, gradians, revolutions, squareMegameters, squareKilometers, squareMeters, squareCentimeters, squareMillimeters, squareMicrometers, squareNanometers, squareInches, squareFeet, squareYards, squareMiles, acres, ares, hectares, gramsPerLiter, milligramsPerDeciliter, partsPerMillion, hours, minutes, seconds, milliseconds, microseconds, nanoseconds, picoseconds, coulombs, megaampereHours, kiloampereHours, ampereHours, milliampereHours, microampereHours, megaamperes, kiloamperes, amperes, milliamperes, microamperes, megavolts, kilovolts, volts, millivolts, microvolts, megaohms, kiloohms, ohms, milliohms, microohms, kilojoules, joules, kilocalories, calories, kilowattHours, terahertz, gigahertz, megahertz, kilohertz, hertz, millihertz, microhertz, nanohertz, framesPerSecond, litersPer100Kilometers, milesPerImperialGallon, milesPerGallon, bytes, bits, nibbles, yottabytes, zettabytes, exabytes, petabytes, terabytes, gigabytes, megabytes, kilobytes, yottabits, zettabits, exabits, petabits, terabits, gigabits, megabits, kilobits, yobibytes, zebibytes, exbibytes, pebibytes, tebibytes, gibibytes, mebibytes, kibibytes, yobibits, zebibits, exbibits, pebibits, tebibits, gibibits, mebibits, kibibits, megameters, kilometers, hectometers, decameters, meters, decimeters, centimeters, millimeters, micrometers, nanometers, picometers, inches, feet, yards, miles, scandinavianMiles, lightyears, nauticalMiles, fathoms, furlongs, astronomicalUnits, parsecs, lux, kilograms, grams, decigrams, centigrams, milligrams, micrograms, nanograms, picograms, ounces, pounds, stones, metricTons, shortTons, carats, ouncesTroy, slugs, terawatts, gigawatts, megawatts, kilowatts, watts, milliwatts, microwatts, nanowatts, picowatts, femtowatts, horsepower, newtonsPerMetersSquared, gigapascals, megapascals, kilopascals, hectopascals, inchesOfMercury, bars, millibars, millimetersOfMercury, poundsForcePerSquareInch, metersPerSecond, kilometersPerHour, milesPerHour, knots, kelvin, celsius, fahrenheit, megaliters, kiloliters, liters, deciliters, centiliters, milliliters, cubicKilometers, cubicMeters, cubicDecimeters, cubicCentimeters, cubicMillimeters, cubicInches, cubicFeet, cubicYards, cubicMiles, acreFeet, bushels, teaspoons, tablespoons, fluidOunces, cups, pints, quarts, gallons, imperialTeaspoons, imperialTablespoons, imperialFluidOunces, imperialPints, imperialQuarts, imperialGallons, metricCups,
-	
+	case m, J, Hz, s, particles, atoms, beings, people, things, moles, farads, siemens, henries, newtons, grays, sieverts, candelas, lumens, webers, teslas, gauss, barns, days, years, britishThermalUnits, electronvolts, angstroms, pascals, atmosphericPressure, rankine, metersPerSecondSquared, gravity, degrees, arcMinutes, arcSeconds, radians, gradians, revolutions, squareMegameters, squareKilometers, squareMeters, squareCentimeters, squareMillimeters, squareMicrometers, squareNanometers, squareInches, squareFeet, squareYards, squareMiles, acres, ares, hectares, gramsPerLiter, milligramsPerDeciliter, partsPerMillion, hours, minutes, seconds, milliseconds, microseconds, nanoseconds, picoseconds, coulombs, megaampereHours, kiloampereHours, ampereHours, milliampereHours, microampereHours, megaamperes, kiloamperes, amperes, milliamperes, microamperes, megavolts, kilovolts, volts, millivolts, microvolts, megaohms, kiloohms, ohms, milliohms, microohms, kilojoules, joules, kilocalories, calories, kilowattHours, terahertz, gigahertz, megahertz, kilohertz, hertz, millihertz, microhertz, nanohertz, framesPerSecond, litersPer100Kilometers, milesPerImperialGallon, milesPerGallon, bytes, bits, nibbles, yottabytes, zettabytes, exabytes, petabytes, terabytes, gigabytes, megabytes, kilobytes, yottabits, zettabits, exabits, petabits, terabits, gigabits, megabits, kilobits, yobibytes, zebibytes, exbibytes, pebibytes, tebibytes, gibibytes, mebibytes, kibibytes, yobibits, zebibits, exbibits, pebibits, tebibits, gibibits, mebibits, kibibits, megameters, kilometers, hectometers, decameters, meters, decimeters, centimeters, millimeters, micrometers, nanometers, picometers, inches, feet, yards, miles, scandinavianMiles, lightyears, nauticalMiles, fathoms, furlongs, astronomicalUnits, parsecs, lux, kilograms, grams, decigrams, centigrams, milligrams, micrograms, nanograms, picograms, ounces, pounds, stones, metricTons, shortTons, carats, ouncesTroy, slugs, terawatts, gigawatts, megawatts, kilowatts, watts, milliwatts, microwatts, nanowatts, picowatts, femtowatts, horsepower, newtonsPerMetersSquared, gigapascals, megapascals, kilopascals, hectopascals, inchesOfMercury, bars, millibars, millimetersOfMercury, poundsForcePerSquareInch, metersPerSecond, kilometersPerHour, milesPerHour, knots, kelvin, celsius, fahrenheit, megaliters, kiloliters, liters, deciliters, centiliters, milliliters, cubicKilometers, cubicMeters, cubicDecimeters, cubicCentimeters, cubicMillimeters, cubicInches, cubicFeet, cubicYards, cubicMiles, acreFeet, bushels, teaspoons, tablespoons, fluidOunces, cups, pints, quarts, gallons, imperialTeaspoons, imperialTablespoons, imperialFluidOunces, imperialPints, imperialQuarts, imperialGallons, metricCups, degreesPerSecond, radiansPerSecond, revolutionsPerSecond, revolutionsPerMinute,
+		 
 	becquerel, curie, rutherford
 }
 
@@ -1857,6 +1882,10 @@ public extension Physical {
 			case .Hz: return left.to(UnitFrequency.hertz)
 			case .s: return left.to(UnitDuration.seconds)
 			case .particles: return left.to(UnitAmount.particles)
+			case .atoms: return left.to(UnitAmount.atoms)
+			case .beings: return left.to(UnitAmount.beings)
+			case .people: return left.to(UnitAmount.people)
+			case .things: return left.to(UnitAmount.things)
 			case .moles: return left.to(UnitAmount.moles)
 			case .farads: return left.to(UnitElectricCapacitance.farads)
 			case .siemens: return left.to(UnitElectricConductance.siemens)
@@ -2081,6 +2110,10 @@ public extension Physical {
 			case .imperialQuarts: return left.to(UnitVolume.imperialQuarts)
 			case .imperialGallons: return left.to(UnitVolume.imperialGallons)
 			case .metricCups: return left.to(UnitVolume.metricCups)
+			case .degreesPerSecond: return left.to(UnitAngularSpeed.degreesPerSecond)
+			case .radiansPerSecond: return left.to(UnitAngularSpeed.radiansPerSecond)
+			case .revolutionsPerSecond: return left.to(UnitAngularSpeed.revolutionsPerSecond)
+			case .revolutionsPerMinute: return left.to(UnitAngularSpeed.revolutionsPerMinute)
 		}
 	}
 }

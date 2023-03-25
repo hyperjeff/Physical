@@ -144,6 +144,18 @@ public extension BinaryFloatingPoint {
 	var particles: Physical {
 		Physical(value: Double(self), unit: UnitAmount.particles)
 	}
+	var atoms: Physical {
+		Physical(value: Double(self), unit: UnitAmount.atoms)
+	}
+	var beings: Physical {
+		Physical(value: Double(self), unit: UnitAmount.beings)
+	}
+	var people: Physical {
+		Physical(value: Double(self), unit: UnitAmount.people)
+	}
+	var things: Physical {
+		Physical(value: Double(self), unit: UnitAmount.things)
+	}
 	var moles: Physical {
 		Physical(value: Double(self), unit: UnitAmount.moles)
 	}
@@ -209,6 +221,9 @@ public extension BinaryFloatingPoint {
 	}
 	var revolutionsPerSecond: Physical {
 		Physical(value: Double(self), unit: UnitAngularSpeed.revolutionsPerSecond)
+	}
+	var revolutionsPerMinute: Physical {
+		Physical(value: Double(self), unit: UnitAngularSpeed.revolutionsPerMinute)
 	}
 	var steradians: Physical {
 		Physical(value: Double(self), unit: UnitSolidAngle.steradians)
@@ -1141,6 +1156,18 @@ public extension BinaryFloatingPoint {
 	
 	func particles(_ exponent: Int) -> Physical {
 		Physical(value: Double(self), units: [(UnitAmount.particles, exponent)], sigfigs: Double(self).sigfigs)
+	}
+	func atoms(_ exponent: Int) -> Physical {
+		Physical(value: Double(self), units: [(UnitAmount.atoms, exponent)], sigfigs: Double(self).sigfigs)
+	}
+	func beings(_ exponent: Int) -> Physical {
+		Physical(value: Double(self), units: [(UnitAmount.beings, exponent)], sigfigs: Double(self).sigfigs)
+	}
+	func people(_ exponent: Int) -> Physical {
+		Physical(value: Double(self), units: [(UnitAmount.people, exponent)], sigfigs: Double(self).sigfigs)
+	}
+	func things(_ exponent: Int) -> Physical {
+		Physical(value: Double(self), units: [(UnitAmount.things, exponent)], sigfigs: Double(self).sigfigs)
 	}
 	func moles(_ exponent: Int) -> Physical {
 		Physical(value: Double(self), units: [(UnitAmount.moles, exponent)], sigfigs: Double(self).sigfigs)
