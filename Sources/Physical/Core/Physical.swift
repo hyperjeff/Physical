@@ -2,10 +2,10 @@ import Foundation
 import Accelerate
 
 infix operator *** // quantity multiplication
+infix operator ≐   // values equal within the limits of their given significant figures
 infix operator ~   //     of the same fundamental order of units
 infix operator !~  // not of the same fundamental order of units
 infix operator ⨃   // have any fundamental base units in common
-infix operator ≐   // equal within the limits of their given significant figures
 infix operator ⧦   // uses a non-zero-offset system of units
 infix operator ⧗   // matching non-zero-offset units
 infix operator ⧖   // exactly matching units
@@ -29,14 +29,9 @@ postfix operator /
 	• Cache the above for not just _this_ object, but for all objects created with a given unit set? (Singleton cache)
 */
 
-//enum PhysicalScalar<Value: Real> {
-//	case scalar(Value)
-//	case array([Value])
-//}
-
 public typealias CoreValueType = Double // ← just an idea
 
-public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection, CustomDebugStringConvertible {
+public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStringConvertible, CustomDebugStringConvertible {
 	public typealias ValuesType = [Physical]
 	public typealias Index = ValuesType.Index
 	public typealias Element = ValuesType.Element
@@ -47,7 +42,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	public subscript(position: ValuesType.Index) -> Physical {
 		get { Physical(value: values![position], units: units, sigfigs: sigfigs) }
 		set {
-			// policy decision: silently fail? throw?
 			if newValue ~ self {
 				if newValue ⧖ self {
 					values![position] = newValue.value
@@ -63,14 +57,9 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		values!.index(after: i)
 	}
 	
-	/* How about a PhysicalValue enum that can be:
-		Double, DoubleRange, Complex, Quaternion, (other standards)
-		(HyperComplex, ... group, field, etc)
-	*/
-	
 	public var value: Double = 0
 	public var values: [Double]?
-	public var sigfigs: Int = 16 // ← how about 0?
+	public var sigfigs: Int = 16
 	public var invertSuffixes = false
 	public var units: DimensionDictionary = [:]
 	public var isNotAThing = false
@@ -82,7 +71,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	public var metadata = Metadata()
 	public var kindOfQuantity: KindOfQuantity?
 	public var errorStack: [String] = []
-//	public var vars: [Variable<Value>] = []
 	
 	private var standardDeviationRaw: Double = 0
 	
@@ -93,18 +81,9 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				var stdDev: Double = 0
 				vDSP_normalizeD(values, 1, nil, 1, &mean, &stdDev, vDSP_Length(values.count))
 				
-				
-				
 				return Physical(value: stdDev, units: units, sigfigs: sigfigs)
 			}
 			else {
-//				if 0 < standardDeviationRaw {
-//					Physical(value: standardDeviationRaw, units: units, sigfigs: 16)
-//				}
-//				else {
-//					return Physical(value: value * pow(10, Double(-sigfigs)), units: units, sigfigs: sigfigs)
-//				}
-				
 				return Physical(value: standardDeviationRaw, units: units, sigfigs: 16)
 			}
 		}
@@ -165,62 +144,33 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		let sortedUnits = units.sorted(by: { a, b in a.key.symbol < b.key.symbol })
 		let numeratorUnits = sortedUnits.filter { (_, v) in v.1.isPositive }
 		
-		// this may not be right with the new units definition, but a first try:
-		
-		if let (_, firstOfAll) = units.first {
-			if let (_, first) = numeratorUnits.first {
+		for (_, (unit, exponent)) in numeratorUnits {
+			if !firstTerm {
+				unitPart += " "
+			}
+			else {
+				firstTerm = false
+			}
 			
-				if firstOfAll.unit.isKind(of: UnitAngularSpeed.self) && firstOfAll.exponent.realValue == 1 {
-					unitPart += first.unit.symbol
-				}
-				else {
-					if first.unit.isKind(of: UnitAngle.self) && first.exponent.realValue == 1 {
-						unitPart += first.unit.symbol
+			let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
+			
+			switch exponent {
+				case let .integer(e):
+					switch e {
+						case 0: break
+						case 1: unitPart += "\(unit.symbol)"
+						default: unitPart += symbol + e.drawnExponent
+					}
+				case .fraction(_, _):
+					unitPart += symbol + "^(\(exponent))"
+				case .real(_):
+					let expString = "\(exponent)"
+					if expString != "1" {
+						unitPart += symbol + "^\(exponent)"
 					}
 					else {
-						for (_, (unit, exponent)) in numeratorUnits {
-							if unit.isKind(of: UnitAngle.self) {
-								continue
-							} else if unit.isKind(of: UnitAngularSpeed.self) {
-								// There may be a scale change needed -- so perhaps this has to be handled elsewhere?
-							}
-							
-							if !firstTerm {
-								unitPart += " "
-							}
-							else {
-								firstTerm = false
-							}
-							
-							let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
-							
-//							if 1 < numeratorUnits.count &&
-//								unit.isKind(of: UnitAmount.self) {
-//								symbol = ""
-//							}
-//							else {
-							switch exponent {
-								case let .integer(e):
-									switch e {
-										case 0: break
-										case 1: unitPart += "\(unit.symbol)"
-										default: unitPart += symbol + e.drawnExponent
-								}
-								case .fraction(_, _):
-									unitPart += symbol + "^(\(exponent))"
-								case .real(_):
-									let expString = "\(exponent)"
-									if expString != "1" {
-										unitPart += symbol + "^\(exponent)"
-									}
-									else {
-										unitPart += symbol
-								}
-							}
-//							}
-						}
+						unitPart += symbol
 					}
-				}
 			}
 			
 			var alreadyDrawnDivisor = false
@@ -229,9 +179,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 			for (_, (unit, exponent)) in sortedUnits where !exponent.isPositive {
 				if unit.isKind(of: UnitAngle.self) {
 					continue
-				}
-				else if unit.isKind(of: UnitAngularSpeed.self) {
-					// There may be a scale change needed -- so perhaps this has to be handled elsewhere?
 				}
 				
 				if !alreadyDrawnDivisor {
@@ -248,11 +195,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				
 				let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
 	
-//				if 1 < sortedUnits.count &&
-//					unit.isKind(of: UnitAmount.self) {
-//					symbol = ""
-//				}
-//				else {
 				switch exponent {
 					case let .integer(e):
 						switch e {
@@ -270,21 +212,8 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 							unitPart += symbol
 					}
 				}
-//				}
 			}
 		}
-		
-//		var spacer = ""
-//		if !variablePart.isEmpty {
-//			if numericalPart == "1" {
-//				numericalPart = ""
-//			}
-//			else {
-//				spacer = " "
-//			}
-//		}
-		
-//		return "\(numericalPart)\(spacer)\(variablePart) \(unitPart)"
 		
 		if let values = values {
 			let numbersString = "[\(values.map({ numberString($0) }).joined(separator: ", "))]"
@@ -340,20 +269,14 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	}
 	
 	public init(value: Double, units: DimensionDictionary, sigfigs: Int = 0) {
-		// vars: [Variable<Value>] = [],
 		self.value = value
 		self.units = units
 		self.sigfigs = sigfigs
-//		self.vars = vars
 	}
 	
-	// add public init(value: Value, unit: (Dimension, Int), ... ?
-	
 	public init(value: Double, units: [(Dimension, Int)], sigfigs: Int) {
-		// vars: [Variable<Value>] = [],
 		self.value = value
 		self.sigfigs = sigfigs
-//		self.vars = vars
 		
 		var newUnits: DimensionDictionary = [:]
 		
@@ -378,20 +301,14 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	}
 	
 	public init(values: [Double], units: DimensionDictionary, sigfigs: Int) {
-		// vars: [Variable<Value>] = [],
 		self.values = values
 		self.units = units
 		self.sigfigs = sigfigs
-		// self.vars = vars
 	}
 	
-	// add public init(value: Value, unit: (Dimension, Int), ... ?
-	
 	public init(values: [Double], units: [(Dimension, Int)], sigfigs: Int) {
-		// vars: [Variable<Value>] = [],
 		self.values = values
 		self.sigfigs = sigfigs
-		// self.vars = vars
 		
 		var newUnits: DimensionDictionary = [:]
 		
@@ -416,10 +333,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		self.init(values: [Double](repeating: repeating, count: count), unit: unit)
 	}
 	
-//	public init(repeating: Double = 0, count: Int, units: Length) {
-//		self.init(values: [Double](repeating: repeating, count: count), units: units.p.units, sigfigs: 16)
-//	}
-	
 	public static var notAThing: Physical {
 		var nothing = Physical()
 		nothing.value = .nan
@@ -429,19 +342,12 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		return nothing
 	}
 	
-//	public mutating func updateLastAddedUnit(unit: Dimension) {
-//		lastAddedUnit = unit
-//	}
-	
-	// Operations:
-	
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(value)
 		hasher.combine(values)
 		hasher.combine(sigfigs)
 		hasher.combine(isNotAThing)
 		hasher.combine(units as NSDictionary)
-//		hasher.combine(withBasicUnits.withFundamentalUnits)
 	}
 	
 	/// Equality of a Physical object and a tuple pair of Physical objects with the same units, which is defined as being between the high and low values of the tuple. Does not make use of sigfigs.
@@ -492,6 +398,10 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 			if let _ = right.values {
 				return false
 			}
+		}
+		
+		if left ⧖ right {
+			return left ≐ right
 		}
 		
 		var l = left
@@ -585,17 +495,12 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		let multiplyUsedVector = units
 			.compactMap { fundamentalBaseVector[$0.key] }
 			.map { $0.nonZeroElements() }
-			.reduce(FundamentalBaseVector()) { a, b in a ∔ b } // ← eventually want to hide this operator within the api
-		
-		// unit test candidate: If count == 2 and any components of multiplyUsedVector are greater than 1,
-		//                      then both are affected units.
+			.reduce(FundamentalBaseVector()) { a, b in a ∔ b }
 		
 		var newValue = value
 		var newUnits: DimensionDictionary = [:]
 		
 		for (base, (unit, exponent)) in units {
-			
-			// ex: (speed, (mph, -2))
 			
 			func set(baseUnit: Dimension, toExponent: TieredNumber) {
 				if toExponent == .integer(0) { return }
@@ -626,16 +531,10 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				set(baseUnit: UnitAmount.baseUnit(),            toExponent: .integer(baseVector.mol))
 				set(baseUnit: UnitTemperature.baseUnit(),       toExponent: .integer(baseVector.K))
 				set(baseUnit: UnitLuminousIntensity.baseUnit(), toExponent: .integer(baseVector.cdl))
+				set(baseUnit: UnitAngle.baseUnit(),             toExponent: .integer(baseVector.rad))
+				set(baseUnit: UnitSolidAngle.baseUnit(),        toExponent: .integer(baseVector.st))
 				
 				switch base {
-					
-					// TODO: What is the exhaustive list of special cases here?
-					//       Hz
-					
-					case UnitAngularSpeed.baseUnit():
-						set(baseUnit: UnitAngle.baseUnit(), toExponent: .integer(1))
-						newValue *= 360 * pow(Measurement(value: 1, unit: unit).converted(to: UnitAngularSpeed.baseUnit()).value, exponent: exponent)
-						
 					case UnitVolume.baseUnit():
 						newValue *= pow(Measurement(value: 1, unit: unit).converted(to: UnitVolume.cubicMeters).value, exponent: exponent)
 						
@@ -649,7 +548,7 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				newUnits[base] = (unit, exponent)
 			}
 		}
-		// po [units, newUnits].map { u in u.map({ $0.key.symbol }).joined(separator: ", ") }.joined(separator: " -> ")
+		
 		units = newUnits
 		value = newValue
 	}
@@ -671,9 +570,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				
 				return
 			}
-//			else if units.first?.key == UnitTemperature.baseUnit() {
-//				forgot what i was thinking for this.
-//			}
 		}
 		
 		for (base, (var unit, exponent)) in units {
@@ -682,9 +578,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				newUnits[base] = (base, exponent)
 			}
 			else {
-				// FIXME: still need for: UnitAngle.degrees
-				// and milesPerImperialGallon & milesPerGallon use same units!
-				
 				if hasNonZeroOffsets {
 					// FIXME: add array version
 					
@@ -744,11 +637,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		units.baseUnits()
 	}
 	
-	/*
-		Special case of a single unit converted to another.
-		What we want is the ability to convert to any other unit, adjusting and scaling as needed
-		4.gallons.converted(to: Newtons) should be possible.
-	*/
 	public func to<T: Dimension>(_ dimension: T) -> Physical {
 		if units.keys.count == 1,
 		   let (base, unit) = units.first,
@@ -775,6 +663,16 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		return convertUp(to: Physical(value: 1, unit: dimension))
 	}
 	
+	public func to(units otherUnits: DimensionDictionary) -> Physical? {
+		let oneOfOtherUnits = Physical(value: 1, units: otherUnits)
+		
+		if self ~ oneOfOtherUnits {
+			return self.convertUp(to: oneOfOtherUnits)
+		}
+		
+		return nil
+	}
+	
 	public func convertUp(to newPhysicalType: Physical) -> Physical {
 		if self ~ newPhysicalType {
 			return Physical(
@@ -788,21 +686,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 	}
 	
 	// Quadratic operations:
-	
-	/*
-	public static func ⨃ (left: Physical, right: Dimension) -> Bool {
-	if left.units.count == 1 && left.units.first!.key == right {
-	return true
-	}
-	
-	for (unitLeft, _) in left.units {
-	if unitLeft.superclass == right.superclass {
-	return true
-	}
-	}
-	
-	return false
-	} */
 	
 	/// Tests two physical quantities for exactly matching units
 	/// - Parameters:
@@ -829,25 +712,12 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		leftFundamental.decomposeMixedUnits()
 		rightFundamental.decomposeMixedUnits()
 		
-		// TODO: This is too aggressive to go straight to fund units when it might not be necessary
-		//   ex: ft^2 going to m^2, need not be broken down more.
-		
 		leftFundamental.convertToFundamentalUnits()
 		rightFundamental.convertToFundamentalUnits()
 		
 		return !Set(leftFundamental.baseUnits)
 			.intersection(rightFundamental.baseUnits)
 			.isEmpty
-		
-//		for leftBase in leftFundamental.units.map({ $0.key }) {
-//			for rightBase in rightFundamental.units.map({ $0.key }) {
-//				if leftBase == rightBase {
-//					return true
-//				}
-//			}
-//		}
-//
-//		return false
 	}
 	
 	/// Tests to see if two physical quantities are of the same kind, i.e., of the same fundamental order of units
@@ -918,18 +788,18 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		return true
 	}
 	
-	/// Tests to see if two physical quantities' values (without regard to units) are equal within the limits of their given significant figures
+	/// Tests to see if two physical quantities' values (without regard to units) are equal given their sigfigs
 	/// - Parameters:
 	///   - left: Physical quantity
 	///   - right: Physical quantity
 	public static func ≐ (left: Physical, right: Physical) -> Bool {
-		if left.value.isZero || right.value.isZero { return true }
+		if left.value.isZero || right.value.isZero { return (left.value.isZero && right.value.isZero) }
 		
 		if left.value.isNaN || right.value.isNaN { return false }
 		
 		if left.values != nil || right.values != nil { return false }
 		
-		let lcs = Swift.min(left.sigfigs, right.sigfigs)
+		let lcs = Physical.Globals.shared.sigfigs ?? Swift.min(left.sigfigs, right.sigfigs)
 		
 		func valueSignature(_ p: Physical) -> Int {
 			let a = pow(10, Double(lcs - 1) - floor(log10(abs(p.value))))
@@ -993,16 +863,13 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 			return notAThing
 		}
 		
+		if left.value.isNaN || right.value.isNaN {
+			return notAThing
+		}
+		
 		var scaleFactor: Double = 1
 		var newUnits = left.units
 		
-		/* this seems a very inefficient double-loop
-		   perhaps find the union of the bases and then walk thru it?
-		*/
-		
-		// let allKeys = Set<Dimension>(left.units.keys).union(Set<Dimension>(right.units.keys)) ...
-		
-		// what does this first loop do?
 		for (baseLeft, (unitLeft, expLeft)) in left.units {
 			for (baseRight, (unitRight, expRight)) in right.units {
 				
@@ -1038,7 +905,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 			}
 		}
 		
-		// what does this follow-up loop do?
 		for (baseRight, (unit, exponent)) in right.units {
 			if let (_, current) = newUnits[baseRight] {
 				let sum = current + exponent
@@ -1050,7 +916,7 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				}
 			}
 			else {
-				// must check there are no commensurate units   <- this still true?
+				// must check there are no commensurate units
 				var commensurate = false
 				for (baseLeft, _) in left.units {
 					if baseLeft == baseRight {
@@ -1086,15 +952,24 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 			)
 		}
 		else {
-			return Physical(
+			var out = Physical(
 				value: newValue,
 				units: newUnits,
 				sigfigs: Swift.min(left.sigfigs, right.sigfigs)
 			)
+			
+			let rx = right.value
+			let lx = left.value
+			let ru = right.standardDeviationRaw
+			let lu = left.standardDeviationRaw
+			
+			out.standardDeviationRaw = √((ru * ru * lx * lx) + (lu * lu * rx * rx))
+			
+			return out
 		}
 	}
 	
-	public static func / (left: Self, right: Self) -> Self {
+	public static func / (left: Physical, right: Physical) -> Self {
 		if left.isNotAThing || right.isNotAThing { return notAThing(logging: "\(left) || \(right)", elements: [left, right]) }
 		
 		// FIXME: This is not correct if right doesn't transform via a simple rescaling
@@ -1103,30 +978,16 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		//        Ideally we have a flag set to detect units which are not purely scalar somehow.
 		//        Perhaps the Measurement API has a way to know this?
 		
-//		var newRight = right
-//		newRight.decomposeMixedUnits()
-//		newRight.convertToFundamentalUnits()
-		
-//		if left ⧦ right {
-			return left * (right ^ -1)
-//		}
-//		else {
-//			var newLeft = left
-//			var newRight = right
-//
-//			newLeft.decomposeMixedUnits()
-//			newRight.decomposeMixedUnits()
-//
-//			newLeft.convertToFundamentalUnits()
-//			newRight.convertToFundamentalUnits()
-//
-//			return newLeft * (newRight ^ -1)
-//		}
+		return left * (right ^ -1)
 	}
 	
 	public static func + (left: Physical, right: Physical) -> Physical {
 		if left.isNotAThing || right.isNotAThing {
 			return notAThing(logging: "\(left) + \(right)", elements: [left, right])
+		}
+		
+		if left.value.isNaN || right.value.isNaN {
+			return notAThing
 		}
 		
 		func additionSigfigs(_ a: Double, _ b: Double) -> Int {
@@ -1150,7 +1011,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		}
 		
 		if left ⧗ right {
-			
 			// Important note: this requires exact unit matching
 			// so ~ is not a sufficient condition.
 
@@ -1181,11 +1041,20 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 					)
 				}
 				else {
-					return Physical(
+					var out = Physical(
 						value: newLeft.value + newRight.value,
 						units: newLeft.units,
 						sigfigs: additionSigfigs(newLeft.value, newRight.value)
 					)
+					
+					let ls² = (newLeft.standardDeviationRaw ^ 2)
+					let rs² = (newRight.standardDeviationRaw ^ 2)
+					
+					out.standardDeviationRaw = (newRight.value < 0) ? // ← oh this feels bad
+						√abs(ls² - rs²) :
+						√abs(ls² + rs²)
+					
+					return out
 				}
 			}
 			
@@ -1212,15 +1081,9 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		return notAThing(logging: "\(left) + \(right)", elements: [left, right])
 	}
 	
-//	public static func +<T> (left: Int, right: Physical<T>) -> Physical<T> {
-//		return left.constant + right
-//	}
-	
 	public static func - (left: Physical, right: Physical) -> Physical {
 		left + (-1 * right)
 	}
-	
-	// combining with Numbers:
 	
 	public static func + (left: Double, right: Physical) -> Physical {
 		left.constant + right
@@ -1243,35 +1106,21 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 			return Physical(values: left * rightValues, units: right.units, sigfigs: right.sigfigs)
 		}
 		else {
-			return Physical(value: left * right.value, units: right.units, sigfigs: right.sigfigs)
+			if left.isNaN || right.value.isNaN {
+				return notAThing
+			}
+			
+			// TODO: we need a better init taking care of uncertainties etc
+			
+			var out = Physical(value: left * right.value, units: right.units, sigfigs: right.sigfigs)
+			out.standardDeviationRaw = right.standardDeviationRaw
+			
+			return out
 		}
 	}
 	
-	public static func / (left: Physical, right: Double) -> Physical {
-		if let leftValues = left.values {
-			return Physical(values: leftValues / right, units: left.units, sigfigs: left.sigfigs)
-		}
-		else {
-			return Physical(value: left.value / right, units: left.units, sigfigs: left.sigfigs)
-		}
-	}
-	
-	public static func / (left: Physical, right: Int) -> Physical {
-		if let leftValues = left.values {
-			return Physical(values: leftValues / Double(right), units: left.units, sigfigs: left.sigfigs)
-		}
-		else {
-			return Physical(value: left.value / Double(right), units: left.units, sigfigs: left.sigfigs)
-		}
-	}
-	
-	public static func * (right: Physical, left: Double) -> Physical {
-		if let rightValues = right.values {
-			return Physical(values: left * rightValues, units: right.units, sigfigs: right.sigfigs)
-		}
-		else {
-			return Physical(value: left * right.value, units: right.units, sigfigs: right.sigfigs)
-		}
+	public static func * (left: Physical, right: Double) -> Physical {
+		right * left
 	}
 	
 	public static func * (left: Int, right: Physical) -> Physical {
@@ -1282,11 +1131,52 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 		left * Double(right)
 	}
 	
+	public static func * (left: [Double], right: Physical) -> Physical? {
+		if right.values == nil {
+			return Physical(values: left * right.value, units: right.units, sigfigs: right.sigfigs)
+		}
+		
+		return nil
+	}
+	
+	public static func * (left: Physical, right: [Double]) -> Physical? {
+		right * left
+	}
+	
+	public static func / (left: Physical, right: Double) -> Physical {
+		if right.isNaN || right.isZero {
+			return notAThing
+		}
+		
+		if let leftValues = left.values {
+			return Physical(values: leftValues / right, units: left.units, sigfigs: left.sigfigs)
+		}
+		else {
+			return Physical(value: left.value / right, units: left.units, sigfigs: left.sigfigs)
+		}
+	}
+	
+	public static func / (left: Physical, right: Int) -> Physical {
+		left / Double(right)
+	}
+	
+	public static func / (left: Int, right: Physical) -> Physical {
+		Double(left) / right
+	}
+	
+	public static func / (left: Double, right: Physical) -> Physical {
+		left.constant / right
+	}
+	
 	public static func ^ (left: Physical, right: Int) -> Physical {
 		left ^ Double(right)
 	}
 	
 	public static func ^ (left: Physical, right: Double) -> Physical {
+		if right.isNaN {
+			return notAThing
+		}
+		
 		var newUnits: DimensionDictionary = [:]
 		var power: TieredNumber!
 		
@@ -1311,12 +1201,6 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				power = .real(right)
 			}
 		}
-		
-//		var newLeft = left
-//
-//		if newLeft.units.containsNonZeroOffsetUnits() {
-//			newLeft.convertToFundamentalUnits()
-//		}
 		
 		for (baseUnit, (unit, exponent)) in left.units {
 			newUnits[baseUnit] = (unit, power * exponent)
@@ -1366,6 +1250,27 @@ public struct Physical: CustomStringConvertible, Equatable, Hashable, Collection
 				rnew.convertToFundamentalUnits()
 				
 				return lnew.value < rnew.value
+			}
+		}
+		
+		return false
+	}
+	
+	public static func <= (left: Physical, right: Physical) -> Bool {
+		if left.isNotAThing || right.isNotAThing {
+			return false
+		}
+		
+		if left ~ right {
+			if left ⧖ right {
+				return left.value <= right.value
+			}
+			else {
+				var (lnew, rnew) = (left, right)
+				lnew.convertToFundamentalUnits()
+				rnew.convertToFundamentalUnits()
+				
+				return lnew.value <= rnew.value
 			}
 		}
 		

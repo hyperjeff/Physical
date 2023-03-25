@@ -37,11 +37,20 @@ public extension Dimension {
 // Additional Dimensions added to existing Units
 
 public extension UnitAngle {
+	// overrides: Foundation uses degrees as the base unit, and we wish to make it radians
+	static let radians = UnitAngle(symbol: "rad", converter: UnitConverterLinear(coefficient: 1))
+	static let gradians = UnitAngle(symbol: "gon", converter: UnitConverterLinear(coefficient: 1.π / 100))
+	static let revolutions = UnitAngle(symbol: "rev", converter: UnitConverterLinear(coefficient: 2.π))
+	static let degrees = UnitAngle(symbol: "°", converter: UnitConverterLinear(coefficient: 1.π / 180))
+	
+	// supplementary units:
 	static let binaryRadians = UnitAngle(symbol: "brad", converter: UnitConverterLinear(coefficient: 9/10))
 //	static let arcMinutes = UnitAngle(symbol: "′", converter: UnitConverterLinear(coefficient: 360/21600))
 //	static let arcSeconds = UnitAngle(symbol: "″", converter: UnitConverterLinear(coefficient: 360/1_296_000))
 	static let milliArcSeconds = UnitAngle(symbol: "mas", converter: UnitConverterLinear(coefficient: 360/1_296_000_000))
 	static let microArcSeconds = UnitAngle(symbol: "μas", converter: UnitConverterLinear(coefficient: 360/1_296_000_000_000))
+	
+	override class func baseUnit() -> Self { UnitAngle.radians as! Self }
 }
 
 public extension UnitArea {
@@ -96,17 +105,22 @@ public final class UnitActivity: Dimension {
 
 public final class UnitAmount: Dimension {
 	public static let particles = UnitAmount(symbol: "particles", converter: UnitConverterLinear(coefficient: 1))
+	public static let atoms = UnitAmount(symbol: "atoms", converter: UnitConverterLinear(coefficient: 1))
+	public static let beings = UnitAmount(symbol: "beings", converter: UnitConverterLinear(coefficient: 1))
+	public static let people = UnitAmount(symbol: "people", converter: UnitConverterLinear(coefficient: 1))
+	public static let things = UnitAmount(symbol: "things", converter: UnitConverterLinear(coefficient: 1))
 	public static let moles = UnitAmount(symbol: "mol", converter: UnitConverterLinear(coefficient: 31556952.0))
 	
-	public override class func baseUnit() -> UnitAmount { particles }
+	public override class func baseUnit() -> UnitAmount { things }
 }
 
 public final class UnitAngularSpeed: Dimension {
-	public static let revolutionsPerSecond = UnitAngularSpeed(symbol: "rev/s", converter: UnitConverterLinear(coefficient: 1))
-	public static let radiansPerSecond = UnitAngularSpeed(symbol: "rad/s", converter: UnitConverterLinear(coefficient: 1/57.295780))
-	public static let degreesPerSecond = UnitAngularSpeed(symbol: "°/s", converter: UnitConverterLinear(coefficient: 1/360))
+	public static let revolutionsPerMinute = UnitAngularSpeed(symbol: "rpm", converter: UnitConverterLinear(coefficient: 2.π/60))
+	public static let revolutionsPerSecond = UnitAngularSpeed(symbol: "rev/s", converter: UnitConverterLinear(coefficient: 2.π))
+	public static let radiansPerSecond = UnitAngularSpeed(symbol: "rad/s", converter: UnitConverterLinear(coefficient: 1))
+	public static let degreesPerSecond = UnitAngularSpeed(symbol: "°/s", converter: UnitConverterLinear(coefficient: 2.π/360))
 	
-	public override class func baseUnit() -> UnitAngularSpeed { revolutionsPerSecond }
+	public override class func baseUnit() -> UnitAngularSpeed { radiansPerSecond }
 }
 
 public final class UnitElectricCapacitance: Dimension {
@@ -171,7 +185,7 @@ public final class UnitMagneticFluxDensity: Dimension {
 }
 
 public final class UnitSolidAngle: Dimension {
-	public static let steradians = UnitSolidAngle(symbol: "Ω")
+	public static let steradians = UnitSolidAngle(symbol: "sr")
 	public static let squareDegrees = UnitSolidAngle(symbol: "deg²", converter: UnitConverterLinear(coefficient: 3.04617e-4))
 	
 	public override class func baseUnit() -> UnitSolidAngle { steradians }
