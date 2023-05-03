@@ -254,6 +254,15 @@ Length(45, unit: .hectares)                 // Compile-time error!
 
 let sailHeight = Length(45, unit: .feet)    // guaranteed type-correct
 sailHeight.physical                         // retrieve dynamic Physical type
+
+func orbitalRadiusOfChargeInMagneticField(
+	mass: Mass,
+	velocity: Speed,
+	charge: ElectricCharge,
+	magneticFluxDensity: MagneticFluxDensity) -> Length? {
+			
+	Length(mass * velocity / (charge * magneticFluxDensity))
+}
 ```
 
 ### Constants and formulas
