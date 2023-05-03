@@ -85,7 +85,7 @@ let distance2 =  3.3.feet
 
 distance1 + distance2
 
-distance1 += 14.ferlongs
+distance1 += 14.furlongs
 
 distance1 < 3e-5.miles
 
