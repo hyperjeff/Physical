@@ -16,6 +16,13 @@ public enum TieredNumber: Equatable, CustomStringConvertible {
 		}
 	}
 	
+	public func matchesSign(of other: TieredNumber) -> Bool {
+		return
+			(isZero && other.isZero) ||
+			(isPositive && other.isPositive) ||
+			(isNegative && other.isNegative)
+	}
+	
 	// purely for debugging:
 	public func kind() -> String {
 		switch self {
@@ -32,6 +39,10 @@ public enum TieredNumber: Equatable, CustomStringConvertible {
 			case let .fraction(a, _): return (0 == a)
 //			case .zero: return true
 		}
+	}
+	
+	public var isNegative: Bool {
+		!isZero && !isPositive
 	}
 	
 	public var realValue: Double {
