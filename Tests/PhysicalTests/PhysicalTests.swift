@@ -2,6 +2,13 @@ import XCTest
 @testable import Physical
 
 final class PhysicalTests: XCTestCase {
+	override func setUpWithError() throws {
+		Physical.Globals.shared.sigfigs = nil
+	}
+	
+	override func tearDownWithError() throws {
+	}
+	
 	func testSigfigs() {
 		XCTAssert((13.49999.mm.sigfigs(2)) == 13.mm)
 		XCTAssert((13.51.mm.sigfigs(2)) != 13.mm)
@@ -196,6 +203,7 @@ final class PhysicalTests: XCTestCase {
 	}
 	
 	func testNaNs() {
+		XCTAssert(Physical.notAThing.value.isNaN)
 		XCTAssert((Double.nan.meters + 2.meters).isNotAThing)
 		XCTAssert((Double.nan * 2.meters).isNotAThing)
 		XCTAssert((2.meters / Double.nan).isNotAThing)
@@ -483,13 +491,15 @@ final class PhysicalTests: XCTestCase {
 	// MARK: - Chemistry -
 	
 	func testTemperature() {
-		XCTAssertEqual(2 * 30.℃.sigfigs(2), 60.℃.sigfigs(2))
-		XCTAssertEqual(2 * 30.℉.sigfigs(2), 60.℉.sigfigs(2))
-		XCTAssertEqual(2 * 30.K.sigfigs(2), 60.K.sigfigs(2))
+		Physical.Globals.shared.sigfigs = 3
 		
-		XCTAssertEqual((30.℃ - 5.℃).sigfigs(2), 25.℃)
-		XCTAssertEqual((30.℉ - 5.℉).sigfigs(2), 25.℉)
-		XCTAssertEqual((30.K - 5.K).sigfigs(2), 25.K)
+		XCTAssertEqual(2 * 30.℃, 60.℃)
+		XCTAssertEqual(2 * 30.℉, 60.℉)
+		XCTAssertEqual(2 * 30.K, 60.K)
+		
+		XCTAssertEqual((30.℃ - 5.℃), 25.℃)
+		XCTAssertEqual((30.℉ - 5.℉), 25.℉)
+		XCTAssertEqual((30.K - 5.K), 25.K)
 		
 		// Addition of different non-zero'd units not allowed
 		
@@ -499,17 +509,17 @@ final class PhysicalTests: XCTestCase {
 		
 		// Any multiplication between different non-zero'd units must first convert to the fundamental dimension base
 		
-		XCTAssert((50.℉.sigfigs(3) / 30.℃.sigfigs(3)).isNotAThing)
-		XCTAssert((50.℉.sigfigs(3) / 30.K.sigfigs(3)).isNotAThing)
-		XCTAssert((50.K.sigfigs(3) / 30.℃.sigfigs(3)).isNotAThing)
+		XCTAssert((50.℉ / 30.℃).isNotAThing)
+		XCTAssert((50.℉ / 30.K).isNotAThing)
+		XCTAssert((50.K / 30.℃).isNotAThing)
 		
-		XCTAssertEqual((50.℉.sigfigs(3) / 10.℉.sigfigs(3)), 5.00.constant.sigfigs(3))
-		XCTAssertEqual((50.℃.sigfigs(3) / 10.℃.sigfigs(3)), 5.00.constant.sigfigs(3))
-		XCTAssertEqual((50.K.sigfigs(3) / 10.K.sigfigs(3)), 5.00.constant.sigfigs(3))
+		XCTAssertEqual((50.℉ / 10.℉), 5.constant)
+		XCTAssertEqual((50.℃ / 10.℃), 5.constant)
+		XCTAssertEqual((50.K / 10.K), 5.constant)
 		
 		// The other scenario is when units show up with negative exponents
 		
-		XCTAssert((150.℉.sigfigs(3) * 23.8e-6.celsius(-1)).isNotAThing)
+		XCTAssert((150.℉ * 23.8e-6.celsius(-1)).isNotAThing)
 	}
 	
 	func testRankineTemps() {
@@ -538,6 +548,38 @@ final class PhysicalTests: XCTestCase {
 		XCTAssert((N * R) ~ 1.atm.m(3)/.K)
 		XCTAssert((N * R * T) ~ (P * V))
 		XCTAssert(1.fahrenheit ~ T)
+	}
+	
+	func testPlanckLength() {
+		// Checking that the Planck length does indeed have dimensions of length
+		
+		let ℏ = Physical.Constants.reducedPlanck
+		let c = Physical.Constants.lightSpeed
+		let G = Physical.Constants.gravitation
+		let c³ = c ^ 3
+		
+		XCTAssert(√(ℏ * G / c³) ~ 1.m)
+	}
+	
+	func testUnitChoices() {
+		func unitDescription(_ x: Physical) -> String {
+			x.description.split(separator: " ")[1...].joined(separator: " ")
+		}
+		
+		var ℏ = Physical.Constants.reducedPlanck
+		
+		XCTAssertEqual(unitDescription(ℏ), "J s")
+		
+		ℏ.decomposeMixedUnits()
+		ℏ.convertToFundamentalUnits()
+		
+		XCTAssertEqual(unitDescription(ℏ), "kg m² / s")
+		
+		let ms = 1.J * 1.s / 1.N
+		
+		XCTAssertEqual(unitDescription(ms), "m s")
+		
+		// much more should be in here
 	}
 	
 	// Exam Survival Guide, Physical Chemistry — Jochen Vogt (2017)
