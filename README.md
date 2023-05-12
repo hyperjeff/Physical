@@ -80,10 +80,14 @@ Simple creation and composition of units. One can then convert results into a mo
 ```swift
 import Physical
 
-let distance1 = 10.5.centimeters
+var distance1 = 10.5.centimeters
 let distance2 =  3.3.feet
 
 distance1 + distance2
+
+distance1 += 14.furlongs
+
+distance1 < 3e-5.miles
 
 let speed = 42.0.kilometersPerHour
 
@@ -188,7 +192,7 @@ _Note:_ The degree symbol is `°` (`⇧⌥8` on a US Qwerty keyboard) and not `�
 
 ### Arrays, Ramps, Indices
 
-Physical can work to describe whole arrays at once, also providing acceleration on calculations done on them for free. As well, a `ramp` function is included, akin to Numpy's `linspace` function.
+Physical can work to describe whole arrays at once, also providing acceleration on calculations done on them for free. As well, a `ramp` function is included, akin to Numpy's `linspace` function. One can treat arrays an n-dimensional vectors as well, with support for rotating (for now) 2-d arrays.
 
 ```swift
 let fileSizes = [1, 3, 14, -2].gigabytes      // [1, 3, 14, -2] GB
@@ -196,13 +200,19 @@ let dataRate = 1.megabits.perSecond           // 1 Mb / s
 
 (fileSizes / dataRate → .hours)               // [2.2222, 6.6667, 31.111, -4.4444] hr
 
-
+(0.s...50.s).by(20.μs)                        // [0, 0.00002, 0.00004, ...] seconds
 ramp(in: 0...1.pi, count: 27)                 // [0, 0.1208304866765305, ...]
+ramp(in: 0...100, by: 3)                      // [0, 3, 6, ..., 99]
 
 let angles = ramp(in: 0...1.pi, count: 27).radians.sigfigs(3)
 
+4.meters.repeated(50)                         // [4, 4, ... ] meters
+
 angles[7]                                     // 0.84581 rad
 sin(angles)[7]                                // 0.74851
+
+var position = [0, 1].meters
+var velocity = [0, 1].rotated(32°) * 110.milesPerHour
 ```
 
 ### Unit exponents
@@ -244,6 +254,15 @@ Length(45, unit: .hectares)                 // Compile-time error!
 
 let sailHeight = Length(45, unit: .feet)    // guaranteed type-correct
 sailHeight.physical                         // retrieve dynamic Physical type
+
+func orbitalRadiusOfChargeInMagneticField(
+	mass: Mass,
+	velocity: Speed,
+	charge: ElectricCharge,
+	magneticFluxDensity: MagneticFluxDensity) -> Length? {
+			
+	Length(mass * velocity / (charge * magneticFluxDensity))
+}
 ```
 
 ### Constants and formulas
@@ -292,6 +311,8 @@ A number of enhancements to float point numbers have been included.
 n√14
 
 47%                // 0.47
+
+distance *= 2.1%
 ```
 
 _Note:_ Both π and √ are typable on most keyboard layouts. (On a US Qwerty layout, they're `⌥p` and `⌥v`.)
