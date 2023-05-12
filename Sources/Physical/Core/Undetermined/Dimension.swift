@@ -234,32 +234,17 @@ public struct FundamentalBaseVector {
 	}
 	
 	public func projectsInto(multiplyUsedBaseVector z: FundamentalBaseVector) -> Bool {
-		if m   != 0 && 1 < z.m   { return true }
-		if s   != 0 && 1 < z.s   { return true }
-		if kg  != 0 && 1 < z.kg  { return true }
-		if A   != 0 && 1 < z.A   { return true }
-		if mol != 0 && 1 < z.mol { return true }
-		if K   != 0 && 1 < z.K   { return true }
-		if cdl != 0 && 1 < z.cdl { return true }
-		if rad != 0 && 1 < z.rad { return true }
-		if st  != 0 && 1 < z.st  { return true }
-		
-		return false
+		(m   != 0 && 1 < z.m)   ||
+		(s   != 0 && 1 < z.s)   ||
+		(kg  != 0 && 1 < z.kg)  ||
+		(A   != 0 && 1 < z.A)   ||
+		(mol != 0 && 1 < z.mol) ||
+		(K   != 0 && 1 < z.K)   ||
+		(cdl != 0 && 1 < z.cdl) ||
+		(rad != 0 && 1 < z.rad) ||
+		(st  != 0 && 1 < z.st)
 	}
 	
-	/*public func multiplyUsedBaseUnits() -> [Dimension] {
-		var out: [Dimension] = []
-		
-		if 1 < m { out.append(UnitLength.baseUnit()) }
-		if 1 < s { out.append(UnitDuration.baseUnit()) }
-		if 1 < kg { out.append(UnitMass.baseUnit()) }
-		if 1 < A { out.append(UnitElectricCurrent.baseUnit()) }
-		if 1 < mol { out.append(UnitAmount.baseUnit()) }
-		if 1 < K { out.append(UnitTemperature.baseUnit()) }
-		if 1 < cdl { out.append(UnitIlluminance.baseUnit()) }
-		
-		return out
-	}*/
 }
 
 fileprivate typealias FBV = FundamentalBaseVector
