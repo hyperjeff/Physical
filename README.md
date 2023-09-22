@@ -23,6 +23,9 @@ The more real-world code that uses this package, the better we can optimize the 
 
 For a recent overview of the project, see [this talk on the framework](https://www.youtube.com/watch?v=xmD8wUZ0egQ) given at 360iDev 2022.
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fhyperjeff%2FPhysical%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/hyperjeff/Physical)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fhyperjeff%2FPhysical%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/hyperjeff/Physical)
+
 ## License
 
 Physical is released under the MIT license.
