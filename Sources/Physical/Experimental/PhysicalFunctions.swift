@@ -169,16 +169,6 @@ public func j1(_ number: Physical) -> Physical { number.isDimensionless ? j1(num
 public func y0(_ number: Physical) -> Physical { number.isDimensionless ? y0(number.value).constant : .notAThing }
 public func y1(_ number: Physical) -> Physical { number.isDimensionless ? y1(number.value).constant : .notAThing }
 
-// experiment:
-
-// The downside of providing such a function is that the coder is then forced to declare the return type, if only by inference, to use either version of the call. It is (currently) seen as better to keep the types Physical, which is what they starte from, and have the developer grab the appropriate value when converting back to Double.
-
-//public func exp(_ number: Physical) -> Double {
-//	number.isDimensionless ? exp(number.value) : .nan
-//}
-
-
-
 // experimental:
 
 public extension Array where Element == Double {

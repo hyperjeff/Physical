@@ -1,7 +1,3 @@
-/// Sources:
-///
-///
-
 public extension Physical {
 	enum SpecialPhysicalSymbols {
 		/// fineStructure

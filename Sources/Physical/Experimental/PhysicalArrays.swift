@@ -94,10 +94,6 @@ public extension Array where Element == Double {
 		return out
 	}
 	
-//	static func ⨀! (left: Array, right: Array) -> Array {
-//		(left ⨀ right)!
-//	}
-	
 	static func .* (left: Array, right: Array) -> Array {
 		left ⨀ right
 	}

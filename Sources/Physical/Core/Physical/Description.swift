@@ -12,10 +12,6 @@ extension Physical: CustomStringConvertible, CustomDebugStringConvertible {
 		func numberString(_ x: Double) -> String {
 			var numericalPart = Physical.Globals.shared.numberFormatter.string(from: NSNumber(value: x))!
 			
-			//		let variablePart = vars.map { $0.description }.joined(separator: " ")
-			
-			// Refactor top + bottom code!
-			
 			if let expString = numericalPart.components(separatedBy: "e").last,
 			   let e = Physical.Globals.shared.numberFormatter.number(from: expString)?.intValue {
 				if -4 < e && e < 6 {
@@ -70,13 +66,6 @@ extension Physical: CustomStringConvertible, CustomDebugStringConvertible {
 		firstTerm = true
 		
 		for (_, (unit, exponent)) in sortedUnits where !exponent.isPositive {
-//			if unit.isKind(of: UnitAngle.self) {
-//				continue
-//			}
-//			else if unit.isKind(of: UnitAngularSpeed.self) {
-//				// There may be a scale change needed -- so perhaps this has to be handled elsewhere?
-//			}
-			
 			if !alreadyDrawnDivisor {
 				unitPart += " / "
 				alreadyDrawnDivisor = true

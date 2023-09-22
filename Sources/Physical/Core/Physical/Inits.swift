@@ -2,22 +2,14 @@ import Foundation
 
 extension Physical {
 	public init(value: Double, units: DimensionDictionary, sigfigs: Int = 0) {
-		objectLog("b")
-		// vars: [Variable<Value>] = [],
 		self.value = value
 		self.units = units
 		self.sigfigs = sigfigs
-		//		self.vars = vars
 	}
 	
-	// add public init(value: Value, unit: (Dimension, Int), ... ?
-	
 	public init(value: Double, units: [(Dimension, Int)], sigfigs: Int) {
-		objectLog("c")
-		// vars: [Variable<Value>] = [],
 		self.value = value
 		self.sigfigs = sigfigs
-		//		self.vars = vars
 		
 		var newUnits: DimensionDictionary = [:]
 		
@@ -42,22 +34,14 @@ extension Physical {
 	}
 	
 	public init(values: [Double], units: DimensionDictionary, sigfigs: Int) {
-		objectLog("d")
-		// vars: [Variable<Value>] = [],
 		self.values = values
 		self.units = units
 		self.sigfigs = sigfigs
-		// self.vars = vars
 	}
 	
-	// add public init(value: Value, unit: (Dimension, Int), ... ?
-	
 	public init(values: [Double], units: [(Dimension, Int)], sigfigs: Int) {
-		objectLog("e")
-		// vars: [Variable<Value>] = [],
 		self.values = values
 		self.sigfigs = sigfigs
-		// self.vars = vars
 		
 		var newUnits: DimensionDictionary = [:]
 		
@@ -81,9 +65,5 @@ extension Physical {
 	public init(repeating: Double = 0, count: Int, unit: Dimension) {
 		self.init(values: [Double](repeating: repeating, count: count), unit: unit)
 	}
-	
-	//	public init(repeating: Double = 0, count: Int, units: Length) {
-	//		self.init(values: [Double](repeating: repeating, count: count), units: units.p.units, sigfigs: 16)
-	//	}
 	
 }

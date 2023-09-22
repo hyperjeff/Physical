@@ -63,12 +63,6 @@ extension Physical {
 			return
 		}
 		
-		//		if let (newUnits, newValue) = Physical.Cache.runtime.decomposeMixedUnits[(units, value)] {
-		//			units = newUnits
-		//			value = newValue
-		//			return
-		//		}
-		
 		let multiplyUsedVector = units
 			.compactMap { fundamentalBaseVector[$0.key] }
 			.map { $0.nonZeroElements() }
@@ -118,14 +112,8 @@ extension Physical {
 				set(baseUnit: UnitSolidAngle.baseUnit(),        toExponent: .integer(baseVector.st))
 				
 				switch base {
-						
-						// TODO: What is the exhaustive list of special cases here?
-						//       Hz
-						
-						//					case UnitAngularSpeed.baseUnit():
-						//						set(baseUnit: UnitAngle.baseUnit(), toExponent: .integer(1))
-						//						newValue *= (360 / 2.π) * pow(Measurement(value: 1, unit: unit).converted(to: UnitAngularSpeed.baseUnit()).value, exponent: exponent)
-						
+					// TODO: What is the exhaustive list of special cases here?
+					
 					case UnitVolume.baseUnit():
 						newValue *= pow(Measurement(value: 1, unit: unit).converted(to: UnitVolume.cubicMeters).value, exponent: exponent)
 						
@@ -140,9 +128,6 @@ extension Physical {
 			}
 		}
 		
-		//		Physical.Cache.runtime.decomposeMixedUnits[(units, value)] = (newUnits, newValue)
-		
-		// po [units, newUnits].map { u in u.map({ $0.key.symbol }).joined(separator: ", ") }.joined(separator: " -> ")
 		units = newUnits
 		value = newValue
 	}
@@ -163,9 +148,6 @@ extension Physical {
 				
 				return
 			}
-			//			else if units.first?.key == UnitTemperature.baseUnit() {
-			//				forgot what i was thinking for this.
-			//			}
 		}
 		
 		for (base, (var unit, exponent)) in units {

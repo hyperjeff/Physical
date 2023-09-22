@@ -4,21 +4,6 @@ import Accelerate
 extension Physical {
 	// Quadratic operations:
 	
-	/*
-	 public static func ⨃ (left: Physical, right: Dimension) -> Bool {
-	 if left.units.count == 1 && left.units.first!.key == right {
-	 return true
-	 }
-	 
-	 for (unitLeft, _) in left.units {
-	 if unitLeft.superclass == right.superclass {
-	 return true
-	 }
-	 }
-	 
-	 return false
-	 } */
-	
 	/// Tests two physical quantities for exactly matching units
 	/// - Parameters:
 	///   - left: Physical quantity
@@ -54,15 +39,6 @@ extension Physical {
 			.intersection(rightFundamental.baseUnits)
 			.isEmpty
 		
-//		for leftBase in leftFundamental.units.map({ $0.key }) {
-//			for rightBase in rightFundamental.units.map({ $0.key }) {
-//				if leftBase == rightBase {
-//					return true
-//				}
-//			}
-//		}
-//
-//		return false
 	}
 	
 	/// Tests to see if the units of two physical quantities have any fundamental base units in common on the same side of the numerator or denominator
@@ -180,8 +156,6 @@ extension Physical {
 			let a = pow(10, Double(lcs - 1) - floor(log10(abs(p.value))))
 			return Int(round(Double(abs(p.value)) * a)) * Int(p.value < 0 ? -1 : 1)
 		}
-		
-		//		print((valueSignature(left), valueSignature(right)))
 		
 		/* Core problem with this technique:
 		 
@@ -393,31 +367,7 @@ extension Physical {
 	public static func / (left: Physical, right: Physical) -> Self {
 		if left.isNotAThing || right.isNotAThing { return notAThing(logging: "\(left) || \(right)", elements: [left, right]) }
 		
-		// FIXME: This is not correct if right doesn't transform via a simple rescaling
-		//        right must be transformed first into the base unit which is purely scalar (has 0 crossing)
-		//        This stuff about altRight is the temporary fix.
-		//        Ideally we have a flag set to detect units which are not purely scalar somehow.
-		//        Perhaps the Measurement API has a way to know this?
-
-//		var newRight = right
-//		newRight.decomposeMixedUnits()
-//		newRight.convertToFundamentalUnits()
-
-//		if left ⧦ right {
 		return left * (right ^ -1)
-//		}
-//		else {
-//			var newLeft = left
-//			var newRight = right
-//
-//			newLeft.decomposeMixedUnits()
-//			newRight.decomposeMixedUnits()
-//
-//			newLeft.convertToFundamentalUnits()
-//			newRight.convertToFundamentalUnits()
-//
-//			return newLeft * (newRight ^ -1)
-//		}
 	}
 	
 	public static func + (left: Physical, right: Physical) -> Physical {
@@ -536,10 +486,6 @@ extension Physical {
 		return notAThing(logging: "\(left) ^ \(right)", elements: [left, right])
 	}
 	
-//	public static func +<T> (left: Int, right: Physical<T>) -> Physical<T> {
-//		return left.constant + right
-//	}
-	
 	public static func - (left: Physical, right: Physical) -> Physical {
 		left + (-1 * right)
 	}
@@ -652,10 +598,6 @@ extension Physical {
 		
 		let left = lefty
 		
-//		if left ~ 1.radians {
-//			left = left → .radians
-//		}
-		
 		var newUnits: DimensionDictionary = [:]
 		var power: TieredNumber!
 		
@@ -680,12 +622,6 @@ extension Physical {
 				power = .real(right)
 			}
 		}
-		
-//		var newLeft = left
-//
-//		if newLeft.units.containsNonZeroOffsetUnits() {
-//			newLeft.convertToFundamentalUnits()
-//		}
 		
 		for (baseUnit, (unit, exponent)) in left.units {
 			/*
@@ -766,13 +702,6 @@ extension Physical {
 			out = Physical(values: newValues, units: newUnits, sigfigs: left.sigfigs)
 		}
 		else {
-			//		if lefty ~ 1.radians {
-			//			return Physical(
-			//				value: pow(left.value, right),
-			//				units: lefty.units,
-			//				sigfigs: left.sigfigs
-			//			)
-			//		} else {
 			out = Physical(
 				value: pow(left.value, right),
 				units: newUnits,

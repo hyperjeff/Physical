@@ -7,7 +7,6 @@ extension Physical: Equatable, Comparable, Hashable {
 		hasher.combine(sigfigs)
 		hasher.combine(isNotAThing)
 		hasher.combine(units as NSDictionary)
-		//		hasher.combine(withBasicUnits.withFundamentalUnits)
 	}
 	
 	/// Equality of a Physical object and a tuple pair of Physical objects with the same units, which is defined as being between the high and low values of the tuple. Does not make use of sigfigs.
@@ -110,53 +109,6 @@ extension Physical: Equatable, Comparable, Hashable {
 	public static func /= (left: inout Physical, right: Double) {
 		left = left / right
 	}
-	
-	/*
-	 public static func ⨁= (left: inout Physical, right: Physical) {
-	 left = left ⨁ right
-	 }
-	 
-	 public static func ⨁ (left: Physical, right: Physical) -> Physical {
-	 var out: Physical = .notAThing
-	 
-	 if left ⧗ right,
-	 left.isAThing, right.isAThing,
-	 left.values?.count == right.values?.count {
-	 
-	 func possiblyAdd(_ a: Physical, _ b: Physical) -> Bool {
-	 if a ⧖ b,
-	 let av = a.values,
-	 let bv = b.values,
-	 let sum = av + bv {
-	 out = Physical(values: sum, units: left.units, sigfigs: left.sigfigs)
-	 return true
-	 }
-	 
-	 return false
-	 }
-	 
-	 // TODO: create a corrected sigfigs, like the + function has
-	 
-	 if !possiblyAdd(left, right) {
-	 var newLeft = left
-	 var newRight = right
-	 
-	 newLeft.convertToFundamentalUnits()
-	 newRight.convertToFundamentalUnits()
-	 
-	 if !possiblyAdd(newLeft, newRight) {
-	 newLeft.decomposeMixedUnits()
-	 newRight.decomposeMixedUnits()
-	 
-	 _ = possiblyAdd(newLeft, newRight)
-	 }
-	 }
-	 }
-	 
-	 // TODO: this is missing notAThing logging
-	 
-	 return out
-	 } */
 	
 	public static func < (left: Physical, right: Physical) -> Bool {
 		if left.isNotAThing || right.isNotAThing {

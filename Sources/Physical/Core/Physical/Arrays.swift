@@ -31,18 +31,9 @@ extension Physical {
 				var stdDev: Double = 0
 				vDSP_normalizeD(values, 1, nil, 1, &mean, &stdDev, vDSP_Length(values.count))
 				
-				
-				
 				return Physical(value: stdDev, units: units, sigfigs: sigfigs)
 			}
 			else {
-				//				if 0 < standardDeviationRaw {
-				//					Physical(value: standardDeviationRaw, units: units, sigfigs: 16)
-				//				}
-				//				else {
-				//					return Physical(value: value * pow(10, Double(-sigfigs)), units: units, sigfigs: sigfigs)
-				//				}
-				
 				return Physical(value: standardDeviationRaw, units: units, sigfigs: 16)
 			}
 		}

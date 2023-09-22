@@ -15,9 +15,4 @@ extension Physical {
 		value.toSigfigs(sigfigs)
 	}
 	
-	public func objectLog(_ x: String = "") {
-		objectCount += 1
-//		print("object count (\(x)): \(objectCount)")
-	}
-	
 }
