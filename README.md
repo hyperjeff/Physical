@@ -180,8 +180,8 @@ asin(sin(75°)) → .degrees      // 75 °
 
 
 let θ₁ = (2.π/5).radians       // 1.2566 rad
-let θ₂ = θ1 → .degrees         // 72 °
-let θ₃ = θ1 → .revolutions     // 0.2 rev
+let θ₂ = θ₁ → .degrees         // 72 °
+let θ₃ = θ₁ → .revolutions     // 0.2 rev
 
 sin(θ₁)                        // 0.95106
 sin(θ₂)                        // 0.95106
