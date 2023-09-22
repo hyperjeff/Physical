@@ -41,14 +41,64 @@ public func simpson(from start: Double, to end: Double, N: Int, f: (Double) -> D
 	)
 }
 
+extension ClosedRange where Bound == Int {
+	public func by(_ stepSize: Double) -> [Double] {
+		let doubleLower = Double(lowerBound)
+		let doubleUpper = Double(upperBound)
+		return (doubleLower ... doubleUpper).by(stepSize)
+	}
+	
+	public func by(_ stepSize: Physical) -> Physical {
+		let doubleLower = Double(lowerBound)
+		let doubleUpper = Double(upperBound)
+		return (doubleLower ... doubleUpper).by(stepSize)
+	}
+}
+
 extension ClosedRange where Bound == Double {
 	public func by(_ stepSize: Double) -> [Double] {
 		Array(stride(from: lowerBound, through: upperBound, by: stepSize))
 	}
 	
-//	public func by(_ stepThing: Physical) -> Physical {
-//		Physical(values: self.by(stepThing.value), units: stepThing.units, sigfigs: stepThing.sigfigs)
-//	}
+	public func by(_ stepSize: Physical, sigfigs: Int = 16) -> Physical {
+		Physical(values: Array(stride(from: lowerBound, through: upperBound, by: stepSize.value)), units: stepSize.units, sigfigs: sigfigs)
+	}
+}
+
+extension ClosedRange where Bound == Physical {
+	public func by(_ stepSize: Physical) -> Physical? {
+		if (lowerBound ~ upperBound) && (lowerBound ~ stepSize),
+		   lowerBound.values == nil && upperBound.values == nil {
+			if let low = equalDimensionDictionaries(lowerBound.units, stepSize.units) ? lowerBound : lowerBound.to(units: stepSize.units),
+			   let high = equalDimensionDictionaries(upperBound.units, stepSize.units) ? upperBound : upperBound.to(units: stepSize.units) {
+				return (low.value ... high.value).by(stepSize, sigfigs: Swift.max(stepSize.sigfigs, Swift.max(low.sigfigs, high.sigfigs)))
+			}
+			
+		}
+		
+		return nil
+	}
+	
+	public func count(_ steps: Int) -> Physical? {
+		if (lowerBound ~ upperBound) && 0 < steps {
+			return self.by((upperBound - lowerBound)/steps)
+		}
+		
+		return nil
+	}
+}
+
+public func ramp(in range: Range<Int>, count: Int) -> [Double] {
+	ramp(in: Double(range.lowerBound)...Double(range.upperBound - 1), count: count)
+}
+public func ramp(in range: ClosedRange<Int>, count: Int) -> [Double] {
+	ramp(in: Double(range.lowerBound)...Double(range.upperBound), count: count)
+}
+public func ramp(in range: Range<Int>, by: Double) -> [Double] {
+	ramp(in: Double(range.lowerBound)...Double(range.upperBound - 1), by: by)
+}
+public func ramp(in range: ClosedRange<Int>, by: Double) -> [Double] {
+	ramp(in: Double(range.lowerBound)...Double(range.upperBound), by: by)
 }
 
 public func ramp(in range: ClosedRange<Double>, count: Int) -> [Double] {
@@ -58,18 +108,6 @@ public func ramp(in range: ClosedRange<Double>, count: Int) -> [Double] {
 public func ramp(in range: ClosedRange<Double>, by: Double) -> [Double] {
 	vDSP.ramp(withInitialValue: range.lowerBound, increment: by, count: Int((range.upperBound - range.lowerBound)/by) + 1)
 }
-
-/*
-extension Physical {
-	public func by(_ stepThing: Physical) -> Physical {
-		guard let vals = values else { return .notAThing }
-		
-		let
-		
-		Physical(values: , units: <#T##DimensionDictionary#>, sigfigs: <#T##Int#>)
-	}
-}
-*/
 
 func sleep(_ δt: Physical) {
 	if δt ~ 1.s {

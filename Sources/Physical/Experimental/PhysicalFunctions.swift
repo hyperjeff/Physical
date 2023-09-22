@@ -124,6 +124,26 @@ public func acosh(_ number: Physical) -> Physical { inversionTrigFunction(acosh,
 public func asinh(_ number: Physical) -> Physical { inversionTrigFunction(asinh, vvasinh, for: number) }
 public func atanh(_ number: Physical) -> Physical { inversionTrigFunction(atanh, vvatanh, for: number) }
 
+// Strong type versions -- think this thru a bit more
+
+private func strongTrigFunction(_ f: DoubleToDouble, _ g: VVDoubles, for number: Angle) -> Physical {
+	if var values = number.physical.values {
+		var count = Int32(values.count)
+		var out = [Double](repeating: 0, count: values.count)
+		g(&out, &values, &count)
+		
+		return Physical(values: out, units: [:], sigfigs: number.physical.sigfigs)
+	}
+	
+	return f(number.physical.to(.radians).value).constant.sigfigs(number.physical.sigfigs)
+}
+
+public func cos(_ angle: Angle) -> Physical { strongTrigFunction(cos, vvcos, for: angle) }
+public func sin(_ angle: Angle) -> Physical { strongTrigFunction(sin, vvsin, for: angle) }
+public func tan(_ angle: Angle) -> Physical { strongTrigFunction(tan, vvtan, for: angle) }
+public func cosh(_ angle: Angle) -> Physical { strongTrigFunction(cosh, vvcosh, for: angle) }
+public func sinh(_ angle: Angle) -> Physical { strongTrigFunction(sinh, vvsinh, for: angle) }
+public func tanh(_ angle: Angle) -> Physical { strongTrigFunction(tanh, vvtanh, for: angle) }
 
 // transcendental functions _________________________________________________________________________________________
 
@@ -174,3 +194,19 @@ public func y1(_ number: Physical) -> Physical { number.isDimensionless ? y1(num
 //public func exp(_ number: Physical) -> Double {
 //	number.isDimensionless ? exp(number.value) : .nan
 //}
+
+
+
+// experimental:
+
+public extension Array where Element == Double {
+	func rotated(_ φ: Physical) -> Physical {
+		if (φ ~ 1.radians) && (count == 2) {
+			let (x, y) = (self[0], self[1])
+			let magnitude = sqrt(x * x + y * y)
+			return [magnitude * cos(φ).value, -magnitude * sin(φ).value].constant
+		}
+		
+		return .notAThing
+	}
+}

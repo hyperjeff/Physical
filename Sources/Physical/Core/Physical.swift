@@ -6,6 +6,7 @@ infix operator ≐   // values equal within the limits of their given significan
 infix operator ~   //     of the same fundamental order of units
 infix operator !~  // not of the same fundamental order of units
 infix operator ⨃   // have any fundamental base units in common
+infix operator ⩀   // have base units in common on same side of units ratio
 infix operator ⧦   // uses a non-zero-offset system of units
 infix operator ⧗   // matching non-zero-offset units
 infix operator ⧖   // exactly matching units
@@ -172,46 +173,46 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 						unitPart += symbol
 					}
 			}
+		}
+		
+		var alreadyDrawnDivisor = false
+		firstTerm = true
+		
+		for (_, (unit, exponent)) in sortedUnits where !exponent.isPositive {
+			if unit.isKind(of: UnitAngle.self) {
+				continue
+			}
 			
-			var alreadyDrawnDivisor = false
-			firstTerm = true
+			if !alreadyDrawnDivisor {
+				unitPart += " / "
+				alreadyDrawnDivisor = true
+			}
 			
-			for (_, (unit, exponent)) in sortedUnits where !exponent.isPositive {
-				if unit.isKind(of: UnitAngle.self) {
-					continue
-				}
-				
-				if !alreadyDrawnDivisor {
-					unitPart += " / "
-					alreadyDrawnDivisor = true
-				}
-				
-				if !firstTerm {
-					unitPart += " "
-				}
-				else {
-					firstTerm = false
-				}
-				
-				let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
-	
-				switch exponent {
-					case let .integer(e):
-						switch e {
-							case -1: unitPart += "\(unit.symbol)"
-							default: unitPart += symbol + abs(e).drawnExponent
+			if !firstTerm {
+				unitPart += " "
+			}
+			else {
+				firstTerm = false
+			}
+			
+			let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
+			
+			switch exponent {
+				case let .integer(e):
+					switch e {
+						case -1: unitPart += "\(unit.symbol)"
+						default: unitPart += symbol + abs(e).drawnExponent
 					}
-					case .fraction(_, _):
-						unitPart += symbol + "^(\(exponent))"
-					case .real(_):
-						let expString = "\(exponent)"
-						if expString != "1" {
-							unitPart += symbol + "^\(expString)"
-						}
-						else {
-							unitPart += symbol
+				case .fraction(_, _):
+					unitPart += symbol + "^(\(exponent))"
+				case .real(_):
+					let expString = "\(exponent)"
+					if expString != "1" {
+						unitPart += symbol + "^\(expString)"
 					}
-				}
+					else {
+						unitPart += symbol
+					}
 			}
 		}
 		
@@ -628,6 +629,7 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 	
 	public var withFundamentalUnits: Physical {
 		var mutatedSelf = self
+		mutatedSelf.decomposeMixedUnits()
 		mutatedSelf.convertToFundamentalUnits()
 		
 		return mutatedSelf
@@ -720,6 +722,35 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 			.isEmpty
 	}
 	
+	/// Tests to see if the units of two physical quantities have any fundamental base units in common on the same side of the numerator or denominator
+	/// - Parameters:
+	///   - left: Physical quantity
+	///   - right: Physical quantity
+	public static func ⩀ (left: Physical, right: Physical) -> Bool {
+		if left.isNotAThing || right.isNotAThing {
+			return false
+		}
+		
+		var leftFundamental = left
+		var rightFundamental = right
+		
+		leftFundamental.decomposeMixedUnits()
+		rightFundamental.decomposeMixedUnits()
+		
+		leftFundamental.convertToFundamentalUnits()
+		rightFundamental.convertToFundamentalUnits()
+		
+		for (baseUnitLeft, (_, expLeft)) in leftFundamental.units {
+			if let (_, expRight) = rightFundamental.units[baseUnitLeft] {
+				if expLeft.matchesSign(of: expRight) {
+					return true
+				}
+			}
+		}
+		
+		return false
+	}
+
 	/// Tests to see if two physical quantities are of the same kind, i.e., of the same fundamental order of units
 	/// - Parameters:
 	///   - left: Physical quantity
@@ -772,7 +803,7 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 		return !(left.units.containsNonZeroOffsetUnits() || right.units.containsNonZeroOffsetUnits())
 	}
 	
-	/// Tests two physical quantities for matching set non-zero-offset units (or both having none)
+	/// Tests two physical quantities for matching set non-zero-offset units (or both having none). If this test is used then ~ is unnecessary.
 	/// - Parameters:
 	///   - left: Physical quantity
 	///   - right: Physical quantity
@@ -832,6 +863,8 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 			return notAThing(logging: "!(left ⧦ right) && !(left ⧗ right) → !\(left ⧦ right) && !\(left ⧗ right)", elements: [left, right])
 		}
 		
+		let result = left *** right
+		
 		// Only units which have a common set of units will be decomposed,
 		// as long as they are not non-zero-offset units
 		if !(left ⧖ right) && (left ⨃ right) && (left ⧦ right) {
@@ -843,11 +876,17 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 			newLeft.convertToFundamentalUnits() // <- note, ⨃ does this calculation also!
 			newRight.convertToFundamentalUnits()
 			
-			return newLeft *** newRight
+			// Only use the fundamentalUnits result if it's clearly simpler than our input dimensions
+			
+			let fundamentalResult = newLeft *** newRight
+			
+			if (left ⩀ right) || (fundamentalResult.units.count < result.units.count) {
+				return fundamentalResult
+			}
 		}
 		
 		// All other cases should be directly multiplied without first converting
-		return left *** right
+		return result
 	}
 	
 	/// Does the main grunt work for Physical quantity multiplication. Internal use only.
@@ -870,10 +909,12 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 		var scaleFactor: Double = 1
 		var newUnits = left.units
 		
+		var usedRightDimensions: [Dimension] = []
+		
 		for (baseLeft, (unitLeft, expLeft)) in left.units {
 			for (baseRight, (unitRight, expRight)) in right.units {
 				
-				if (baseLeft == baseRight) && (unitLeft != unitRight) {
+				if (baseLeft == baseRight) {
 					
 					let a = Measurement<Dimension>(value: 1, unit: unitLeft)
 					let b = Measurement<Dimension>(value: 1, unit: unitRight)
@@ -896,16 +937,20 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 					
 					let sum = expLeft + expRight
 					if !sum.isZero {
-						newUnits[baseLeft] = (newMeasure.unit, expLeft + expRight)
+						newUnits[baseLeft] = (newMeasure.unit, sum)
 					}
-					else if let _ = newUnits[unitLeft] {
+					else if let _ = newUnits[baseLeft] {
 						newUnits.removeValue(forKey: baseLeft)
 					}
+					
+					usedRightDimensions.append(baseRight)
 				}
 			}
 		}
 		
-		for (baseRight, (unit, exponent)) in right.units {
+		let rightUnitsStillToGo = right.units.filter { !usedRightDimensions.contains($0.key) }
+		
+		for (baseRight, (unit, exponent)) in rightUnitsStillToGo {
 			if let (_, current) = newUnits[baseRight] {
 				let sum = current + exponent
 				if !sum.isZero {
@@ -1019,9 +1064,10 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 
 			func returnPhysical() -> Physical {
 				if let leftValues = newLeft.values,
-				   let rightValues = newRight.values {
+				   let rightValues = newRight.values,
+				   let sum = leftValues + rightValues {
 					return Physical(
-						values: leftValues + rightValues,
+						values: sum,
 						units: newLeft.units,
 						sigfigs: additionSigfigs(newLeft.value, newRight.value)
 					)
@@ -1234,7 +1280,27 @@ public struct Physical: Equatable, Comparable, Hashable, Collection, CustomStrin
 	public static func += (left: inout Physical, right: Physical) {
 		left = left + right
 	}
-
+	
+	public static func -= (left: inout Physical, right: Physical) {
+		left = left - right
+	}
+	
+	public static func *= (left: inout Physical, right: Physical) {
+		left = left * right
+	}
+	
+	public static func /= (left: inout Physical, right: Physical) {
+		left = left / right
+	}
+	
+	public static func *= (left: inout Physical, right: Double) {
+		left = left * right
+	}
+	
+	public static func /= (left: inout Physical, right: Double) {
+		left = left / right
+	}
+	
 	public static func < (left: Physical, right: Physical) -> Bool {
 		if left.isNotAThing || right.isNotAThing {
 			return false

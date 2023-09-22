@@ -3,7 +3,7 @@ import Accelerate
 
 //____________________________________________________________/ NOT GENERATED
 
-extension Array where Element == Double {
+public extension Array where Element == Double {
 	static func * (left: Array, right: Double) -> Array {
 		var out = left
 		cblas_dscal(Int32(out.count), right, &out, 1)
@@ -59,9 +59,27 @@ public extension Array where Element == Double {
 public func vectorize(_ array: [Physical]) -> Physical? {
 	if let item = array.first,
 	   !item.isUnitless {
-		let values = array.map { $0.value }
+		
+		// perhaps we can make this safety check optional, since it takes time
+		for element in array {
+			if element !~ item {
+				return nil
+			}
+		}
+		
+		let homogeneous = array.allSatisfy { $0 ⧖ item }
+		let values: [Double]
+		
+		if homogeneous {
+			values = array.map { $0.value }
+		}
+		else {
+			values = array.compactMap { $0.to(units: item.units)?.value }
+		}
+		
 		return Physical(values: values, unit: item.units.values.first!.unit, sigfigs: item.sigfigs)
 	}
+	
 	return nil
 }
 
@@ -83,6 +101,39 @@ public extension Physical {
 	func repeated(_ times: Int) -> Physical {
 		Physical(values: [Double](repeating: self.value, count: times), units: self.units, sigfigs: self.sigfigs)
 	}
+	
+	var magnitude: Physical {
+		if var vector = values {
+			let norm = cblas_dnrm2(Int32(vector.count), &vector, 1)
+			return Physical(value: norm, units: units, sigfigs: sigfigs)
+		}
+		
+		return self
+	}
+	
+	var x: Physical {
+		if let vals = values, vals.count == 2 {
+			return self[0]
+		}
+		
+		return .notAThing
+	}
+	
+	var height: Physical { y }
+	
+	var y: Physical {
+		if let vals = values, vals.count == 2 {
+			return self[1]
+		}
+		
+		return .notAThing
+	}
+}
+
+public extension Array where Element == Physical {
+	static func → (left: Array<Physical>, right: PhysicalConversionType) -> [Physical] {
+		left.map { $0 → right }
+	}
 }
 
 //____________________________________________________________/ GENERATED
@@ -93,7 +144,7 @@ public extension Array where Element == Double {
 	//____________________________________________________________/ SPECIAL CASES
 	
 	var constant: Physical {
-		Physical(values: self, units: [:], sigfigs: 0)
+		Physical(values: self, units: [:], sigfigs: 16)
 	}
 	
 	var s: Physical {
@@ -320,6 +371,213 @@ public extension Array where Element == Double {
 	var imperialQuarts: Physical { Physical(values: self, unit: UnitVolume.imperialQuarts) }
 	var imperialGallons: Physical { Physical(values: self, unit: UnitVolume.imperialGallons) }
 	var metricCups: Physical { Physical(values: self, unit: UnitVolume.metricCups) }
+	
+	// "per" functions
+	
+	var perMetersPerSecondSquared: Physical { Physical(values: self, units: [(UnitAcceleration.metersPerSecondSquared, -1)], sigfigs: 16) }
+	var perGravity: Physical { Physical(values: self, units: [(UnitAcceleration.gravity, -1)], sigfigs: 16) }
+	var perDegree: Physical { Physical(values: self, units: [(UnitAngle.degrees, -1)], sigfigs: 16) }
+	var perArcMinute: Physical { Physical(values: self, units: [(UnitAngle.arcMinutes, -1)], sigfigs: 16) }
+	var perArcSecond: Physical { Physical(values: self, units: [(UnitAngle.arcSeconds, -1)], sigfigs: 16) }
+	var perRadian: Physical { Physical(values: self, units: [(UnitAngle.radians, -1)], sigfigs: 16) }
+	var perGradian: Physical { Physical(values: self, units: [(UnitAngle.gradians, -1)], sigfigs: 16) }
+	var perRevolution: Physical { Physical(values: self, units: [(UnitAngle.revolutions, -1)], sigfigs: 16) }
+	var perSquareMegameter: Physical { Physical(values: self, units: [(UnitArea.squareMegameters, -1)], sigfigs: 16) }
+	var perSquareKilometer: Physical { Physical(values: self, units: [(UnitArea.squareKilometers, -1)], sigfigs: 16) }
+	var perSquareMeter: Physical { Physical(values: self, units: [(UnitArea.squareMeters, -1)], sigfigs: 16) }
+	var perSquareCentimeter: Physical { Physical(values: self, units: [(UnitArea.squareCentimeters, -1)], sigfigs: 16) }
+	var perSquareMillimeter: Physical { Physical(values: self, units: [(UnitArea.squareMillimeters, -1)], sigfigs: 16) }
+	var perSquareMicrometer: Physical { Physical(values: self, units: [(UnitArea.squareMicrometers, -1)], sigfigs: 16) }
+	var perSquareNanometer: Physical { Physical(values: self, units: [(UnitArea.squareNanometers, -1)], sigfigs: 16) }
+	var perSquareInche: Physical { Physical(values: self, units: [(UnitArea.squareInches, -1)], sigfigs: 16) }
+	var perSquareFeet: Physical { Physical(values: self, units: [(UnitArea.squareFeet, -1)], sigfigs: 16) }
+	var perSquareYard: Physical { Physical(values: self, units: [(UnitArea.squareYards, -1)], sigfigs: 16) }
+	var perSquareMile: Physical { Physical(values: self, units: [(UnitArea.squareMiles, -1)], sigfigs: 16) }
+	var perAcre: Physical { Physical(values: self, units: [(UnitArea.acres, -1)], sigfigs: 16) }
+	var perAre: Physical { Physical(values: self, units: [(UnitArea.ares, -1)], sigfigs: 16) }
+	var perHectare: Physical { Physical(values: self, units: [(UnitArea.hectares, -1)], sigfigs: 16) }
+	var perGramsPerLiter: Physical { Physical(values: self, units: [(UnitConcentrationMass.gramsPerLiter, -1)], sigfigs: 16) }
+	var perMilligramsPerDeciliter: Physical { Physical(values: self, units: [(UnitConcentrationMass.milligramsPerDeciliter, -1)], sigfigs: 16) }
+	var perPartsPerMillion: Physical { Physical(values: self, units: [(UnitDispersion.partsPerMillion, -1)], sigfigs: 16) }
+	var perHour: Physical { Physical(values: self, units: [(UnitDuration.hours, -1)], sigfigs: 16) }
+	var perMinute: Physical { Physical(values: self, units: [(UnitDuration.minutes, -1)], sigfigs: 16) }
+	var perSecond: Physical { Physical(values: self, units: [(UnitDuration.seconds, -1)], sigfigs: 16) }
+	var perMillisecond: Physical { Physical(values: self, units: [(UnitDuration.milliseconds, -1)], sigfigs: 16) }
+	var perMicrosecond: Physical { Physical(values: self, units: [(UnitDuration.microseconds, -1)], sigfigs: 16) }
+	var perNanosecond: Physical { Physical(values: self, units: [(UnitDuration.nanoseconds, -1)], sigfigs: 16) }
+	var perPicosecond: Physical { Physical(values: self, units: [(UnitDuration.picoseconds, -1)], sigfigs: 16) }
+	var perCoulomb: Physical { Physical(values: self, units: [(UnitElectricCharge.coulombs, -1)], sigfigs: 16) }
+	var perMegaampereHour: Physical { Physical(values: self, units: [(UnitElectricCharge.megaampereHours, -1)], sigfigs: 16) }
+	var perKiloampereHour: Physical { Physical(values: self, units: [(UnitElectricCharge.kiloampereHours, -1)], sigfigs: 16) }
+	var perAmpereHour: Physical { Physical(values: self, units: [(UnitElectricCharge.ampereHours, -1)], sigfigs: 16) }
+	var perMilliampereHour: Physical { Physical(values: self, units: [(UnitElectricCharge.milliampereHours, -1)], sigfigs: 16) }
+	var perMicroampereHour: Physical { Physical(values: self, units: [(UnitElectricCharge.microampereHours, -1)], sigfigs: 16) }
+	var perMegaampere: Physical { Physical(values: self, units: [(UnitElectricCurrent.megaamperes, -1)], sigfigs: 16) }
+	var perKiloampere: Physical { Physical(values: self, units: [(UnitElectricCurrent.kiloamperes, -1)], sigfigs: 16) }
+	var perAmpere: Physical { Physical(values: self, units: [(UnitElectricCurrent.amperes, -1)], sigfigs: 16) }
+	var perMilliampere: Physical { Physical(values: self, units: [(UnitElectricCurrent.milliamperes, -1)], sigfigs: 16) }
+	var perMicroampere: Physical { Physical(values: self, units: [(UnitElectricCurrent.microamperes, -1)], sigfigs: 16) }
+	var perMegavolt: Physical { Physical(values: self, units: [(UnitElectricPotentialDifference.megavolts, -1)], sigfigs: 16) }
+	var perKilovolt: Physical { Physical(values: self, units: [(UnitElectricPotentialDifference.kilovolts, -1)], sigfigs: 16) }
+	var perVolt: Physical { Physical(values: self, units: [(UnitElectricPotentialDifference.volts, -1)], sigfigs: 16) }
+	var perMillivolt: Physical { Physical(values: self, units: [(UnitElectricPotentialDifference.millivolts, -1)], sigfigs: 16) }
+	var perMicrovolt: Physical { Physical(values: self, units: [(UnitElectricPotentialDifference.microvolts, -1)], sigfigs: 16) }
+	var perMegaohm: Physical { Physical(values: self, units: [(UnitElectricResistance.megaohms, -1)], sigfigs: 16) }
+	var perKiloohm: Physical { Physical(values: self, units: [(UnitElectricResistance.kiloohms, -1)], sigfigs: 16) }
+	var perOhm: Physical { Physical(values: self, units: [(UnitElectricResistance.ohms, -1)], sigfigs: 16) }
+	var perMilliohm: Physical { Physical(values: self, units: [(UnitElectricResistance.milliohms, -1)], sigfigs: 16) }
+	var perMicroohm: Physical { Physical(values: self, units: [(UnitElectricResistance.microohms, -1)], sigfigs: 16) }
+	var perKilojoule: Physical { Physical(values: self, units: [(UnitEnergy.kilojoules, -1)], sigfigs: 16) }
+	var perJoule: Physical { Physical(values: self, units: [(UnitEnergy.joules, -1)], sigfigs: 16) }
+	var perKilocalorie: Physical { Physical(values: self, units: [(UnitEnergy.kilocalories, -1)], sigfigs: 16) }
+	var perCalorie: Physical { Physical(values: self, units: [(UnitEnergy.calories, -1)], sigfigs: 16) }
+	var perKilowattHour: Physical { Physical(values: self, units: [(UnitEnergy.kilowattHours, -1)], sigfigs: 16) }
+	var perTerahertz: Physical { Physical(values: self, units: [(UnitFrequency.terahertz, -1)], sigfigs: 16) }
+	var perGigahertz: Physical { Physical(values: self, units: [(UnitFrequency.gigahertz, -1)], sigfigs: 16) }
+	var perMegahertz: Physical { Physical(values: self, units: [(UnitFrequency.megahertz, -1)], sigfigs: 16) }
+	var perKilohertz: Physical { Physical(values: self, units: [(UnitFrequency.kilohertz, -1)], sigfigs: 16) }
+	var perHertz: Physical { Physical(values: self, units: [(UnitFrequency.hertz, -1)], sigfigs: 16) }
+	var perMillihertz: Physical { Physical(values: self, units: [(UnitFrequency.millihertz, -1)], sigfigs: 16) }
+	var perMicrohertz: Physical { Physical(values: self, units: [(UnitFrequency.microhertz, -1)], sigfigs: 16) }
+	var perNanohertz: Physical { Physical(values: self, units: [(UnitFrequency.nanohertz, -1)], sigfigs: 16) }
+	var perFramesPerSecond: Physical { Physical(values: self, units: [(UnitFrequency.framesPerSecond, -1)], sigfigs: 16) }
+//	var perLitersPer100Kilometer: Physical { Physical(values: self, units: [(UnitFuelEfficiency.litersPer100Kilometers, -1, sigfigs: 16)]) }
+	var perMilesPerImperialGallon: Physical { Physical(values: self, units: [(UnitFuelEfficiency.milesPerImperialGallon, -1)], sigfigs: 16) }
+	var perMilesPerGallon: Physical { Physical(values: self, units: [(UnitFuelEfficiency.milesPerGallon, -1)], sigfigs: 16) }
+	var perByte: Physical { Physical(values: self, units: [(UnitInformationStorage.bytes, -1)], sigfigs: 16) }
+	var perBit: Physical { Physical(values: self, units: [(UnitInformationStorage.bits, -1)], sigfigs: 16) }
+	var perNibble: Physical { Physical(values: self, units: [(UnitInformationStorage.nibbles, -1)], sigfigs: 16) }
+	var perYottabyte: Physical { Physical(values: self, units: [(UnitInformationStorage.yottabytes, -1)], sigfigs: 16) }
+	var perZettabyte: Physical { Physical(values: self, units: [(UnitInformationStorage.zettabytes, -1)], sigfigs: 16) }
+	var perExabyte: Physical { Physical(values: self, units: [(UnitInformationStorage.exabytes, -1)], sigfigs: 16) }
+	var perPetabyte: Physical { Physical(values: self, units: [(UnitInformationStorage.petabytes, -1)], sigfigs: 16) }
+	var perTerabyte: Physical { Physical(values: self, units: [(UnitInformationStorage.terabytes, -1)], sigfigs: 16) }
+	var perGigabyte: Physical { Physical(values: self, units: [(UnitInformationStorage.gigabytes, -1)], sigfigs: 16) }
+	var perMegabyte: Physical { Physical(values: self, units: [(UnitInformationStorage.megabytes, -1)], sigfigs: 16) }
+	var perKilobyte: Physical { Physical(values: self, units: [(UnitInformationStorage.kilobytes, -1)], sigfigs: 16) }
+	var perYottabit: Physical { Physical(values: self, units: [(UnitInformationStorage.yottabits, -1)], sigfigs: 16) }
+	var perZettabit: Physical { Physical(values: self, units: [(UnitInformationStorage.zettabits, -1)], sigfigs: 16) }
+	var perExabit: Physical { Physical(values: self, units: [(UnitInformationStorage.exabits, -1)], sigfigs: 16) }
+	var perPetabit: Physical { Physical(values: self, units: [(UnitInformationStorage.petabits, -1)], sigfigs: 16) }
+	var perTerabit: Physical { Physical(values: self, units: [(UnitInformationStorage.terabits, -1)], sigfigs: 16) }
+	var perGigabit: Physical { Physical(values: self, units: [(UnitInformationStorage.gigabits, -1)], sigfigs: 16) }
+	var perMegabit: Physical { Physical(values: self, units: [(UnitInformationStorage.megabits, -1)], sigfigs: 16) }
+	var perKilobit: Physical { Physical(values: self, units: [(UnitInformationStorage.kilobits, -1)], sigfigs: 16) }
+	var perYobibyte: Physical { Physical(values: self, units: [(UnitInformationStorage.yobibytes, -1)], sigfigs: 16) }
+	var perZebibyte: Physical { Physical(values: self, units: [(UnitInformationStorage.zebibytes, -1)], sigfigs: 16) }
+	var perExbibyte: Physical { Physical(values: self, units: [(UnitInformationStorage.exbibytes, -1)], sigfigs: 16) }
+	var perPebibyte: Physical { Physical(values: self, units: [(UnitInformationStorage.pebibytes, -1)], sigfigs: 16) }
+	var perTebibyte: Physical { Physical(values: self, units: [(UnitInformationStorage.tebibytes, -1)], sigfigs: 16) }
+	var perGibibyte: Physical { Physical(values: self, units: [(UnitInformationStorage.gibibytes, -1)], sigfigs: 16) }
+	var perMebibyte: Physical { Physical(values: self, units: [(UnitInformationStorage.mebibytes, -1)], sigfigs: 16) }
+	var perKibibyte: Physical { Physical(values: self, units: [(UnitInformationStorage.kibibytes, -1)], sigfigs: 16) }
+	var perYobibit: Physical { Physical(values: self, units: [(UnitInformationStorage.yobibits, -1)], sigfigs: 16) }
+	var perZebibit: Physical { Physical(values: self, units: [(UnitInformationStorage.zebibits, -1)], sigfigs: 16) }
+	var perExbibit: Physical { Physical(values: self, units: [(UnitInformationStorage.exbibits, -1)], sigfigs: 16) }
+	var perPebibit: Physical { Physical(values: self, units: [(UnitInformationStorage.pebibits, -1)], sigfigs: 16) }
+	var perTebibit: Physical { Physical(values: self, units: [(UnitInformationStorage.tebibits, -1)], sigfigs: 16) }
+	var perGibibit: Physical { Physical(values: self, units: [(UnitInformationStorage.gibibits, -1)], sigfigs: 16) }
+	var perMebibit: Physical { Physical(values: self, units: [(UnitInformationStorage.mebibits, -1)], sigfigs: 16) }
+	var perKibibit: Physical { Physical(values: self, units: [(UnitInformationStorage.kibibits, -1)], sigfigs: 16) }
+	var perMegameter: Physical { Physical(values: self, units: [(UnitLength.megameters, -1)], sigfigs: 16) }
+	var perKilometer: Physical { Physical(values: self, units: [(UnitLength.kilometers, -1)], sigfigs: 16) }
+	var perHectometer: Physical { Physical(values: self, units: [(UnitLength.hectometers, -1)], sigfigs: 16) }
+	var perDecameter: Physical { Physical(values: self, units: [(UnitLength.decameters, -1)], sigfigs: 16) }
+	var perMeter: Physical { Physical(values: self, units: [(UnitLength.meters, -1)], sigfigs: 16) }
+	var perDecimeter: Physical { Physical(values: self, units: [(UnitLength.decimeters, -1)], sigfigs: 16) }
+	var perCentimeter: Physical { Physical(values: self, units: [(UnitLength.centimeters, -1)], sigfigs: 16) }
+	var perMillimeter: Physical { Physical(values: self, units: [(UnitLength.millimeters, -1)], sigfigs: 16) }
+	var perMicrometer: Physical { Physical(values: self, units: [(UnitLength.micrometers, -1)], sigfigs: 16) }
+	var perNanometer: Physical { Physical(values: self, units: [(UnitLength.nanometers, -1)], sigfigs: 16) }
+	var perPicometer: Physical { Physical(values: self, units: [(UnitLength.picometers, -1)], sigfigs: 16) }
+	var perInche: Physical { Physical(values: self, units: [(UnitLength.inches, -1)], sigfigs: 16) }
+	var perFeet: Physical { Physical(values: self, units: [(UnitLength.feet, -1)], sigfigs: 16) }
+	var perYard: Physical { Physical(values: self, units: [(UnitLength.yards, -1)], sigfigs: 16) }
+	var perMile: Physical { Physical(values: self, units: [(UnitLength.miles, -1)], sigfigs: 16) }
+	var perScandinavianMile: Physical { Physical(values: self, units: [(UnitLength.scandinavianMiles, -1)], sigfigs: 16) }
+	var perLightyear: Physical { Physical(values: self, units: [(UnitLength.lightyears, -1)], sigfigs: 16) }
+	var perNauticalMile: Physical { Physical(values: self, units: [(UnitLength.nauticalMiles, -1)], sigfigs: 16) }
+	var perFathom: Physical { Physical(values: self, units: [(UnitLength.fathoms, -1)], sigfigs: 16) }
+	var perFurlong: Physical { Physical(values: self, units: [(UnitLength.furlongs, -1)], sigfigs: 16) }
+	var perAstronomicalUnit: Physical { Physical(values: self, units: [(UnitLength.astronomicalUnits, -1)], sigfigs: 16) }
+	var perParsec: Physical { Physical(values: self, units: [(UnitLength.parsecs, -1)], sigfigs: 16) }
+	var perLux: Physical { Physical(values: self, units: [(UnitIlluminance.lux, -1)], sigfigs: 16) }
+	var perKilogram: Physical { Physical(values: self, units: [(UnitMass.kilograms, -1)], sigfigs: 16) }
+	var perGram: Physical { Physical(values: self, units: [(UnitMass.grams, -1)], sigfigs: 16) }
+	var perDecigram: Physical { Physical(values: self, units: [(UnitMass.decigrams, -1)], sigfigs: 16) }
+	var perCentigram: Physical { Physical(values: self, units: [(UnitMass.centigrams, -1)], sigfigs: 16) }
+	var perMilligram: Physical { Physical(values: self, units: [(UnitMass.milligrams, -1)], sigfigs: 16) }
+	var perMicrogram: Physical { Physical(values: self, units: [(UnitMass.micrograms, -1)], sigfigs: 16) }
+	var perNanogram: Physical { Physical(values: self, units: [(UnitMass.nanograms, -1)], sigfigs: 16) }
+	var perPicogram: Physical { Physical(values: self, units: [(UnitMass.picograms, -1)], sigfigs: 16) }
+	var perOunce: Physical { Physical(values: self, units: [(UnitMass.ounces, -1)], sigfigs: 16) }
+	var perPoundsMass: Physical { Physical(values: self, units: [(UnitMass.pounds, -1)], sigfigs: 16) }
+	var perStone: Physical { Physical(values: self, units: [(UnitMass.stones, -1)], sigfigs: 16) }
+	var perMetricTon: Physical { Physical(values: self, units: [(UnitMass.metricTons, -1)], sigfigs: 16) }
+	var perShortTon: Physical { Physical(values: self, units: [(UnitMass.shortTons, -1)], sigfigs: 16) }
+	var perCarat: Physical { Physical(values: self, units: [(UnitMass.carats, -1)], sigfigs: 16) }
+	var perOuncesTroy: Physical { Physical(values: self, units: [(UnitMass.ouncesTroy, -1)], sigfigs: 16) }
+	var perSlug: Physical { Physical(values: self, units: [(UnitMass.slugs, -1)], sigfigs: 16) }
+	var perTerawatt: Physical { Physical(values: self, units: [(UnitPower.terawatts, -1)], sigfigs: 16) }
+	var perGigawatt: Physical { Physical(values: self, units: [(UnitPower.gigawatts, -1)], sigfigs: 16) }
+	var perMegawatt: Physical { Physical(values: self, units: [(UnitPower.megawatts, -1)], sigfigs: 16) }
+	var perKilowatt: Physical { Physical(values: self, units: [(UnitPower.kilowatts, -1)], sigfigs: 16) }
+	var perWatt: Physical { Physical(values: self, units: [(UnitPower.watts, -1)], sigfigs: 16) }
+	var perMilliwatt: Physical { Physical(values: self, units: [(UnitPower.milliwatts, -1)], sigfigs: 16) }
+	var perMicrowatt: Physical { Physical(values: self, units: [(UnitPower.microwatts, -1)], sigfigs: 16) }
+	var perNanowatt: Physical { Physical(values: self, units: [(UnitPower.nanowatts, -1)], sigfigs: 16) }
+	var perPicowatt: Physical { Physical(values: self, units: [(UnitPower.picowatts, -1)], sigfigs: 16) }
+	var perFemtowatt: Physical { Physical(values: self, units: [(UnitPower.femtowatts, -1)], sigfigs: 16) }
+	var perHorsepower: Physical { Physical(values: self, units: [(UnitPower.horsepower, -1)], sigfigs: 16) }
+	var perNewtonsPerMetersSquared: Physical { Physical(values: self, units: [(UnitPressure.newtonsPerMetersSquared, -1)], sigfigs: 16) }
+	var perGigapascal: Physical { Physical(values: self, units: [(UnitPressure.gigapascals, -1)], sigfigs: 16) }
+	var perMegapascal: Physical { Physical(values: self, units: [(UnitPressure.megapascals, -1)], sigfigs: 16) }
+	var perKilopascal: Physical { Physical(values: self, units: [(UnitPressure.kilopascals, -1)], sigfigs: 16) }
+	var perHectopascal: Physical { Physical(values: self, units: [(UnitPressure.hectopascals, -1)], sigfigs: 16) }
+	var perInchesOfMercury: Physical { Physical(values: self, units: [(UnitPressure.inchesOfMercury, -1)], sigfigs: 16) }
+	var perBar: Physical { Physical(values: self, units: [(UnitPressure.bars, -1)], sigfigs: 16) }
+	var perMillibar: Physical { Physical(values: self, units: [(UnitPressure.millibars, -1)], sigfigs: 16) }
+	var perMillimetersOfMercury: Physical { Physical(values: self, units: [(UnitPressure.millimetersOfMercury, -1)], sigfigs: 16) }
+	var perPoundsForcePerSquareInch: Physical { Physical(values: self, units: [(UnitPressure.poundsForcePerSquareInch, -1)], sigfigs: 16) }
+	var perMetersPerSecond: Physical { Physical(values: self, units: [(UnitSpeed.metersPerSecond, -1)], sigfigs: 16) }
+	var perKilometersPerHour: Physical { Physical(values: self, units: [(UnitSpeed.kilometersPerHour, -1)], sigfigs: 16) }
+	var perMilesPerHour: Physical { Physical(values: self, units: [(UnitSpeed.milesPerHour, -1)], sigfigs: 16) }
+	var perKnot: Physical { Physical(values: self, units: [(UnitSpeed.knots, -1)], sigfigs: 16) }
+	var perKelvin: Physical { Physical(values: self, units: [(UnitTemperature.kelvin, -1)], sigfigs: 16) }
+	var perCelsius: Physical { Physical(values: self, units: [(UnitTemperature.celsius, -1)], sigfigs: 16) }
+	var perFahrenheit: Physical { Physical(values: self, units: [(UnitTemperature.fahrenheit, -1)], sigfigs: 16) }
+	var perMegaliter: Physical { Physical(values: self, units: [(UnitVolume.megaliters, -1)], sigfigs: 16) }
+	var perKiloliter: Physical { Physical(values: self, units: [(UnitVolume.kiloliters, -1)], sigfigs: 16) }
+	var perLiter: Physical { Physical(values: self, units: [(UnitVolume.liters, -1)], sigfigs: 16) }
+	var perDeciliter: Physical { Physical(values: self, units: [(UnitVolume.deciliters, -1)], sigfigs: 16) }
+	var perCentiliter: Physical { Physical(values: self, units: [(UnitVolume.centiliters, -1)], sigfigs: 16) }
+	var perMilliliter: Physical { Physical(values: self, units: [(UnitVolume.milliliters, -1)], sigfigs: 16) }
+	var perCubicKilometer: Physical { Physical(values: self, units: [(UnitVolume.cubicKilometers, -1)], sigfigs: 16) }
+	var perCubicMeter: Physical { Physical(values: self, units: [(UnitVolume.cubicMeters, -1)], sigfigs: 16) }
+	var perCubicDecimeter: Physical { Physical(values: self, units: [(UnitVolume.cubicDecimeters, -1)], sigfigs: 16) }
+	var perCubicCentimeter: Physical { Physical(values: self, units: [(UnitVolume.cubicCentimeters, -1)], sigfigs: 16) }
+	var perCubicMillimeter: Physical { Physical(values: self, units: [(UnitVolume.cubicMillimeters, -1)], sigfigs: 16) }
+	var perCubicInche: Physical { Physical(values: self, units: [(UnitVolume.cubicInches, -1)], sigfigs: 16) }
+	var perCubicFeet: Physical { Physical(values: self, units: [(UnitVolume.cubicFeet, -1)], sigfigs: 16) }
+	var perCubicYard: Physical { Physical(values: self, units: [(UnitVolume.cubicYards, -1)], sigfigs: 16) }
+	var perCubicMile: Physical { Physical(values: self, units: [(UnitVolume.cubicMiles, -1)], sigfigs: 16) }
+	var perAcreFeet: Physical { Physical(values: self, units: [(UnitVolume.acreFeet, -1)], sigfigs: 16) }
+	var perBushel: Physical { Physical(values: self, units: [(UnitVolume.bushels, -1)], sigfigs: 16) }
+	var perTeaspoon: Physical { Physical(values: self, units: [(UnitVolume.teaspoons, -1)], sigfigs: 16) }
+	var perTablespoon: Physical { Physical(values: self, units: [(UnitVolume.tablespoons, -1)], sigfigs: 16) }
+	var perFluidOunce: Physical { Physical(values: self, units: [(UnitVolume.fluidOunces, -1)], sigfigs: 16) }
+	var perCup: Physical { Physical(values: self, units: [(UnitVolume.cups, -1)], sigfigs: 16) }
+	var perPint: Physical { Physical(values: self, units: [(UnitVolume.pints, -1)], sigfigs: 16) }
+	var perQuart: Physical { Physical(values: self, units: [(UnitVolume.quarts, -1)], sigfigs: 16) }
+	var perGallon: Physical { Physical(values: self, units: [(UnitVolume.gallons, -1)], sigfigs: 16) }
+	var perImperialTeaspoon: Physical { Physical(values: self, units: [(UnitVolume.imperialTeaspoons, -1)], sigfigs: 16) }
+	var perImperialTablespoon: Physical { Physical(values: self, units: [(UnitVolume.imperialTablespoons, -1)], sigfigs: 16) }
+	var perImperialFluidOunce: Physical { Physical(values: self, units: [(UnitVolume.imperialFluidOunces, -1)], sigfigs: 16) }
+	var perImperialPint: Physical { Physical(values: self, units: [(UnitVolume.imperialPints, -1)], sigfigs: 16) }
+	var perImperialQuart: Physical { Physical(values: self, units: [(UnitVolume.imperialQuarts, -1)], sigfigs: 16) }
+	var perImperialGallon: Physical { Physical(values: self, units: [(UnitVolume.imperialGallons, -1)], sigfigs: 16) }
+	var perMetricCup: Physical { Physical(values: self, units: [(UnitVolume.metricCups, -1)], sigfigs: 16) }
+
 	
 	
 	//____________________________________________________________/ FROM EXTENSIONS TO APPLE'S UNITS

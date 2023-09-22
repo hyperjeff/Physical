@@ -432,8 +432,8 @@ public extension Physical {
 		public static let lightSpeed = 299_792_458.m.s(-1)
 		public static let gravitation = 6.674_30e-11.m(3).kg(-1).s(-2)
 		
-		public static let planck = 6.626_070_15e-34.J.s(1)
-		public static let reducedPlanck = 1.054_571_817e-34.J.s(1)
+		public static let planck = 6.626_070_15e-34.J.s
+		public static let reducedPlanck = 1.054_571_817e-34.J.s
 		public static let fineStructure = 7.297_352_5693e-3.constant // 0.007_297_352_562_781_278 ish
 		public static let inverseFineStructure = 137.035_999_084.constant
 		public static let rydberg = 10_973_731.568_160.m(-1)
@@ -463,11 +463,11 @@ public extension Physical {
 		public static let atomicMass = 1.660_539_066_60e-27.kg
 		public static let stefanBoltzmann = 5.670_374_419e-8.W.m(-2).kelvin(-4)
 		public static let firstRadiation = 3.741_771_852e-16.W.m(2)
-		public static let secondRadiation = 1.438_776_877e-2.m.kelvin(1)
+		public static let secondRadiation = 1.438_776_877e-2.m.kelvin
 		public static let firstRadiationSpectralRadiance = 1.191_042_972e-16.W.m(2).steradians
-		public static let wienWavelength = 2.897_771_955e-3.m.kelvin(1)
+		public static let wienWavelength = 2.897_771_955e-3.m.kelvin
 		public static let wienFrequency = 5.878_925_757e10.Hz.kelvin(-1)
-		public static let wienEntropy = 3.002_916_077e-3.m.kelvin(1)
+		public static let wienEntropy = 3.002_916_077e-3.m.kelvin
 	}
 }
 

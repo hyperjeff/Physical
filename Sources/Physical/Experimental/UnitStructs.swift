@@ -14,6 +14,9 @@ public func +<T: PhysicalType> (lhs: T, rhs: T) -> T {
 	return out
 }
 public func +=<T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical += rhs.physical }
+public func -=<T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical -= rhs.physical }
+public func *=<T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical *= rhs.physical }
+public func /=<T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical /= rhs.physical }
 
 public func == (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical == rhs.physical }
 public func < (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical < rhs.physical }
