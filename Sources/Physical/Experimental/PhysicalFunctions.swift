@@ -1,16 +1,6 @@
 import Foundation
 import Accelerate
 
-postfix operator °
-prefix operator √
-prefix operator ∛
-prefix operator ∜
-prefix operator -
-infix operator ∓
-infix operator ±
-infix operator → : CastingPrecedence
-
-
 public typealias DoubleToDouble = (Double) -> (Double)
 public typealias VVDoubles = (UnsafeMutablePointer<Double>, UnsafePointer<Double>, UnsafePointer<Int32>) -> Void
 
@@ -46,14 +36,6 @@ public extension Physical {
 		-1 * left
 	}
 	
-//	static func ∓ (left: Physical, right: Physical) -> (Physical, Physical) {
-//		(left - right, left + right)
-//	}
-//
-//	static func ± (left: Physical, right: Physical) -> (Physical, Physical) {
-//		(left + right, left - right)
-//	}
-	
 	static func * (left: (Physical, Physical), right: Physical) -> (Physical, Physical) {
 		(left.0 * right, left.1 * right)
 	}
@@ -77,8 +59,8 @@ public func abs(_ number: Physical) -> Physical {
 // trigonometric functions _________________________________________________________________________________________
 
 private func trigFunction(_ f: DoubleToDouble, _ g: VVDoubles, for number: Physical) -> Physical {
-	if number ~ 1.0.radians {
-		if var values = number.values {
+	if number ~ 1.radians {
+		if var values = number.to(.radians).values {
 			var count = Int32(values.count)
 			var out = [Double](repeating: 0, count: values.count)
 			g(&out, &values, &count)

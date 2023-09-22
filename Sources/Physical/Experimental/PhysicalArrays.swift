@@ -34,6 +34,29 @@ public extension Array where Element == Double {
 		return out
 	}
 	
+	static func +! (left: Array, right: Array) -> Array {
+		var out = right
+		cblas_daxpy(Int32(out.count), 1, left, 1, &out, 1)
+		
+		return out
+	}
+	
+	static func - (left: Array, right: Array) -> Array? {
+		guard left.count == right.count else { return nil }
+		
+		var out = left
+		cblas_daxpy(Int32(out.count), -1, right, 1, &out, 1)
+		
+		return out
+	}
+	
+	static func -! (left: Array, right: Array) -> Array {
+		var out = left
+		cblas_daxpy(Int32(out.count), -1, right, 1, &out, 1)
+		
+		return out
+	}
+	
 	static func + (left: Array, right: Double) -> Array {
 		var out = [Double](repeating: right, count: left.count)
 		cblas_daxpy(Int32(out.count), 1, left, 1, &out, 1)
@@ -48,36 +71,95 @@ public extension Array where Element == Double {
 		return out
 	}
 	
-}
-
-public extension Array where Element == Double {
+	static func - (left: Double, right: Array) -> Array {
+		var out = right
+		var x = [Double](repeating: left, count: out.count)
+		catlas_daxpby(Int32(out.count), 1, &x, 1, -1, &out, 1)
+		return out
+	}
+	
+	static func - (left: Array, right: Double) -> Array {
+		left + (-right)
+	}
+	
+	static func ⨁ (left: Array, right: Array) -> Array? {
+		left + right
+	}
+	
+	static func ⨀ (left: Array, right: Array) -> Array {
+//		guard left.count == right.count else { return nil }
+		
+		var out = [Double](repeating: 0, count: left.count)
+		vDSP_vmulD(left, 1, right, 1, &out, 1, vDSP_Length(left.count))
+		return out
+	}
+	
+//	static func ⨀! (left: Array, right: Array) -> Array {
+//		(left ⨀ right)!
+//	}
+	
+	static func .* (left: Array, right: Array) -> Array {
+		left ⨀ right
+	}
+	
+	static func • (left: Array, right: Array) -> Double {
+		cblas_ddot(1, left, 1, right, 1)
+	}
+	
+	// the Following COULD be generated, but is small enough to hard-code
+	
+	func sum() -> Double {
+		vDSP.sum(self)
+	}
+	
+	func mean() -> Double {
+		vDSP.mean(self)
+	}
+	
+	func minimum() -> Double {
+		vDSP.minimum(self)
+	}
+	
+	func maximum() -> Double {
+		vDSP.maximum(self)
+	}
+	
 	var sigfigs: Int {
 		self.map { $0.sigfigs }.max() ?? 0
 	}
+
 }
 
 public func vectorize(_ array: [Physical]) -> Physical? {
-	if let item = array.first,
-	   !item.isUnitless {
+	if let item = array.first {
 		
-		// perhaps we can make this safety check optional, since it takes time
+		// TODO: speed up this check
 		for element in array {
 			if element !~ item {
 				return nil
 			}
 		}
 		
-		let homogeneous = array.allSatisfy { $0 ⧖ item }
-		let values: [Double]
-		
-		if homogeneous {
-			values = array.map { $0.value }
+		if item.isUnitless {
+			return array
+				.map { $0.value }
+				.constant
+				.sigfigs(item.sigfigs)
 		}
 		else {
-			values = array.compactMap { $0.to(units: item.units)?.value }
+			// perhaps we can make this safety check optional, since it takes time
+			let homogeneous = array.allSatisfy { $0 ⧖ item }
+			let values: [Double]
+			
+			if homogeneous {
+				values = array.map { $0.value }
+			}
+			else {
+				values = array.compactMap { $0.to(units: item.units)?.value }
+			}
+			
+			return Physical(values: values, unit: item.units.values.first!.unit, sigfigs: item.sigfigs)
 		}
-		
-		return Physical(values: values, unit: item.units.values.first!.unit, sigfigs: item.sigfigs)
 	}
 	
 	return nil
@@ -102,6 +184,38 @@ public extension Physical {
 		Physical(values: [Double](repeating: self.value, count: times), units: self.units, sigfigs: self.sigfigs)
 	}
 	
+	func sum() -> Physical {
+		if let vector = values {
+			return Physical(value: vDSP.sum(vector), units: units, sigfigs: sigfigs)
+		}
+		
+		return self
+	}
+	
+	func mean() -> Physical {
+		if let vector = values {
+			return Physical(value: vDSP.mean(vector), units: units, sigfigs: sigfigs)
+		}
+		
+		return self
+	}
+	
+	func minimum() -> Physical {
+		if let vector = values {
+			return Physical(value: vDSP.minimum(vector), units: units, sigfigs: sigfigs)
+		}
+		
+		return self
+	}
+	
+	func maximum() -> Physical {
+		if let vector = values {
+			return Physical(value: vDSP.maximum(vector), units: units, sigfigs: sigfigs)
+		}
+		
+		return self
+	}
+	
 	var magnitude: Physical {
 		if var vector = values {
 			let norm = cblas_dnrm2(Int32(vector.count), &vector, 1)
@@ -109,6 +223,36 @@ public extension Physical {
 		}
 		
 		return self
+	}
+	
+	static func ⨀ (left: Physical, right: Physical) -> Physical {
+		return preMultiply(left, right, elementWise: true)
+	}
+	
+	func slidingWindowAverage(windowLength: Int) -> Physical {
+		if let vector = values {
+			let n = vector.count
+			let windowOffset = windowLength / 2
+			var out = [Double](repeating: 0, count: n)
+			
+			vDSP_vswsumD(vector, 1, &out[windowOffset], 1, vDSP_Length(n + windowOffset), vDSP_Length(windowLength))
+			
+			let slice = vector[0...windowLength]
+			
+			for i in 0..<windowOffset {
+				for j in 0..<(windowLength - windowOffset + i) {
+					out[i] += slice[j]
+				}
+			
+				out[i] += Double(windowOffset - i) * vector[i]
+			}
+			
+			cblas_dscal(Int32(n), 1 / Double(windowLength), &out, 1)
+			
+			return Physical(values: out, units: units, sigfigs: sigfigs)
+		}
+		
+		return .notAThing
 	}
 	
 	var x: Physical {
@@ -135,6 +279,7 @@ public extension Array where Element == Physical {
 		left.map { $0 → right }
 	}
 }
+
 
 //____________________________________________________________/ GENERATED
 
@@ -167,6 +312,9 @@ public extension Array where Element == Double {
 	}
 	
 	//____________________________________________________________/ FROM APPLE'S TYPES
+	
+	// why was newtons missing??
+	var newtons: Physical { Physical(values: self, unit: UnitForce.newtons)}
 	
 	var metersPerSecondSquared: Physical { Physical(values: self, unit: UnitAcceleration.metersPerSecondSquared) }
 	var gravity: Physical { Physical(values: self, unit: UnitAcceleration.gravity) }
@@ -585,6 +733,7 @@ public extension Array where Element == Double {
 	//____________________________________________________________/ FROM ORIGINAL UNITS
 	
 	var particles: Physical { Physical(values: self, unit: UnitAmount.particles) }
+	var events: Physical { Physical(values: self, unit: UnitAmount.events) }
 	var years: Physical { Physical(values: self, unit: UnitDuration.years) }
 	var pascals: Physical { Physical(values: self, unit: UnitPressure.pascals) }
 }

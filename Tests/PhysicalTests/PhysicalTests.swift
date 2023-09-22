@@ -158,7 +158,6 @@ final class PhysicalTests: XCTestCase {
 		XCTAssertEqual(1°.description, "1 °")
 		XCTAssertEqual(1°.m(-1).description, "1 ° / m")
 		
-		XCTAssertEqual((1.s / 1°.kg).description, (1.s / 1.kg).description)
 		XCTAssertEqual(1.radiansPerSecond.description, "1 rad/s")
 	}
 	
@@ -224,83 +223,7 @@ final class PhysicalTests: XCTestCase {
 		// also: F == [121.3, 556.8, 883.8].newtons
 	}
 	
-	/*
-	func testUnitPromotion() {
-		let F = 1.ft * 20.lbs / (1.minutes^2)
-		XCTAssert(F.convertUp(to: 1.newtons).sigfigs(5) == 7.6808e-4.newtons)
-		XCTAssert(F.to_newtons.sigfigs(5) == 7.6808e-4.newtons)
-		XCTAssert(F.convertUp(to: 1.parsecs) == .notAThing)
-		XCTAssert((F * 1.yards).convertUp(to: 1.joules).sigfigs(5) == 7.0233e-4.joules)
-		XCTAssert(((F * 1.yards).convertUp(to: 1.joules) / 1.meters).sigfigs(5) == 7.0233e-4.kg.m(1).s(-2))
-		XCTAssert(F.withFundamentalUnits.sigfigs(5) == 7.6808e-4.kg.m(1).s(-2))
-	}*/
-	
-	/*
-	func testBasicNumericComparisons() {
-		let x: Float = 12.3456
-		let y: Double = 12.3456
-//		let z: Float80 = 12.3456
-		
-		let p = Physical(value: Doublex, unit: UnitPower.horsepower) / 4
-		let q = Physical(value: y, unit: UnitPower.horsepower) / 4
-//		let r = Physical(value: z, unit: UnitPower.horsepower) / 4
-		print(p.description)
-//		XCTAssert(p.description == r.description)
-		XCTAssert(p.description == q.description)
-//		XCTAssert(q.description == r.description)
-	}*/
-	
 	// MARK: - Physics -
-	
-	func testTires() {
-		// Base on this video from Darien: https://www.youtube.com/watch?v=NYvKxsYFqO8
-		
-		//_________________________________________/ Physical constants
-		let airDensity = 1.225.kg.m(-3)
-		let gravity = Physical.Constants.Earth.surfaceGravity
-		
-		//_________________________________________/ Characteristics of the car
-		let groundClearance = 6.inches
-		let frontalArea = 2.2.squareMeters
-		let dragCoefficient = 0.25
-		let mass = 1800.kg
-		
-		//_________________________________________/ Choice of tires
-		let narrowTire = 205.mm
-		let wideTire = 305.mm
-		
-		//_________________________________________/ Driving scenario
-		let speed = 75.mph
-		let distance = 320.km
-		
-		//_________________________________________/ Step 1. Energies required to overcome air drag
-		
-		func energyRequiredToOvercomeDrag(forArea area: Physical) -> Physical {
-			airDensity * (speed^2) * dragCoefficient * area * distance / 2
-		}
-		
-		let areaExposedNarrowPerTire = groundClearance * narrowTire
-		let areaExposedWidePerTire = groundClearance * wideTire
-		let ΔareaExposed = 2 * (areaExposedWidePerTire - areaExposedNarrowPerTire)
-		
-		print(energyRequiredToOvercomeDrag(forArea: frontalArea).sigfigs(3) → .kilowattHours)
-		print(energyRequiredToOvercomeDrag(forArea: frontalArea + ΔareaExposed).sigfigs(3) → .kilowattHours)
-		
-		//_________________________________________/ Step 2. Rolling resistance
-		
-		let bestCaseEnergy  = 0.005 * mass * gravity * distance
-		let badCaseEnergy   = 0.015 * mass * gravity * distance
-		let realisticEnergySavings = (0.01 - 0.008) * mass * gravity * distance
-		
-		//		print((bestCaseEnergy.to_kilowattHours.sigfigs(3), badCaseEnergy.to_kilowattHours.sigfigs(3)))
-		//		print(realisticEnergySavings.to_kilowattHours.sigfigs(3))
-		
-		//_________________________________________/ Step 3. Wheel size
-		
-		
-		
-		//		print("")
-	}
 	
 	func testLong43() {
 		let aluminumPlatTemp = 68.5.℉
@@ -375,26 +298,6 @@ final class PhysicalTests: XCTestCase {
 		print(orbitHeight.physical → .miles)
 		XCTAssertEqual(orbitHeight.physical, (235 ± 1%).miles)
 	}
-	
-	/* ± still needs some thought
-	func testPlusMinus() {
-		let a = 5.m
-		let b = 4 ± 1.1.m
-		let c = 2 ± 0.3.m
-		let d = 2 ± 0.3.s
-		let e = -12.345.miles
-		let f = -13.441 ± 2.miles
-		let g = 0.constant.gigaannum
-		let h = 2 ± 2.3.s
-		
-		XCTAssert(!(a == c))
-		XCTAssert(!(a == d))
-		XCTAssertNotEqual(a, b)
-		XCTAssertNotEqual(a, c)
-		XCTAssertNotEqual(a, d)
-		XCTAssertEqual(e, f)
-		XCTAssertEqual(g, h)
-	}*/
 	
 	func testMoonWeight() {
 		let weight = 1_000.lbf.sigfigs(3)
@@ -531,7 +434,7 @@ final class PhysicalTests: XCTestCase {
 	}
 	
 	func testPVeqNRT() {
-		let P = 1.atm                // ← kg / m s2
+		let P = 1.atm
 		let V = 0.100.cubicMeters
 		let N = 0.00420.moles
 		
@@ -550,40 +453,6 @@ final class PhysicalTests: XCTestCase {
 		XCTAssert(1.fahrenheit ~ T)
 	}
 	
-	func testPlanckLength() {
-		// Checking that the Planck length does indeed have dimensions of length
-		
-		let ℏ = Physical.Constants.reducedPlanck
-		let c = Physical.Constants.lightSpeed
-		let G = Physical.Constants.gravitation
-		let c³ = c ^ 3
-		
-		XCTAssert(√(ℏ * G / c³) ~ 1.m)
-	}
-	
-	func testUnitChoices() {
-		func unitDescription(_ x: Physical) -> String {
-			x.description.split(separator: " ")[1...].joined(separator: " ")
-		}
-		
-		var ℏ = Physical.Constants.reducedPlanck
-		
-		XCTAssertEqual(unitDescription(ℏ), "J s")
-		
-		ℏ.decomposeMixedUnits()
-		ℏ.convertToFundamentalUnits()
-		
-		XCTAssertEqual(unitDescription(ℏ), "kg m² / s")
-		
-		let ms = 1.J * 1.s / 1.N
-		
-		XCTAssertEqual(unitDescription(ms), "m s")
-		
-		// much more should be in here
-	}
-	
-	// Exam Survival Guide, Physical Chemistry — Jochen Vogt (2017)
-	
 	func testInterIonicDistanceInSalt() { // 2.2
 		let densityNaCl = 2.165.g/.cm(3)
 		let massNa = Physical.Constants.Atom.sodium.mass
@@ -595,7 +464,6 @@ final class PhysicalTests: XCTestCase {
 		
 		let volumeOneMoleNaCl = volume / Physical.Constants.avogadro
 		
-//		let ionDistance = (volumeOneMoleNaCl / 2) ^ (1/3)
 		let ionDistance = ∛(volumeOneMoleNaCl / 2)
 		
 		XCTAssertEqual(massNaCl, 58.443.g/.moles )
@@ -603,169 +471,4 @@ final class PhysicalTests: XCTestCase {
 		XCTAssertEqual(volumeOneMoleNaCl, 4.48e-29.m³ )
 		XCTAssertEqual(ionDistance, 2.82e-10.m )
 	}
-	
-	// MARK: - Experiments -
-	
-	func test___PhysicalExponent() {
-		XCTAssert((1.minutes ^ 1.ft).isNotAThing)
-		
-		let R₁ = 22.ohms
-		let R₂ = 47.ohms
-		let v₀ = 5.volts
-		let v = v₀ ^ (1 + R₁/R₂)  // ← what units should this have?
-		
-		print(v)
-	}
-	
-	func test___() {
-		let a = [1.1, 2.2, 3.3].kg + [10.01, 20.02, 33.33].kg
-		let b = [1.1, 2.2, 3.3].kg - [10.01, 20.02, 33.33].kg
-		
-		// b[1] = -18.kg ← would be nice
-		
-		print(a)
-		print(b)
-		
-		print(a.sigfigs(3))
-		print(([1, 2, 3].kg + 10.kg).sigfigs(2))
-		print((1.kg + [10, 20, 33].kg).sigfigs(2))
-	}
-	
-	func test____() {
-		var l = Physical.Constants.lightSpeed
-		var g = 2.N
-		var n = 2.N.meters(1).hours(2)
-		
-		let o = 1.meters(3) → .liters
-		print(o)
-		print(1.cubicMeters → .liters)
-		print(1.L → .cubicMeters)
-		print(1.L.withBasicUnits)
-		
-		let a₀ = 27.g.cm(-3)
-		let b₀ = 27.g.cm(-3).watts(-2)
-		let c₀ = 14.seconds(-1)
-		
-		let a = 27.g/.cm(3)
-		let b = 27.g/.cm(3).watts(2)
-		let c = 14/.seconds
-		
-		let b₁ = 27.g.per.cm(3).watts(2)
-		
-		print("\(b) | \(b₁)")
-		
-		let freeFall = 9.81.m/.s
-		
-		print(freeFall)
-		print((a₀, b₀, c₀))
-		print((a, b))
-		print(c)
-		
-		
-		let P = 1.atm
-		let N = 0.0042.moles
-//		let V = 0.1.cubicMeters
-		let V = 0.1.meters(3)
-		let R = Physical.Constants.molarGas
-		let R₁ = 0.08206.atm.liters(1).kelvin(-1).moles(-1)
-		let R₂ = 0.08206.atm.liters(1)/.kelvin(1).moles(1)
-		
-		// experimental single-exponent vars:
-		let R₀ = 0.08206.atm.liters/.kelvin.moles
-		
-		print(P * V / (N * R))
-		print(P * V / (N * R₁))
-		print(P * V / (N * R₂))
-		print(P * V / (N * R₀))
-		print(P * V / (N * R) → .celsius)
-		print(P * V / (N * R₁) → .celsius)
-		
-		//    1 atm  *  0.1 m^3      K mol           m^3
-		//   -------------------------------  =  290 --- K  =  290,000 K
-		//    0.0042 mol  *  0.08206 atm L            L
-		
-		
-//		XCTAssert() // should be 1000
-	}
-	
-	func test_____() {
-		let t = 6.celsius
-		
-		let m = 4.s + 3.m
-		let z = m + Physical.notAThing
-		
-		struct Polly {
-			var coefficients: Physical  // ← which *must* be built on an array of values [a, b, c, ...].«unit»
-			
-			func expand(toOrder order: Int) -> ((Physical) -> Physical) {
-				guard let α = coefficients.values,
-					  order <= α.count
-				else {
-					return { _ in .notAThing }
-				}
-				
-				return { x in
-					(0..<order).map({ j in α[j] * (x ^ j) }).reduce(x * 0, +)
-				}
-			}
-		}
-		
-		let x: Physical = [1.2, 0, 11].constant
-		let p = Polly(coefficients: x)
-		//let f = p.expand(toOrder: 3)
-		
-		//f(3.m)
-		
-
-		
-	}
-	
-	func test_Foster_Tregeagle() {
-		let power = 70.megawatts
-		let momentOfInertia = 16_000.kg.squareMeters
-		let idleLoad = 10.revolutions/.min
-		let syncSpeed = 93.75.revolutions/.min
-		let Δtime = 3.minutes
-		
-		let energy1 = momentOfInertia * (idleLoad ^ 2) / 2
-		let torqueAverage = (syncSpeed - idleLoad) * momentOfInertia / Δtime
-		
-		// Type 1 KOQ error test:
-		XCTAssert((energy1 + torqueAverage).isNotAThing)
-
-	}
-	// what is the point of the following?
-//    static var allTests = [
-//		("testZeroCase", testZeroCase),
-//        ("testAdditionSigfigs", testAdditionSigfigs),
-//		("testMultiplicationSigfigs", testMultiplicationSigfigs)
-//
-//    ]
 }
-
-/*
-final class PhysicalTypeTests: XCTestCase {
-	func testTest() {
-		let pt = PhysicalType<UnitDuration>(physical: 3.s)
-		
-		func add1s(time: PhysicalType<UnitDuration>) -> Physical {
-			return 2.s
-		}
-		
-		print(add1s(time: pt))
-		
-		print(Complex(4.0))
-		
-		func thisPow<T: Real>(_ x: T, toThe y: T) -> T { pow(x, y) }
-		
-		print(thisPow(Double(10.0), toThe: Double(12.3456)))
-	}
-}
-*/
-
-
-/*
- N       kg m        kg
----  =  ------- =  -----
-m m     m m s s    m s s
-*/

@@ -36,17 +36,20 @@ public extension Dimension {
 
 // Additional Dimensions added to existing Units
 
+public extension UnitAcceleration {
+	static let gals = UnitAcceleration(symbol: "Gal", converter: UnitConverterLinear(coefficient: 0.01))
+}
+
 public extension UnitAngle {
 	// overrides: Foundation uses degrees as the base unit, and we wish to make it radians
 	static let radians = UnitAngle(symbol: "rad", converter: UnitConverterLinear(coefficient: 1))
 	static let gradians = UnitAngle(symbol: "gon", converter: UnitConverterLinear(coefficient: 1.π / 100))
+	static let cycles = UnitAngle(symbol: "cyl", converter: UnitConverterLinear(coefficient: 2.π))
 	static let revolutions = UnitAngle(symbol: "rev", converter: UnitConverterLinear(coefficient: 2.π))
 	static let degrees = UnitAngle(symbol: "°", converter: UnitConverterLinear(coefficient: 1.π / 180))
 	
 	// supplementary units:
 	static let binaryRadians = UnitAngle(symbol: "brad", converter: UnitConverterLinear(coefficient: 9/10))
-//	static let arcMinutes = UnitAngle(symbol: "′", converter: UnitConverterLinear(coefficient: 360/21600))
-//	static let arcSeconds = UnitAngle(symbol: "″", converter: UnitConverterLinear(coefficient: 360/1_296_000))
 	static let milliArcSeconds = UnitAngle(symbol: "mas", converter: UnitConverterLinear(coefficient: 360/1_296_000_000))
 	static let microArcSeconds = UnitAngle(symbol: "μas", converter: UnitConverterLinear(coefficient: 360/1_296_000_000_000))
 	
@@ -54,7 +57,7 @@ public extension UnitAngle {
 }
 
 public extension UnitArea {
-	static let barns = UnitArea(symbol: "b", converter: UnitConverterLinear(coefficient: 10e-28))
+	static let barns = UnitArea(symbol: "b", converter: UnitConverterLinear(coefficient: 1e-28))
 }
 
 public extension UnitDuration {
@@ -75,7 +78,7 @@ public extension UnitEnergy {
 }
 
 public extension UnitLength {
-	static let angstroms = UnitLength(symbol: "Å", converter: UnitConverterLinear(coefficient: 10e-10))
+	static let angstroms = UnitLength(symbol: "Å", converter: UnitConverterLinear(coefficient: 1e-10))
 }
 
 public extension UnitMass {
@@ -85,6 +88,10 @@ public extension UnitMass {
 public extension UnitPressure {
 	static let pascals = UnitPressure(symbol: "Pa", converter: UnitConverterLinear(coefficient: 1))
 	static let atmosphericPressure = UnitPressure(symbol: "atm", converter: UnitConverterLinear(coefficient: 101_325))
+	static let baryes = UnitPressure(symbol: "Ba", converter: UnitConverterLinear(coefficient: 0.1))
+	
+	// TODO: it seems we can't make the following pascals per se because it's not defined as a property of NSUnitPressure
+//	override class func baseUnit() -> Self { UnitPressure.pascals as! Self }
 }
 
 // Rankine units require a special unit converter (i think)
@@ -109,7 +116,11 @@ public final class UnitAmount: Dimension {
 	public static let beings = UnitAmount(symbol: "beings", converter: UnitConverterLinear(coefficient: 1))
 	public static let people = UnitAmount(symbol: "people", converter: UnitConverterLinear(coefficient: 1))
 	public static let things = UnitAmount(symbol: "things", converter: UnitConverterLinear(coefficient: 1))
-	public static let moles = UnitAmount(symbol: "mol", converter: UnitConverterLinear(coefficient: 31556952.0))
+	public static let events = UnitAmount(symbol: "events", converter: UnitConverterLinear(coefficient: 1))
+	public static let molecules = UnitAmount(symbol: "molecules", converter: UnitConverterLinear(coefficient: 1))
+	public static let counts = UnitAmount(symbol: "counts", converter: UnitConverterLinear(coefficient: 1))
+	public static let entities = UnitAmount(symbol: "entities", converter: UnitConverterLinear(coefficient: 1))
+	public static let moles = UnitAmount(symbol: "mol", converter: UnitConverterLinear(coefficient: 6.02214076e23))
 	
 	public override class func baseUnit() -> UnitAmount { things }
 }
@@ -179,7 +190,7 @@ public final class UnitMagneticFlux: Dimension {
 
 public final class UnitMagneticFluxDensity: Dimension {
 	public static let teslas = UnitMagneticFluxDensity(symbol: "T", converter: UnitConverterLinear(coefficient: 1))
-	public static let gauss = UnitMagneticFluxDensity(symbol: "Gs", converter: UnitConverterLinear(coefficient: 10e-4))
+	public static let gauss = UnitMagneticFluxDensity(symbol: "Gs", converter: UnitConverterLinear(coefficient: 1e-4))
 	
 	public override class func baseUnit() -> UnitMagneticFluxDensity { teslas }
 }
@@ -187,6 +198,24 @@ public final class UnitMagneticFluxDensity: Dimension {
 public final class UnitSolidAngle: Dimension {
 	public static let steradians = UnitSolidAngle(symbol: "sr")
 	public static let squareDegrees = UnitSolidAngle(symbol: "deg²", converter: UnitConverterLinear(coefficient: 3.04617e-4))
+//	public static let solidDegrees = UnitSolidAngle(symbol: "deg²", converter: UnitConverterLinear(coefficient: 3.04617e-4))
 	
 	public override class func baseUnit() -> UnitSolidAngle { steradians }
 }
+
+// TODO: This doesn't come out right because there is no fundamental SI unit for these -- fixable?
+//       Can the baseUnit have a coefficient different than 1?
+
+public final class UnitDynamicViscosity: Dimension {
+	public static let poise = UnitDynamicViscosity(symbol: "P", converter: UnitConverterLinear(coefficient: 0.1))
+	public static let poiseuille = UnitDynamicViscosity(symbol: "Pl", converter: UnitConverterLinear(coefficient: 1))
+	
+	public override class func baseUnit() -> UnitDynamicViscosity { poise }
+}
+
+public final class UnitKinematicViscosity: Dimension {
+	public static let stokes = UnitKinematicViscosity(symbol: "St", converter: UnitConverterLinear(coefficient: 0.0001))
+	
+	public override class func baseUnit() -> UnitKinematicViscosity { stokes }
+}
+

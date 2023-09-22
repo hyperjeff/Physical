@@ -1,18 +1,18 @@
 import Foundation
 import Accelerate
 
-prefix operator √
-prefix operator ∛
-prefix operator ∜
-
-infix operator √ : MultiplicationPrecedence
-
-postfix operator %
-
 public let π = Double.pi // should this be Double.pi.constant ?
 
 public struct Percentage {
 	var value: Double
+}
+
+public func * (left: Int, right: Percentage) -> Double {
+	Double(left) * right
+}
+
+public func * (left: Double, right: Percentage) -> Double {
+	left * right.value / 100
 }
 
 public struct DoubleRange {
@@ -33,10 +33,18 @@ public extension Dimension {
 
 
 public extension Double {
+	func dignum() -> Double {
+		0 < self ? 1 : -1
+	}
+	
 	func toSigfigs(_ sigfigs: Int) -> Double {
-		let scale = pow(10, floor(-log10(self) + Double(sigfigs)))
+		let value = abs(self)
+		let scale = pow(10, floor(-log10(value) + Double(sigfigs)))
 		
-		return Foundation.round(scale * self) / scale
+		var out = Foundation.round(scale * value) / scale
+		if self < 0 { out *= -1 }
+		
+		return out
 	}
 	
 	static postfix func % (left: Double) -> Percentage {
@@ -128,6 +136,10 @@ public func ^ (left: Double, right: Double) -> Double {
 	pow(left, right)
 }
 
+public func ^ (left: Double, right: Int) -> Double {
+	pow(left, Double(right))
+}
+
 public prefix func √ (right: Double) -> Double {
 	sqrt(right)
 }
@@ -136,76 +148,22 @@ public func √ (left: Int, right: Double) -> Double {
 	pow(right, 1 / Double(left))
 }
 
-//public prefix func ∛<T: Real> (right: T) -> T {
-//	.cbrt(right)
-//}
-//public prefix func ∜<T: Real> (right: T) -> T {
-//	T.pow(right, T(0.25))
-//}
-/*
-public extension Real {
-	var sigfigs: Int {
-		let b = "\(self)"
-			.components(separatedBy: "e").first!
-			.trimmingCharacters(in: CharacterSet(charactersIn: "0."))
-		return b.count - (b.contains(".") ? 1 : 0)
-	}
-	
-	func toInteger() -> Int? {
-		if let floaty = self as? Float {
-			return Int(floaty)
-		}
-		else if let doubly = self as? Double {
-			return Int(doubly)
-		}
-//		else if let f80 = self as? Float80 {
-//			return Int(f80)
-//		}
-		
-		return nil
-	}
-	
-	func toDouble() -> Double? {
-		if let floaty = self as? Float {
-			return Double(floaty)
-		}
-		else if let doubly = self as? Double {
-			return doubly
-		}
-		else if let f80 = self as? Float80 {
-			return Double(f80)
-		}
-		
-		return nil
-	}
-}
-*/
-
-public extension Double {
-	var π: Double {
+public extension BinaryFloatingPoint {
+	var π: any BinaryFloatingPoint {
 		self * .pi
 	}
-	var π²: Double {
+	var π²: any BinaryFloatingPoint {
 		self * .pi * .pi
 	}
 	
-	var e: Double {
+	var e: any BinaryFloatingPoint {
 		Double(self) * exp(1.0)
 	}
 	
 	var constant: Physical {
-		Physical(value: self, units: [:], sigfigs: self.sigfigs)
-	}	
-
-	var sigfigs: Int {
-		let b = "\(self)"
-			.components(separatedBy: "e").first!
-			.trimmingCharacters(in: CharacterSet(charactersIn: "0."))
-		return b.count - (b.contains(".") ? 1 : 0)
+		Physical(value: Double(self), units: [:], sigfigs: self.sigfigs)
 	}
-}
 
-public extension Float {
 	var sigfigs: Int {
 		let b = "\(self)"
 			.components(separatedBy: "e").first!
@@ -240,12 +198,12 @@ public extension Physical {
 		
 		return left.value.degrees
 	}
-	
-	//	var radians: Physical {
-	//		if self !~ 1.constant {
-	//			return .notAThing
-	//		}
-	//
-	//		return self.value.degrees
-	//	}
+}
+
+infix operator ∩ : LogicalConjunctionPrecedence
+
+public extension Set {
+	static func ∩ (left: Set, right: Set) -> Set {
+		left.intersection(right)
+	}
 }

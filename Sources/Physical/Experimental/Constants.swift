@@ -1,7 +1,89 @@
 /// Sources:
 ///
 ///
+
 public extension Physical {
+	enum SpecialPhysicalSymbols {
+		/// fineStructure
+		case α
+		/// fineStructure
+		case alpha
+		/// lightSpeed
+		case c
+		/// elementaryCharge
+		case e
+		/// vacuumElectricPermittivity
+		case ε
+		/// vacuumElectricPermittivity
+		case epsilon
+		/// gravitation
+		case G
+		/// surfaceGravity
+		case g
+		/// planck
+		case h
+		/// reducedPlanck
+		case hbar
+		/// boltzmann
+		case kB
+		/// mass
+		case me
+		/// mass
+		case mp
+		/// vacuumMagneticPermeability
+		case mu
+		/// vacuumMagneticPermeability
+		case μ
+		/// avogadro
+		case N
+		/// rydberg
+		case R
+		/// stefanBoltzmann
+		case sigma
+		/// stefanBoltzmann
+		case σ
+		/// vacuumImpedance
+		case Z
+	}
+	
+	static func standardSymbol(_ symbol: SpecialPhysicalSymbols) -> Physical {
+		switch symbol {
+			case .α, .alpha: return Physical.Constants.fineStructure
+			case .c: return Physical.Constants.lightSpeed
+			case .e: return Physical.Constants.elementaryCharge
+			case .ε, .epsilon: return Physical.Constants.vacuumElectricPermittivity
+			case .G: return Physical.Constants.gravitation
+			case .g: return Physical.Constants.Earth.surfaceGravity
+			case .h: return Physical.Constants.planck
+			case .hbar: return Physical.Constants.reducedPlanck
+			case .kB: return Physical.Constants.boltzmann
+			case .me: return Physical.Constants.Particle.Electron.mass
+			case .mp: return Physical.Constants.Particle.Proton.mass
+			case .mu, .μ: return Physical.Constants.vacuumMagneticPermeability
+			case .N: return Physical.Constants.avogadro
+			case .R: return Physical.Constants.rydberg
+			case .sigma, .σ: return Physical.Constants.stefanBoltzmann
+			case .Z: return Physical.Constants.vacuumImpedance
+				//			case "ke": return Constants.coulomb ← add!
+		}
+	}
+	
+	static func standardSymbols(_ symbols: (SpecialPhysicalSymbols, SpecialPhysicalSymbols)) -> (Physical, Physical) {
+		(standardSymbol(symbols.0), standardSymbol(symbols.1))
+	}
+	static func standardSymbols(_ symbols: (SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols)) -> (Physical, Physical, Physical) {
+		(standardSymbol(symbols.0), standardSymbol(symbols.1), standardSymbol(symbols.2))
+	}
+	static func standardSymbols(_ symbols: (SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols)) -> (Physical, Physical, Physical, Physical) {
+		(standardSymbol(symbols.0), standardSymbol(symbols.1), standardSymbol(symbols.2), standardSymbol(symbols.3))
+	}
+	static func standardSymbols(_ symbols: (SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols)) -> (Physical, Physical, Physical, Physical, Physical) {
+		(standardSymbol(symbols.0), standardSymbol(symbols.1), standardSymbol(symbols.2), standardSymbol(symbols.3), standardSymbol(symbols.4))
+	}
+	static func standardSymbols(_ symbols: (SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols, SpecialPhysicalSymbols)) -> (Physical, Physical, Physical, Physical, Physical, Physical) {
+		(standardSymbol(symbols.0), standardSymbol(symbols.1), standardSymbol(symbols.2), standardSymbol(symbols.3), standardSymbol(symbols.4), standardSymbol(symbols.5))
+	}
+	
 	struct Constants {
 		public struct Particle {
 			public struct Electron {
@@ -288,8 +370,17 @@ public extension Physical {
 		}
 		
 		public struct Earth {
-			public static let aphelion = 152_100_000.km
-			public static let perihelion = 147_095_000.km
+			public struct aphelion {
+				public static let distance = 152_100_000.km
+				public static let speed = 29.29e3.mps
+			}
+			
+			public struct perihelion {
+				public static let distance = 147_095_000.km
+				public static let speed = 30.29e3.mps
+				public static let longitude = 102.94719°
+			}
+			
 			public static let semimajorAxis = 149_598_023.km
 			public static let eccentricity = 0.016_7086.constant
 			public static let orbitalPeriod = 31_558_149.7635.s
@@ -421,33 +512,34 @@ public extension Physical {
 			}
 		}
 		
-		public static let avogadro = 6.022_140_76e23.moles(-1)
-		public static let boltzmann = 1.380_649e-23.J.kelvin(-1)
-		public static let faraday = 96_485.332_12.coulombs.moles(-1)
-		public static let molarGas = 8.314_462_618.J.moles(-1).kelvin(-1)
-		public static let molarMass = 0.999_999_999_65e-3.kg.moles(-1)
-		public static let carbon12MolarMass = 11.999_999_9958e-3.kg.moles(-1)
-		public static let molarPlanck = 3.990_312_712e-10.J.hertz(-1).moles(-1)
+		public static let avogadro = 6.022_140_76e23/.moles
+		public static let boltzmann = 1.380_649e-23.J/.kelvin
+		public static let faraday = 96_485.332_12.coulombs/.moles
+		public static let molarGas = 8.314_462_618.J/.moles.kelvin
+		public static let molarMass = 0.999_999_999_65e-3.kg/.moles
+		public static let carbon12MolarMass = 11.999_999_9958e-3.kg/.moles
+		public static let molarPlanck = 3.990_312_712e-10.J/.hertz.moles
 		
-		public static let lightSpeed = 299_792_458.m.s(-1)
-		public static let gravitation = 6.674_30e-11.m(3).kg(-1).s(-2)
+		public static let lightSpeed = 299_792_458.m/.s
+		public static let gravitation = 6.674_30e-11.m(3)/.kg.s(2)
 		
 		public static let planck = 6.626_070_15e-34.J.s
-		public static let reducedPlanck = 1.054_571_817e-34.J.s
+		public static let reducedPlanck = 1.054_571_817e-34.J.s.perRadian
 		public static let fineStructure = 7.297_352_5693e-3.constant // 0.007_297_352_562_781_278 ish
 		public static let inverseFineStructure = 137.035_999_084.constant
-		public static let rydberg = 10_973_731.568_160.m(-1)
+		public static let rydberg = 10_973_731.568_160/.m
 		public static let hyperfineTransitionFrequency = 9_192_631_770.Hz
-		public static let bohrMagneton = 9.276_010_0783e-24.J.teslas(-1)
-		public static let nuclearMagneton = 5.050_783_7461e-27.J.teslas(-1)
+		public static let bohrMagneton = 9.276_010_0783e-24.J/.teslas
+		public static let nuclearMagneton = 5.050_783_7461e-27.J/.teslas
 		public static let bohrRadius = 6.291_772_109_03e-11.m
 		public static let bjerrumWaterLength = 7.1.angstroms
 		public static let elementaryCharge = 1.602_176_634e-19.coulombs
 		
-		public static let vacuumElectricPermittivity = 8.854_187_8128e-12.F.m(-1)
-		public static let vacuumMagneticPermeability = 1.256_637_062_12e-6.N.amperes(-2)
+		public static let vacuumElectricPermittivity = 8.854_187_8128e-12.F/.m
+//		public static let vacuumMagneticPermeability = 1.256_637_062_12e-6.N/.amperes(2).radians
+		public static let vacuumMagneticPermeability = 1.256_637_062_12e-6.henries/.m
 		public static let vacuumImpedance = 376.730_313_668.ohms
-		public static let josephson = 483_597.848_4e9.Hz.volts(-1)
+		public static let josephson = 483_597.848_4e9.Hz/.volts
 		public static let vonKlitzing = 25_812.807_45.ohms
 		public static let quantumConductance = 7.748_091_729e-5.siemens
 		public static let inverseQuantumConductance = 12_906.403_72.ohms
@@ -456,17 +548,17 @@ public extension Physical {
 		public static let electronGFactor = -2.002_319_304_362_56.constant
 	//	public static let fermiCoupling = 1.166_3787e-5.
 		public static let hartreeEnergy = 4.359_744_722_2071e-18.J
-		public static let circulationQuantum = 3.636_947_5516e-4.m(2).s(-1)
+		public static let circulationQuantum = 3.636_947_5516e-4.m(2)/.s
 		public static let thomsonCrossSection = 6.652_458_7321e-29.m(2)
 		public static let wZMassRatio = 0.881_53.constant
 		public static let weakMixingAngle = 0.222_90.constant
 		public static let atomicMass = 1.660_539_066_60e-27.kg
-		public static let stefanBoltzmann = 5.670_374_419e-8.W.m(-2).kelvin(-4)
+		public static let stefanBoltzmann = 5.670_374_419e-8.W/.m(2).kelvin(4)
 		public static let firstRadiation = 3.741_771_852e-16.W.m(2)
 		public static let secondRadiation = 1.438_776_877e-2.m.kelvin
 		public static let firstRadiationSpectralRadiance = 1.191_042_972e-16.W.m(2).steradians
-		public static let wienWavelength = 2.897_771_955e-3.m.kelvin
-		public static let wienFrequency = 5.878_925_757e10.Hz.kelvin(-1)
+		public static let wienDisplacement = 2.897_771_955e-3.m.kelvin
+		public static let wienFrequency = 5.878_925_757e10.Hz/.kelvin
 		public static let wienEntropy = 3.002_916_077e-3.m.kelvin
 	}
 }
