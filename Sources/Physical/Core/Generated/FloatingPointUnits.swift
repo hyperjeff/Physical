@@ -156,6 +156,18 @@ public extension BinaryFloatingPoint {
 	var things: Physical {
 		Physical(value: Double(self), unit: UnitAmount.things)
 	}
+	var events: Physical {
+		Physical(value: Double(self), unit: UnitAmount.events)
+	}
+	var molecules: Physical {
+		Physical(value: Double(self), unit: UnitAmount.molecules)
+	}
+	var counts: Physical {
+		Physical(value: Double(self), unit: UnitAmount.counts)
+	}
+	var entities: Physical {
+		Physical(value: Double(self), unit: UnitAmount.entities)
+	}
 	var moles: Physical {
 		Physical(value: Double(self), unit: UnitAmount.moles)
 	}
@@ -279,6 +291,15 @@ public extension BinaryFloatingPoint {
 	var rankine: Physical {
 		Physical(value: Double(self), unit: UnitTemperature.rankine)
 	}
+	var poise: Physical {
+		Physical(value: Double(self), unit: UnitDynamicViscosity.poise)
+	}
+	var poiseuille: Physical {
+		Physical(value: Double(self), unit: UnitDynamicViscosity.poiseuille)
+	}
+	var stokes: Physical {
+		Physical(value: Double(self), unit: UnitKinematicViscosity.stokes)
+	}
 	
 	// Extracted properties from NSUnit.h
 	// Raw units
@@ -301,6 +322,9 @@ public extension BinaryFloatingPoint {
 	}
 	var arcSeconds: Physical {
 		Physical(value: Double(self), unit: UnitAngle.arcSeconds)
+	}
+	var cycles: Physical {
+		Physical(value: Double(self), unit: UnitAngle.cycles)
 	}
 	var radians: Physical {
 		Physical(value: Double(self), unit: UnitAngle.radians)
