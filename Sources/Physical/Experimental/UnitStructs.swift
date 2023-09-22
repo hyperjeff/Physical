@@ -3,7 +3,7 @@ import Foundation
 
 // NOT GENERATED:
 
-public protocol PhysicalType: CustomStringConvertible {
+public protocol PhysicalType: CustomStringConvertible, Equatable {
 	var physical: Physical { get set }
 	init(values: [Double], unit: Dimension)
 }
@@ -20,6 +20,7 @@ public func /=<T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical /= rhs.ph
 
 public func == (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical == rhs.physical }
 public func < (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical < rhs.physical }
+public func > (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical > rhs.physical }
 public func <= (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical <= rhs.physical }
 
 public func * (lhs: any PhysicalType, rhs: any PhysicalType) -> Physical { lhs.physical * rhs.physical }
