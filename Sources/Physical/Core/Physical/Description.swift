@@ -23,85 +23,8 @@ extension Physical: CustomStringConvertible, CustomDebugStringConvertible {
 			return numericalPart.trimmingCharacters(in: .whitespaces)
 		}
 		
-		var unitPart = ""
-		var firstTerm = true
-		
-		let sortedUnits = units.sorted(by: { a, b in a.key.symbol < b.key.symbol })
-		let numeratorUnits = sortedUnits.filter { (_, v) in v.1.isPositive }
-		
-		for (_, (unit, exponent)) in numeratorUnits {
-			if !firstTerm {
-				unitPart += " "
-			}
-			else {
-				firstTerm = false
-			}
-			
-			let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
-			
-			switch exponent {
-				case let .integer(e):
-					switch e {
-						case 0: break
-						case 1: unitPart += "\(unit.symbol)"
-						default: unitPart += symbol + e.drawnExponent
-					}
-					
-				case .fraction(_, _):
-					unitPart += symbol + "^(\(exponent))"
-					
-				case .real(_):
-					let expString = "\(exponent)"
-					
-					if expString != "1" {
-						unitPart += symbol + "^\(exponent)"
-					}
-					else {
-						unitPart += symbol
-					}
-			}
-		}
-		
-		var alreadyDrawnDivisor = false
-		firstTerm = true
-		
-		for (_, (unit, exponent)) in sortedUnits where !exponent.isPositive {
-			if !alreadyDrawnDivisor {
-				unitPart += " / "
-				alreadyDrawnDivisor = true
-			}
-			
-			if !firstTerm {
-				unitPart += " "
-			}
-			else {
-				firstTerm = false
-			}
-			
-			let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
-			
-			switch exponent {
-				case let .integer(e):
-					switch e {
-						case -1: unitPart += "\(unit.symbol)"
-						default: unitPart += symbol + abs(e).drawnExponent
-					}
-					
-				case .fraction(_, _):
-					unitPart += symbol + "^(\(abs(exponent)))"
-					
-				case .real(_):
-					let expString = "\(abs(exponent))"
-					
-					if expString == "1" {
-						unitPart += symbol
-					}
-					else {
-						unitPart += symbol + "^\(expString)"
-					}
-			}
-		}
-		
+    let unitPart = self.unitDescription
+
 		if let values = values {
 			let numbersString = "[\(values.map({ numberString($0) }).joined(separator: ", "))]"
 			return "\(numbersString) \(unitPart)".trimmingCharacters(in: .whitespaces)
@@ -149,10 +72,88 @@ extension Physical: CustomStringConvertible, CustomDebugStringConvertible {
 		
 		return out.joined(separator: "\n")
 	}
-	
+
 	public var unitDescription: String {
-		// TODO: fix this terrible hack:
-		description.components(separatedBy: "]").last!.trimmingCharacters(in: .whitespaces)
+    var unitPart = ""
+    var firstTerm = true
+
+    let sortedUnits = units.sorted(by: { a, b in a.key.symbol < b.key.symbol })
+    let numeratorUnits = sortedUnits.filter { (_, v) in v.1.isPositive }
+
+    for (_, (unit, exponent)) in numeratorUnits {
+      if !firstTerm {
+        unitPart += " "
+      }
+      else {
+        firstTerm = false
+      }
+
+      let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
+
+      switch exponent {
+      case let .integer(e):
+        switch e {
+        case 0: break
+        case 1: unitPart += "\(unit.symbol)"
+        default: unitPart += symbol + e.drawnExponent
+        }
+
+      case .fraction(_, _):
+        unitPart += symbol + "^(\(exponent))"
+
+      case .real(_):
+        let expString = "\(exponent)"
+
+        if expString != "1" {
+          unitPart += symbol + "^\(exponent)"
+        }
+        else {
+          unitPart += symbol
+        }
+      }
+    }
+
+    var alreadyDrawnDivisor = false
+    firstTerm = true
+
+    for (_, (unit, exponent)) in sortedUnits where !exponent.isPositive {
+      if !alreadyDrawnDivisor {
+        unitPart += " / "
+        alreadyDrawnDivisor = true
+      }
+
+      if !firstTerm {
+        unitPart += " "
+      }
+      else {
+        firstTerm = false
+      }
+
+      let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
+
+      switch exponent {
+      case let .integer(e):
+        switch e {
+        case -1: unitPart += "\(unit.symbol)"
+        default: unitPart += symbol + abs(e).drawnExponent
+        }
+
+      case .fraction(_, _):
+        unitPart += symbol + "^(\(abs(exponent)))"
+
+      case .real(_):
+        let expString = "\(abs(exponent))"
+
+        if expString == "1" {
+          unitPart += symbol
+        }
+        else {
+          unitPart += symbol + "^\(expString)"
+        }
+      }
+    }
+
+    return unitPart
 	}
 
 	public var tagDescription: String {

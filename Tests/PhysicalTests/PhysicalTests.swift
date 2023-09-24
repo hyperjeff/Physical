@@ -471,4 +471,38 @@ final class PhysicalTests: XCTestCase {
 		XCTAssertEqual(volumeOneMoleNaCl, 4.48e-29.m³ )
 		XCTAssertEqual(ionDistance, 2.82e-10.m )
 	}
+
+  // Reproduces Issue #2
+  func testDescription() {
+    var length = 5.meters
+    XCTAssertEqual(length.description, "5 m")
+    XCTAssertEqual(length.unitDescription, "m")
+    XCTAssertEqual(length.dimensionalDescription, "L")
+    length = 14.millimeters
+    XCTAssertEqual(length.description, "14 mm")
+    XCTAssertEqual(length.unitDescription, "mm")
+    XCTAssertEqual(length.dimensionalDescription, "L")
+    length = 8.feet
+    XCTAssertEqual(length.description, "8 ft")
+    XCTAssertEqual(length.unitDescription, "ft")
+    XCTAssertEqual(length.dimensionalDescription, "L")
+
+    var area = 2.feet.feet
+    XCTAssertEqual(area.description, "2 ft²")
+    XCTAssertEqual(area.unitDescription, "ft²")
+    XCTAssertEqual(area.dimensionalDescription, "L²")
+    area = 6.meters(2)
+    XCTAssertEqual(area.description, "6 m²")
+    XCTAssertEqual(area.unitDescription, "m²")
+    XCTAssertEqual(area.dimensionalDescription, "L²")
+
+    var lengthArray = [13, 19].kilometers
+    XCTAssertEqual(lengthArray.description, "[13, 19] km")
+    XCTAssertEqual(lengthArray.unitDescription, "km")
+    XCTAssertEqual(lengthArray.dimensionalDescription, "L")
+    lengthArray = [20, 21].miles
+    XCTAssertEqual(lengthArray.description, "[20, 21] mi")
+    XCTAssertEqual(lengthArray.unitDescription, "mi")
+    XCTAssertEqual(lengthArray.dimensionalDescription, "L")
+  }
 }
