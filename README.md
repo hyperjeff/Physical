@@ -103,7 +103,7 @@ _Note:_ That's a real unicode arrow character → (U+2192), not ->. It's utterly
 
 ### Chaining units
 
-To create a Physical object with any dimension, just daisy chain units, possibly with exponents. As well, one can force a unit to be in the denominator via `/` as below.
+To create a Physical object with any dimension, just daisy chain units, possibly with exponents. As well, one can force a unit to be in the denominator via `/` as below. Each unit also has a "per" variant.
 
 ```swift
 let aForce = 1.kilograms.meters.seconds(-2)
@@ -111,9 +111,12 @@ aForce → .newtons
 
 6.meters.seconds(-1)
 6.meters/.seconds
+6.meters.perSecond
 
+12.metersPerSecondSquared
 12.meters/.seconds/.seconds
 12.m/.s(2)
+12.meters.perSecond.perSecond
 ```
 
 ### Various means of expression
@@ -168,11 +171,11 @@ mass * acceleration * 37.feet → .joules    // 50.749 J
 
 ### Angles and Trig
 
-Trig functions use units, contrary to what you might think [1]. Physical provides both trig and inverse trig functions (normal and hyperbolic) that both wipe out a whole class of bugs ("do I multiply by π and divide by 180?"), but also makes your code, and reasoning about it, greatly improve. These functions are in addition to the standard trig functions and do not conflict with them.
+Trig functions use units, contrary to what you might think. Physical provides both trig, exponent and inverse trig functions (normal and hyperbolic) that both wipe out a whole class of bugs ("do I multiply by π and divide by 180?"), but also makes your code, and reasoning about it, greatly improve. These functions are in addition to the standard trig functions and do not conflict with them.
 
-Currently the result of a trig function is a Physical object of unitless (`constant`) type. If you need to use the Double value, grab its value. E.g., `sin(φ).value`. This allows inverse trig functions to return Physical objects with units radian, without interferring with existing trig functions in the Swift standard library.
+Trig functions map angles to a real number. Inverse functions map real numbers back to angles.
 
-_[1] In fairness, other approaches are being considered, but for now this is the situation._
+These functions do not interfere with existing old school trig functions and will not contradict any existing algorithms. It's purely opt-in.
 
 ```swift
 75°                            // 75 °
@@ -191,7 +194,7 @@ sin(θ₂)                        // 0.95106
 sin(θ₃)                        // 0.95106
 ```
 
-_Note:_ The degree symbol is `°` (`⇧⌥8` on a US Qwerty keyboard) and not `º` (`⌥0`).
+_Note:_ The degree symbol is `°` (`⇧⌥8` on a US Standard keyboard) and not `º` (`⌥0`).
 
 ### Arrays, Ramps, Indices
 
@@ -218,7 +221,7 @@ var position = [0, 1].meters
 var velocity = [0, 1].rotated(32°) * 110.milesPerHour
 ```
 
-### Unit exponents
+### Exponents and power function
 
 Exponents are of a special `TieredNumber` type, that is alternately an integer, a rational or of floating point value, and will gracefully degrade as needed. This allows equations to recover integer or rational exponents, providing better unit matching and accuracy of results.
 
