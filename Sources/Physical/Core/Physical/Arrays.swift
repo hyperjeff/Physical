@@ -1,11 +1,15 @@
 import Foundation
 import Accelerate
 
-extension Physical {
-	public var startIndex: Index { values!.startIndex }
-	public var endIndex: Index { values!.endIndex }
+public extension Physical {
+	var isArray: Bool {
+		values != nil
+	}
 	
-	public subscript(position: ValuesType.Index) -> Physical {
+	var startIndex: Index { values!.startIndex }
+	var endIndex: Index { values!.endIndex }
+	
+	subscript(position: ValuesType.Index) -> Physical {
 		get { Physical(value: values![position], units: units, sigfigs: sigfigs) }
 		set {
 			// policy decision: silently fail? throw?
@@ -20,11 +24,11 @@ extension Physical {
 		}
 	}
 	
-	public func index(after i: ValuesType.Index) -> ValuesType.Index {
+	func index(after i: ValuesType.Index) -> ValuesType.Index {
 		values!.index(after: i)
 	}
 	
-	public var standardDeviation: Physical {
+	var standardDeviation: Physical {
 		get {
 			if let values = values {
 				var mean: Double = 0
@@ -42,7 +46,7 @@ extension Physical {
 		}
 	}
 	
-	public func sigfigs(_ siggy: Int) -> Physical {
+	func sigfigs(_ siggy: Int) -> Physical {
 		if let vals = values {
 			return Physical(values: vals, units: units, sigfigs: siggy)
 		}
@@ -51,8 +55,25 @@ extension Physical {
 		}
 	}
 	
-	public var maximumError: Physical {
+	var maximumError: Physical {
 		Physical(value: abs(value) * 5 * pow(10, -Double(sigfigs)), units: units, sigfigs: 16) // what would sigfigs be here?
 	}
 	
+}
+
+public extension Array where Element == Physical {
+	func average() -> Physical {
+		if let itemZero = first {
+			let test = self[1...].reduce(true) { a, b in a && (b ~ itemZero) }
+			if !test { return .notAThing }
+			
+			if itemZero ~ Temperature.self {
+				return map { $0 → .kelvin }.reduce(0.kelvin, +) / count
+			}
+			
+			return reduce(0 * itemZero, +) / count
+		}
+		
+		return .notAThing
+	}
 }
