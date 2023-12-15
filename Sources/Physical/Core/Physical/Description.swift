@@ -23,8 +23,116 @@ extension Physical: CustomStringConvertible, CustomDebugStringConvertible {
 			return numericalPart.trimmingCharacters(in: .whitespaces)
 		}
 		
-    let unitPart = self.unitDescription
-
+		var unitPart = ""
+		var firstTerm = true
+		
+		let sortedUnits = units.sorted(by: { a, b in a.key.symbol < b.key.symbol })
+		let numeratorUnits = sortedUnits.filter { (_, v) in v.1.isPositive }
+		
+		func symbol(from unit: Dimension) -> (String, String) {
+			var unitSymbol = unit.symbol
+			
+			if unit.isKind(of: UnitTemperature.self),
+			   case KindOfQuantity.difference? = kindOfQuantity {
+				unitSymbol = "∆" + unitSymbol
+			}
+			
+			let symbol = unitSymbol.contains("/") ? "(\(unitSymbol))" : "\(unitSymbol)"
+			
+			return (unitSymbol, symbol)
+		}
+		
+		for (_, (unit, exponent)) in numeratorUnits {
+			if !firstTerm {
+				unitPart += " "
+			}
+			else {
+				firstTerm = false
+			}
+			
+			let (unitSymbol, symbol) = symbol(from: unit)
+			
+			switch exponent {
+				case let .integer(e):
+					switch e {
+						case 0: break
+						case 1: unitPart += "\(unitSymbol)"
+						default: unitPart += symbol + e.drawnExponent
+					}
+					
+				case .fraction(_, _):
+					unitPart += symbol + "^(\(exponent))"
+					
+				case .real(_):
+					let expString = "\(exponent)"
+					
+					if expString != "1" {
+						unitPart += symbol + "^\(exponent)"
+					}
+					else {
+						unitPart += symbol
+					}
+			}
+		}
+		
+		var alreadyDrawnDivisor = false
+		firstTerm = true
+		
+		for (_, (unit, exponent)) in sortedUnits where !exponent.isPositive {
+//			if unit.isKind(of: UnitAngle.self) {
+//				continue
+//			}
+//			else if unit.isKind(of: UnitAngularSpeed.self) {
+//				// There may be a scale change needed -- so perhaps this has to be handled elsewhere?
+//			}
+			
+			if !alreadyDrawnDivisor {
+				unitPart += " / "
+				alreadyDrawnDivisor = true
+			}
+			
+			if !firstTerm {
+				unitPart += " "
+			}
+			else {
+				firstTerm = false
+			}
+			
+			let (unitSymbol, symbol) = symbol(from: unit)
+			
+			switch exponent {
+				case let .integer(e):
+					switch e {
+						case -1: unitPart += "\(unitSymbol)"
+						default: unitPart += symbol + abs(e).drawnExponent
+					}
+					
+				case .fraction(_, _):
+					unitPart += symbol + "^(\(abs(exponent)))"
+					
+				case .real(_):
+					let expString = "\(abs(exponent))"
+					
+					if expString == "1" {
+						unitPart += symbol
+					}
+					else {
+						unitPart += symbol + "^\(expString)"
+					}
+			}
+		}
+		
+		// FIXME: This ↓ only activates for pure dB constants, but should really mix with other units
+		
+		if hasDBValue {
+			if case let KindOfQuantity.standardDecibel(reference: ref)? = kindOfQuantity {
+				unitPart = "dB\(ref.rawValue)"
+			}
+			else if case let KindOfQuantity.decibel(reference: ref, symbol: symbol)? = kindOfQuantity {
+				unitPart = "dB \(symbol.isEmpty ? "(\(ref))" : symbol)"
+			}
+		}
+		
 		if let values = values {
 			let numbersString = "[\(values.map({ numberString($0) }).joined(separator: ", "))]"
 			return "\(numbersString) \(unitPart)".trimmingCharacters(in: .whitespaces)
@@ -72,90 +180,15 @@ extension Physical: CustomStringConvertible, CustomDebugStringConvertible {
 		
 		return out.joined(separator: "\n")
 	}
-
+	
 	public var unitDescription: String {
-    var unitPart = ""
-    var firstTerm = true
-
-    let sortedUnits = units.sorted(by: { a, b in a.key.symbol < b.key.symbol })
-    let numeratorUnits = sortedUnits.filter { (_, v) in v.1.isPositive }
-
-    for (_, (unit, exponent)) in numeratorUnits {
-      if !firstTerm {
-        unitPart += " "
-      }
-      else {
-        firstTerm = false
-      }
-
-      let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
-
-      switch exponent {
-      case let .integer(e):
-        switch e {
-        case 0: break
-        case 1: unitPart += "\(unit.symbol)"
-        default: unitPart += symbol + e.drawnExponent
-        }
-
-      case .fraction(_, _):
-        unitPart += symbol + "^(\(exponent))"
-
-      case .real(_):
-        let expString = "\(exponent)"
-
-        if expString != "1" {
-          unitPart += symbol + "^\(exponent)"
-        }
-        else {
-          unitPart += symbol
-        }
-      }
-    }
-
-    var alreadyDrawnDivisor = false
-    firstTerm = true
-
-    for (_, (unit, exponent)) in sortedUnits where !exponent.isPositive {
-      if !alreadyDrawnDivisor {
-        unitPart += " / "
-        alreadyDrawnDivisor = true
-      }
-
-      if !firstTerm {
-        unitPart += " "
-      }
-      else {
-        firstTerm = false
-      }
-
-      let symbol = unit.symbol.contains("/") ? "(\(unit.symbol))" : "\(unit.symbol)"
-
-      switch exponent {
-      case let .integer(e):
-        switch e {
-        case -1: unitPart += "\(unit.symbol)"
-        default: unitPart += symbol + abs(e).drawnExponent
-        }
-
-      case .fraction(_, _):
-        unitPart += symbol + "^(\(abs(exponent)))"
-
-      case .real(_):
-        let expString = "\(abs(exponent))"
-
-        if expString == "1" {
-          unitPart += symbol
-        }
-        else {
-          unitPart += symbol + "^\(expString)"
-        }
-      }
-    }
-
-    return unitPart
+		func snippingFirstItem(separatedBy s: String) -> String {
+			description.components(separatedBy: s)[1...].joined(separator: s).trimmingCharacters(in: .whitespaces)
+		}
+		
+		return snippingFirstItem(separatedBy: isArray ? "]" : " ")
 	}
-
+	
 	public var tagDescription: String {
 		var unitPart = ""
 		var firstTerm = true
