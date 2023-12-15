@@ -20,6 +20,7 @@ public let fundamentalDimensions = [
 	UnitMass.baseUnit(),
 	UnitTemperature.baseUnit(),
 	UnitAngle.baseUnit(),
+	UnitSolidAngle.baseUnit(),
 ]
 
 public let productDimensionLookup = [
@@ -61,55 +62,28 @@ public let fundamentalSIDimensions = [
 	UnitTemperature.self,
 ]
 
-extension Dimension {
-	public var dimensionSymbol: String {
-		switch self {
-			case is UnitAngle: return "A"
-			case is UnitLength: return "L"
-			case is UnitMass: return "M"
-			case is UnitDuration: return "T"
-			case is UnitElectricCurrent: return "I"
-			case is UnitTemperature: return "Θ"
-			case is UnitAmount: return "N"
-			case is UnitSolidAngle: return "Ω"
-			case is UnitIlluminance: return "J"
-			default: return "?"
-		}
-	}
-}
-
-public let nonZeroOffsetUnits: [Dimension] = [
-	UnitTemperature.celsius,
-	UnitTemperature.fahrenheit,
-]
-
-extension Int {
+public extension Int {
 	var oneOrZero: Int {
 		(self == 0) ? 0 : 1
 	}
 	
-	public var drawnExponent: String {
-		if self < 2 || 9 < self {
-			return "^\(self)"
-		}
-		else {
-			switch self {
-				case 2: return "²"
-				case 3: return "³"
-				case 4: return "⁴"
-				case 5: return "⁵"
-				case 6: return "⁶"
-				case 7: return "⁷"
-				case 8: return "⁸"
-				case 9: return "⁹"
-				default: return "^\(self)"
-			}
+	var drawnExponent: String {
+		switch self {
+			case 2: "²"
+			case 3: "³"
+			case 4: "⁴"
+			case 5: "⁵"
+			case 6: "⁶"
+			case 7: "⁷"
+			case 8: "⁸"
+			case 9: "⁹"
+			default: "^\(self)"
 		}
 	}
 	
 	// Refactor this!
 	
-	public var drawnExponentGeneral: String {
+	var drawnExponentGeneral: String {
 		var out = ""
 		
 		if self < 0 {
@@ -145,10 +119,14 @@ public extension Dictionary where Key == Dimension, Value == (unit: Dimension, e
 		}.isEmpty
 	}
 	
+	var nonZeroOffsetUnits: [Dimension] {
+		values.filter {
+			($0.unit.converter as? UnitConverterLinear)?.constant != 0
+		}.map { $0.unit }
+	}
+	
 	func containsNonZeroOffsetUnits() -> Bool {
-		return !filter {
-			nonZeroOffsetUnits.contains($0.value.unit)
-		}.isEmpty
+		!nonZeroOffsetUnits.isEmpty
 	}
 	
 	func baseUnits() -> Set<Dimension> {
@@ -180,32 +158,43 @@ public func equalDimensionDictionaries(_ a: DimensionDictionary, _ b: DimensionD
 }
 
 public struct FundamentalBaseVector {
-	public var m = 0
-	public var s = 0
-	public var kg = 0
-	public var A = 0
-	public var mol = 0
-	public var K = 0
-	public var cdl = 0
-	public var rad = 0
-	public var st = 0
+	public var length = 0
+	public var duration = 0
+	public var mass = 0
+	public var current = 0
+	public var amount = 0
+	public var temperature = 0
+	public var luminousIntensity = 0
+	public var angle = 0
+	public var solidAngle = 0
 	
 	// purely just to make it accessible publicly
 	public init() {}
 	
-	public init(m m1: Int, s s1: Int, kg k1: Int, A A1: Int, mol mo1: Int, K K1: Int, cdl c1: Int, rad r1: Int) {
-		m = m1
-		s = s1
-		kg = k1
-		A = A1
-		mol = mo1
-		K = K1
-		cdl = c1
-		rad = r1
+	public init(length: Int = 0, duration: Int = 0, mass: Int = 0, current: Int = 0, amount: Int = 0, temperature: Int = 0, luminousIntensity: Int = 0, angle: Int = 0, solidAngle: Int = 0) {
+		self.length = length
+		self.duration = duration
+		self.mass = mass
+		self.current = current
+		self.amount = amount
+		self.temperature = temperature
+		self.luminousIntensity = luminousIntensity
+		self.angle = angle
+		self.solidAngle = solidAngle
 	}
 	
 	public func nonZeroElements() -> FundamentalBaseVector {
-		FBV(m: m.oneOrZero, s: s.oneOrZero, kg: kg.oneOrZero, A: A.oneOrZero, mol: mol.oneOrZero, K: K.oneOrZero, cdl: cdl.oneOrZero, rad: rad.oneOrZero)
+		FBV(
+			length: length.oneOrZero,
+			duration: duration.oneOrZero,
+			mass: mass.oneOrZero,
+			current: current.oneOrZero,
+			amount: amount.oneOrZero,
+			temperature: temperature.oneOrZero,
+			luminousIntensity: luminousIntensity.oneOrZero,
+			angle: angle.oneOrZero,
+			solidAngle: solidAngle.oneOrZero
+		)
 	}
 	
 	public func exp(_ xs: [Int], power: Double) -> (Bool, [Int]) {
@@ -216,39 +205,30 @@ public struct FundamentalBaseVector {
 		return (out, ints)
 	}
 	
-	public func intExponents(forPower p: Double) -> FundamentalBaseVector? {
-		let (ok, e) = exp([m, s, kg, A, mol, K, cdl, rad, st], power: p)
-		
-		if ok {
-			return FBV(m: e[0], s: e[1], kg: e[2], A: e[3], mol: e[4], K: e[5], cdl: e[6], rad: e[7])
-		}
-		
-		return nil
-	}
-	
 	static public func ∔ (left: FundamentalBaseVector, right: FundamentalBaseVector) -> FundamentalBaseVector {
 		FBV(
-			m: left.m + right.m,
-			s: left.s + right.s,
-			kg: left.kg + right.kg,
-			A: left.A + right.A,
-			mol: left.mol + right.mol,
-			K: left.K + right.K,
-			cdl: left.cdl + right.cdl,
-			rad: left.rad + right.rad
+			length: left.length + right.length,
+			duration: left.duration + right.duration,
+			mass: left.mass + right.mass,
+			current: left.current + right.current,
+			amount: left.amount + right.amount,
+			temperature: left.temperature + right.temperature,
+			luminousIntensity: left.luminousIntensity + right.luminousIntensity,
+			angle: left.angle + right.angle,
+			solidAngle: left.solidAngle + right.solidAngle
 		)
 	}
 	
 	public func projectsInto(multiplyUsedBaseVector z: FundamentalBaseVector) -> Bool {
-		(m   != 0 && 1 < z.m)   ||
-		(s   != 0 && 1 < z.s)   ||
-		(kg  != 0 && 1 < z.kg)  ||
-		(A   != 0 && 1 < z.A)   ||
-		(mol != 0 && 1 < z.mol) ||
-		(K   != 0 && 1 < z.K)   ||
-		(cdl != 0 && 1 < z.cdl) ||
-		(rad != 0 && 1 < z.rad) ||
-		(st  != 0 && 1 < z.st)
+		(length != 0 && 1 < z.length) ||
+		(duration != 0 && 1 < z.duration) ||
+		(mass != 0 && 1 < z.mass) ||
+		(current != 0 && 1 < z.current) ||
+		(amount != 0 && 1 < z.amount) ||
+		(temperature != 0 && 1 < z.temperature) ||
+		(luminousIntensity != 0 && 1 < z.luminousIntensity) ||
+		(angle != 0 && 1 < z.angle) ||
+		(solidAngle != 0 && 1 < z.solidAngle)
 	}
 	
 }
@@ -256,44 +236,64 @@ public struct FundamentalBaseVector {
 fileprivate typealias FBV = FundamentalBaseVector
 
 public let fundamentalBaseVector: [Dimension : FundamentalBaseVector] = [
-	UnitAcceleration.baseUnit()                : FBV(m:  1, s: -2, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitActivity.baseUnit()                    : FBV(m:  0, s: -1, kg:  0, A:  0, mol: 1, K: 0, cdl: 0, rad: 0),
-	UnitAmount.baseUnit()                      : FBV(m:  0, s:  0, kg:  0, A:  0, mol: 1, K: 0, cdl: 0, rad: 0),
-	UnitAngle.baseUnit()                       : FBV(m:  0, s:  0, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 1),
-	UnitAngularSpeed.baseUnit()                : FBV(m:  0, s: -1, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 1),
-	UnitArea.baseUnit()                        : FBV(m:  2, s:  0, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitConcentrationMass.baseUnit()           : FBV(m: -3, s:  0, kg:  1, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitDuration.baseUnit()                    : FBV(m:  0, s:  1, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitElectricCapacitance.baseUnit()         : FBV(m: -2, s:  4, kg: -1, A:  2, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitElectricCharge.baseUnit()              : FBV(m:  0, s:  1, kg:  0, A:  1, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitElectricConductance.baseUnit()         : FBV(m: -2, s:  3, kg: -1, A:  2, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitElectricCurrent.baseUnit()             : FBV(m:  0, s:  0, kg:  0, A:  1, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitElectricInductance.baseUnit()          : FBV(m:  2, s: -2, kg:  1, A: -2, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitElectricPotentialDifference.baseUnit() : FBV(m:  2, s: -3, kg:  1, A: -1, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitElectricResistance.baseUnit()          : FBV(m:  2, s: -3, kg:  1, A: -2, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitEnergy.baseUnit()                      : FBV(m:  2, s: -2, kg:  1, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitForce.baseUnit()                       : FBV(m:  1, s: -2, kg:  1, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitFrequency.baseUnit()                   : FBV(m:  0, s: -1, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitIlluminance.baseUnit()                 : FBV(m: -2, s:  0, kg:  0, A:  0, mol: 0, K: 0, cdl: 1, rad: 0),
-	UnitIonizingRadiation.baseUnit()           : FBV(m:  2, s: -2, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitLength.baseUnit()                      : FBV(m:  1, s:  0, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitLuminousFlux.baseUnit()                : FBV(m:  0, s:  0, kg:  0, A:  0, mol: 0, K: 0, cdl: 1, rad: 0),
-	UnitLuminousIntensity.baseUnit()           : FBV(m:  0, s:  0, kg:  0, A:  0, mol: 0, K: 0, cdl: 1, rad: 0),
-	UnitMagneticFlux.baseUnit()                : FBV(m:  2, s: -2, kg:  1, A: -1, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitMagneticFluxDensity.baseUnit()         : FBV(m:  0, s: -2, kg:  1, A: -1, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitMass.baseUnit()                        : FBV(m:  0, s:  0, kg:  1, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitPower.baseUnit()                       : FBV(m:  2, s: -3, kg:  1, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitPressure.baseUnit()                    : FBV(m: -1, s: -2, kg:  1, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitSolidAngle.baseUnit()                  : FBV(m:  0, s:  0, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 1),
-	UnitSpeed.baseUnit()                       : FBV(m:  1, s: -1, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitTemperature.baseUnit()                 : FBV(m:  0, s:  0, kg:  0, A:  0, mol: 0, K: 1, cdl: 0, rad: 0),
-	UnitDynamicViscosity.baseUnit()            : FBV(m: -1, s: -1, kg:  1, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitKinematicViscosity.baseUnit()          : FBV(m:  2, s: -1, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
-	UnitVolume.baseUnit()                      : FBV(m:  3, s:  0, kg:  0, A:  0, mol: 0, K: 0, cdl: 0, rad: 0),
+	UnitAcceleration.baseUnit()                : FBV(length: 1, duration: -2),
+	UnitActivity.baseUnit()                    : FBV(duration: -1, amount: 1),
+	UnitAmount.baseUnit()                      : FBV(amount: 1),
+	UnitAngle.baseUnit()                       : FBV(angle: 1),
+	UnitAngularSpeed.baseUnit()                : FBV(duration: -1, angle: 1),
+	UnitArea.baseUnit()                        : FBV(length: 2),
+	UnitConcentrationMass.baseUnit()           : FBV(length: -3, mass: 1),
+	UnitDuration.baseUnit()                    : FBV(duration: 1),
+	UnitDynamicViscosity.baseUnit()            : FBV(length: -1, duration: -1, mass: 1),
+	UnitElectricCapacitance.baseUnit()         : FBV(length: -2, duration: 4, mass: -1, current: 2),
+	UnitElectricCharge.baseUnit()              : FBV(duration: 1, current: 1),
+	UnitElectricConductance.baseUnit()         : FBV(length: -2, duration: 3, mass: -1, current: 2),
+	UnitElectricCurrent.baseUnit()             : FBV(current: 1),
+	UnitElectricInductance.baseUnit()          : FBV(length: 2, duration: -2, mass: 1, current: -2),
+	UnitElectricPotentialDifference.baseUnit() : FBV(length: 2, duration: -3, mass: 1, current: -1),
+	UnitElectricResistance.baseUnit()          : FBV(length: 2, duration: -3, mass: 1, current: -2),
+	UnitEnergy.baseUnit()                      : FBV(length: 2, duration: -2, mass: 1),
+	UnitForce.baseUnit()                       : FBV(length: 1, duration: -2, mass: 1),
+	UnitFrequency.baseUnit()                   : FBV(duration: -1),
+	UnitIlluminance.baseUnit()                 : FBV(length: -2, luminousIntensity: 1, solidAngle: 1),
+	UnitIonizingRadiation.baseUnit()           : FBV(length: 2, duration: -2),
+	UnitKinematicViscosity.baseUnit()          : FBV(length: 2, duration: -1),
+	UnitLength.baseUnit()                      : FBV(length: 1),
+	UnitLuminousFlux.baseUnit()                : FBV(luminousIntensity: 1, solidAngle: 1),
+	UnitLuminousIntensity.baseUnit()           : FBV(luminousIntensity: 1),
+	UnitMagneticFlux.baseUnit()                : FBV(length: 2, duration: -2, mass: 1, current: -1),
+	UnitMagneticFluxDensity.baseUnit()         : FBV(duration: -2, mass: 1, current: -1),
+	UnitMass.baseUnit()                        : FBV(mass: 1),
+	UnitPower.baseUnit()                       : FBV(length: 2, duration: -3, mass: 1),
+	UnitPressure.baseUnit()                    : FBV(length: -1, duration: -2, mass: 1),
+	UnitSolidAngle.baseUnit()                  : FBV(solidAngle: 1),
+	UnitSpeed.baseUnit()                       : FBV(length: 1, duration: -1),
+	UnitTemperature.baseUnit()                 : FBV(temperature: 1),
+	UnitVolume.baseUnit()                      : FBV(length: 3),
 ]
 
 public extension Dimension {
+	var dimensionSymbol: String {
+		switch self {
+			case is UnitAngle: "α"
+			case is UnitLength: "L"
+			case is UnitMass: "M"
+			case is UnitDuration: "T"
+			case is UnitElectricCurrent: "I"
+			case is UnitTemperature: "Θ"
+			case is UnitAmount: "N"
+			case is UnitSolidAngle: "Ω"
+			case is UnitIlluminance: "J"
+			default: "?"
+		}
+	}
+	
 	func isCompositeDimension() -> Bool {
 		return !fundamentalDimensions.contains(self)
 	}
+	
+	var hasNonZeroOffset: Bool {
+		(converter as? UnitConverterLinear)?.constant != 0
+	}
+
 }
