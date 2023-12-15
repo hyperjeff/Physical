@@ -1,13 +1,13 @@
 import Foundation
 
-extension Physical {
-	public init(value: Double, units: DimensionDictionary, sigfigs: Int = 0) {
+public extension Physical {
+	init(value: Double, units: DimensionDictionary, sigfigs: Int = 0) {
 		self.value = value
 		self.units = units
 		self.sigfigs = sigfigs
 	}
 	
-	public init(value: Double, units: [(Dimension, Int)], sigfigs: Int) {
+	init(value: Double, units: [(Dimension, Int)], sigfigs: Int) {
 		self.value = value
 		self.sigfigs = sigfigs
 		
@@ -25,21 +25,21 @@ extension Physical {
 		self.units = newUnits
 	}
 	
-	public init(value: Double, unit: Dimension, sigfigs: Int) {
+	init(value: Double, unit: Dimension, sigfigs: Int) {
 		self.init(value: value, units: [type(of: unit).baseUnit() : (unit, .integer(1))], sigfigs: sigfigs)
 	}
 	
-	public init(value: Double, unit: Dimension) {
+	init(value: Double, unit: Dimension) {
 		self.init(value: value, unit: unit, sigfigs: value.sigfigs)
 	}
 	
-	public init(values: [Double], units: DimensionDictionary, sigfigs: Int) {
+	init(values: [Double], units: DimensionDictionary, sigfigs: Int) {
 		self.values = values
 		self.units = units
 		self.sigfigs = sigfigs
 	}
 	
-	public init(values: [Double], units: [(Dimension, Int)], sigfigs: Int) {
+	init(values: [Double], units: [(Dimension, Int)], sigfigs: Int) {
 		self.values = values
 		self.sigfigs = sigfigs
 		
@@ -54,15 +54,15 @@ extension Physical {
 		self.units = newUnits
 	}
 	
-	public init(values: [Double], unit: Dimension, sigfigs: Int) {
+	init(values: [Double], unit: Dimension, sigfigs: Int) {
 		self.init(values: values, units: [type(of: unit).baseUnit() : (unit, .integer(1))], sigfigs: sigfigs)
 	}
 	
-	public init(values: [Double], unit: Dimension) {
+	init(values: [Double], unit: Dimension) {
 		self.init(values: values, unit: unit, sigfigs: values.sigfigs)
 	}
 	
-	public init(repeating: Double = 0, count: Int, unit: Dimension) {
+	init(repeating: Double = 0, count: Int, unit: Dimension) {
 		self.init(values: [Double](repeating: repeating, count: count), unit: unit)
 	}
 	

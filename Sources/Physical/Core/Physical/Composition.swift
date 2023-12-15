@@ -1,5 +1,5 @@
-extension Physical {
-	public static postfix func / (left: Physical) -> Physical {
+public extension Physical {
+	static postfix func / (left: Physical) -> Physical {
 		var out = left
 		out.invertSuffixes = true
 		return out

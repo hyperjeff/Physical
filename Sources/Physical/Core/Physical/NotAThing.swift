@@ -1,9 +1,9 @@
-extension Physical {
-	public var isAThing: Bool {
+public extension Physical {
+	var isAThing: Bool {
 		!isNotAThing
 	}
 	
-	public static var notAThing: Physical {
+	static var notAThing: Physical {
 		var nothing = Physical()
 		nothing.value = .nan
 		nothing.sigfigs = 0
@@ -12,7 +12,7 @@ extension Physical {
 		return nothing
 	}
 	
-	public static func notAThing(logging: String, elements: [Physical] = []) -> Physical {
+	static func notAThing(logging: String, elements: [Physical] = []) -> Physical {
 		var out: Physical = .notAThing
 		
 		out.errorStack.append(logging)
