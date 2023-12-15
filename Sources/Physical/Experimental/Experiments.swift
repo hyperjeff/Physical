@@ -83,38 +83,38 @@ public enum RangeType {
 	case standard, even, odd, nonzero
 }
 
-extension ClosedRange where Bound == Int {
-	public func by(_ stepSize: Double) -> [Double] {
+public extension ClosedRange where Bound == Int {
+	func by(_ stepSize: Double) -> [Double] {
 		let doubleLower = Double(lowerBound)
 		let doubleUpper = Double(upperBound)
 		return (doubleLower ... doubleUpper).by(stepSize)
 	}
 	
-	public func by(_ stepSize: Physical) -> Physical {
+	func by(_ stepSize: Physical) -> Physical {
 		let doubleLower = Double(lowerBound)
 		let doubleUpper = Double(upperBound)
 		return (doubleLower ... doubleUpper).by(stepSize)
 	}
 	
-	public func count(_ n: Int) -> [Double] {
+	func count(_ n: Int) -> [Double] {
 		ramp(in: self, count: n)
 	}
 }
 
-extension ClosedRange where Bound == Double {
-	public func by(_ stepSize: Double) -> [Double] {
+public extension ClosedRange where Bound == Double {
+	func by(_ stepSize: Double) -> [Double] {
 		Array(stride(from: lowerBound, through: upperBound, by: stepSize))
 	}
 	
-	public func by(_ stepSize: Physical, sigfigs: Int = 16) -> Physical {
+	func by(_ stepSize: Physical, sigfigs: Int = 16) -> Physical {
 		Physical(values: Array(stride(from: lowerBound, through: upperBound, by: stepSize.value)), units: stepSize.units, sigfigs: sigfigs)
 	}
 }
 
-extension ClosedRange where Bound == Physical {
-	public func by(_ stepSize: Physical) -> Physical? {
+public extension ClosedRange where Bound == Physical {
+	func by(_ stepSize: Physical) -> Physical? {
 		if (lowerBound ~ upperBound) && (lowerBound ~ stepSize),
-		   lowerBound.values == nil && upperBound.values == nil {
+		   !lowerBound.isArray && !upperBound.isArray {
 			if let low = equalDimensionDictionaries(lowerBound.units, stepSize.units) ? lowerBound : lowerBound.to(units: stepSize.units),
 			   let high = equalDimensionDictionaries(upperBound.units, stepSize.units) ? upperBound : upperBound.to(units: stepSize.units) {
 				return (low.value ... high.value).by(stepSize, sigfigs: Swift.max(stepSize.sigfigs, Swift.max(low.sigfigs, high.sigfigs)))
@@ -125,7 +125,7 @@ extension ClosedRange where Bound == Physical {
 		return nil
 	}
 	
-	public func count(_ steps: Int) -> Physical {
+	func count(_ steps: Int) -> Physical {
 		if (lowerBound ~ upperBound) && 0 < steps {
 			return self.by((upperBound - lowerBound)/steps)!
 		}
@@ -199,9 +199,9 @@ public enum TimePrecision: CFTimeInterval {
 	
 	var description: String {
 		switch self {
-			case .microSeconds: return "μs"
-			case .milliSeconds: return "ms"
-			case .seconds: return "seconds"
+			case .microSeconds: "μs"
+			case .milliSeconds: "ms"
+			case .seconds: "seconds"
 		}
 	}
 }
