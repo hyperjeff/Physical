@@ -45,6 +45,19 @@ public extension Physical {
 	}
 }
 
+public func * (left: Physical, right: Percentage) -> Physical {
+	if let values = left.values {
+		Physical(values: values * right.value / 100, units: left.units, sigfigs: left.sigfigs)
+	}
+	else {
+		Physical(value: left.value * right.value / 100, units: left.units, sigfigs: left.sigfigs)
+	}
+}
+
+public func * (left: Percentage, right: Physical) -> Physical {
+	right * left
+}
+
 public func abs(_ number: Physical) -> Physical {
 	if let values = number.values {
 		var out = [Double](repeating: 0, count: values.count)

@@ -6,6 +6,7 @@ import Foundation
 public protocol PhysicalType: CustomStringConvertible, Equatable {
 	var physical: Physical { get set }
 	init(values: [Double], unit: Dimension)
+	init?(_ y: Physical)
 }
 
 public func +<T: PhysicalType> (lhs: T, rhs: T) -> T {
@@ -13,20 +14,20 @@ public func +<T: PhysicalType> (lhs: T, rhs: T) -> T {
 	out.physical += rhs.physical
 	return out
 }
-public func +=<T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical += rhs.physical }
-public func -=<T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical -= rhs.physical }
-public func *=<T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical *= rhs.physical }
-public func /=<T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical /= rhs.physical }
+public func += <T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical += rhs.physical }
+public func -= <T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical -= rhs.physical }
+public func *= <T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical *= rhs.physical }
+public func /= <T: PhysicalType> ( lhs: inout T, rhs: T) { lhs.physical /= rhs.physical }
 
 public func == (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical == rhs.physical }
+public func <= (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical <= rhs.physical }
 public func < (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical < rhs.physical }
 public func > (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical > rhs.physical }
-public func <= (lhs: any PhysicalType, rhs: any PhysicalType) -> Bool { lhs.physical <= rhs.physical }
 
 public func * (lhs: any PhysicalType, rhs: any PhysicalType) -> Physical { lhs.physical * rhs.physical }
+public func / (lhs: any PhysicalType, rhs: any PhysicalType) -> Physical { lhs.physical / rhs.physical }
 public func * (lhs: any PhysicalType, rhs: Physical) -> Physical { lhs.physical * rhs }
 public func * (lhs: Physical, rhs: any PhysicalType) -> Physical { lhs * rhs.physical }
-public func / (lhs: any PhysicalType, rhs: any PhysicalType) -> Physical { lhs.physical / rhs.physical }
 public func / (lhs: any PhysicalType, rhs: Physical) -> Physical { lhs.physical / rhs }
 public func / (lhs: Physical, rhs: any PhysicalType) -> Physical { lhs / rhs.physical }
 public func + (lhs: any PhysicalType, rhs: Physical) -> Physical { lhs.physical + rhs }
@@ -35,18 +36,20 @@ public func - (lhs: any PhysicalType, rhs: Physical) -> Physical { lhs.physical 
 public func - (lhs: Physical, rhs: any PhysicalType) -> Physical { lhs - rhs.physical }
 public func ^ (lhs: any PhysicalType, rhs: Double) -> Physical { lhs.physical ^ rhs }
 
-public func *<T: PhysicalType> (lhs: T, rhs: Double) -> T {
+public func * <T: PhysicalType> (lhs: T, rhs: Double) -> T {
 	var out = lhs
 	out.physical = lhs.physical * rhs
 	return out
 }
-public func /<T: PhysicalType> (lhs: T, rhs: Double) -> T {
+public func / <T: PhysicalType> (lhs: T, rhs: Double) -> T {
 	var out = lhs
 	out.physical = lhs.physical / rhs
 	return out
 }
-public func *<T: PhysicalType> (lhs: T, rhs: [Double]) -> T? {
-	if let newPhys = lhs.physical * rhs {
+public func * <T: PhysicalType> (lhs: T, rhs: [Double]) -> T? {
+	let newPhys = lhs.physical * rhs
+	
+	if newPhys.isAThing {
 		var out = lhs
 		out.physical = newPhys
 		return out
@@ -54,10 +57,10 @@ public func *<T: PhysicalType> (lhs: T, rhs: [Double]) -> T? {
 	
 	return nil
 }
-public func *<T: PhysicalType> (lhs: Double, rhs: T) -> T { rhs * lhs }
-public func *<T: PhysicalType> (lhs: [Double], rhs: T) -> T? { rhs * lhs }
+public func * <T: PhysicalType> (lhs: Double, rhs: T) -> T { rhs * lhs }
+public func * <T: PhysicalType> (lhs: [Double], rhs: T) -> T? { rhs * lhs }
 
-public prefix func -<T: PhysicalType> (rhs: T) -> T {
+public prefix func - <T: PhysicalType> (rhs: T) -> T {
 	var out = rhs
 	out.physical = -1 * rhs.physical
 	return out
@@ -76,6 +79,14 @@ public func vectorize<T: PhysicalType>(_ array: [T]) -> T? {
 		return T(values: values, unit: item.physical.units.values.first!.unit)
 	}
 	return nil
+}
+
+public func ~ (left: Physical, right: PhysicalConversionType) -> Bool {
+	left ~ Physical(value: 1, unit: right.toPhysical())
+}
+
+public func ~ (left: Physical, right: any PhysicalType.Type) -> Bool {
+	right.init(left) != nil
 }
 
 // GENERATED:_______________________________________________________________________________________

@@ -6,261 +6,251 @@ public enum PhysicalConversionType {
 		 becquerel, curie, rutherford
 }
 
-public extension Physical {
-	func to(_ conversionType: PhysicalConversionType) -> Physical {
-		self → conversionType
-	}
-	
-	static func → (left: Physical, right: PhysicalConversionType) -> Physical {
-		left.to(right.toPhysical())
-	}
-}
-
 public extension PhysicalConversionType {
 	func toPhysical() -> Dimension {
 		switch self {
-			case .becquerel: return UnitActivity.becquerel
-			case .curie: return UnitActivity.curie
-			case .rutherford: return UnitActivity.rutherford
-			case .m: return UnitLength.meters
-			case .J: return UnitEnergy.joules
-			case .Hz: return UnitFrequency.hertz
-			case .s: return UnitDuration.seconds
-			case .ergs: return UnitEnergy.ergs
-			case .particles: return UnitAmount.particles
-			case .atoms: return UnitAmount.atoms
-			case .beings: return UnitAmount.beings
-			case .people: return UnitAmount.people
-			case .things: return UnitAmount.things
-			case .moles: return UnitAmount.moles
-			case .farads: return UnitElectricCapacitance.farads
-			case .siemens: return UnitElectricConductance.siemens
-			case .henries: return UnitElectricInductance.henries
-			case .newtons: return UnitForce.newtons
-			case .grays: return UnitIonizingRadiation.grays
-			case .sieverts: return UnitIonizingRadiation.sieverts
-			case .candelas: return UnitLuminousIntensity.candelas
-			case .lumens: return UnitLuminousFlux.lumens
-			case .webers: return UnitMagneticFlux.webers
-			case .teslas: return UnitMagneticFluxDensity.teslas
-			case .gauss: return UnitMagneticFluxDensity.gauss
-			case .barns: return UnitArea.barns
-			case .days: return UnitDuration.days
-			case .years: return UnitDuration.years
-			case .britishThermalUnits: return UnitEnergy.britishThermalUnits
-			case .electronvolts: return UnitEnergy.electronvolts
-			case .angstroms: return UnitLength.angstroms
-			case .pascals: return UnitPressure.pascals
-			case .atmosphericPressure: return UnitPressure.atmosphericPressure
-			case .rankine: return UnitTemperature.rankine
-			case .metersPerSecondSquared: return UnitAcceleration.metersPerSecondSquared
-			case .gravity: return UnitAcceleration.gravity
-			case .degrees: return UnitAngle.degrees
-			case .arcMinutes: return UnitAngle.arcMinutes
-			case .arcSeconds: return UnitAngle.arcSeconds
-			case .radians: return UnitAngle.radians
-			case .gradians: return UnitAngle.gradians
-			case .revolutions: return UnitAngle.revolutions
-			case .cycles: return UnitAngle.cycles
-			case .squareMegameters: return UnitArea.squareMegameters
-			case .squareKilometers: return UnitArea.squareKilometers
-			case .squareMeters: return UnitArea.squareMeters
-			case .squareCentimeters: return UnitArea.squareCentimeters
-			case .squareMillimeters: return UnitArea.squareMillimeters
-			case .squareMicrometers: return UnitArea.squareMicrometers
-			case .squareNanometers: return UnitArea.squareNanometers
-			case .squareInches: return UnitArea.squareInches
-			case .squareFeet: return UnitArea.squareFeet
-			case .squareYards: return UnitArea.squareYards
-			case .squareMiles: return UnitArea.squareMiles
-			case .acres: return UnitArea.acres
-			case .ares: return UnitArea.ares
-			case .hectares: return UnitArea.hectares
-			case .gramsPerLiter: return UnitConcentrationMass.gramsPerLiter
-			case .milligramsPerDeciliter: return UnitConcentrationMass.milligramsPerDeciliter
-			case .partsPerMillion: return UnitDispersion.partsPerMillion
-			case .hours: return UnitDuration.hours
-			case .minutes: return UnitDuration.minutes
-			case .seconds: return UnitDuration.seconds
-			case .milliseconds: return UnitDuration.milliseconds
-			case .microseconds: return UnitDuration.microseconds
-			case .nanoseconds: return UnitDuration.nanoseconds
-			case .picoseconds: return UnitDuration.picoseconds
-			case .coulombs: return UnitElectricCharge.coulombs
-			case .megaampereHours: return UnitElectricCharge.megaampereHours
-			case .kiloampereHours: return UnitElectricCharge.kiloampereHours
-			case .ampereHours: return UnitElectricCharge.ampereHours
-			case .milliampereHours: return UnitElectricCharge.milliampereHours
-			case .microampereHours: return UnitElectricCharge.microampereHours
-			case .megaamperes: return UnitElectricCurrent.megaamperes
-			case .kiloamperes: return UnitElectricCurrent.kiloamperes
-			case .amperes: return UnitElectricCurrent.amperes
-			case .milliamperes: return UnitElectricCurrent.milliamperes
-			case .microamperes: return UnitElectricCurrent.microamperes
-			case .megavolts: return UnitElectricPotentialDifference.megavolts
-			case .kilovolts: return UnitElectricPotentialDifference.kilovolts
-			case .volts: return UnitElectricPotentialDifference.volts
-			case .millivolts: return UnitElectricPotentialDifference.millivolts
-			case .microvolts: return UnitElectricPotentialDifference.microvolts
-			case .megaohms: return UnitElectricResistance.megaohms
-			case .kiloohms: return UnitElectricResistance.kiloohms
-			case .ohms: return UnitElectricResistance.ohms
-			case .milliohms: return UnitElectricResistance.milliohms
-			case .microohms: return UnitElectricResistance.microohms
-			case .kilojoules: return UnitEnergy.kilojoules
-			case .joules: return UnitEnergy.joules
-			case .kilocalories: return UnitEnergy.kilocalories
-			case .calories: return UnitEnergy.calories
-			case .kilowattHours: return UnitEnergy.kilowattHours
-			case .terahertz: return UnitFrequency.terahertz
-			case .gigahertz: return UnitFrequency.gigahertz
-			case .megahertz: return UnitFrequency.megahertz
-			case .kilohertz: return UnitFrequency.kilohertz
-			case .hertz: return UnitFrequency.hertz
-			case .millihertz: return UnitFrequency.millihertz
-			case .microhertz: return UnitFrequency.microhertz
-			case .nanohertz: return UnitFrequency.nanohertz
-			case .framesPerSecond: return UnitFrequency.framesPerSecond
-			case .litersPer100Kilometers: return UnitFuelEfficiency.litersPer100Kilometers
-			case .milesPerImperialGallon: return UnitFuelEfficiency.milesPerImperialGallon
-			case .milesPerGallon: return UnitFuelEfficiency.milesPerGallon
-			case .bytes: return UnitInformationStorage.bytes
-			case .bits: return UnitInformationStorage.bits
-			case .nibbles: return UnitInformationStorage.nibbles
-			case .yottabytes: return UnitInformationStorage.yottabytes
-			case .zettabytes: return UnitInformationStorage.zettabytes
-			case .exabytes: return UnitInformationStorage.exabytes
-			case .petabytes: return UnitInformationStorage.petabytes
-			case .terabytes: return UnitInformationStorage.terabytes
-			case .gigabytes: return UnitInformationStorage.gigabytes
-			case .megabytes: return UnitInformationStorage.megabytes
-			case .kilobytes: return UnitInformationStorage.kilobytes
-			case .yottabits: return UnitInformationStorage.yottabits
-			case .zettabits: return UnitInformationStorage.zettabits
-			case .exabits: return UnitInformationStorage.exabits
-			case .petabits: return UnitInformationStorage.petabits
-			case .terabits: return UnitInformationStorage.terabits
-			case .gigabits: return UnitInformationStorage.gigabits
-			case .megabits: return UnitInformationStorage.megabits
-			case .kilobits: return UnitInformationStorage.kilobits
-			case .yobibytes: return UnitInformationStorage.yobibytes
-			case .zebibytes: return UnitInformationStorage.zebibytes
-			case .exbibytes: return UnitInformationStorage.exbibytes
-			case .pebibytes: return UnitInformationStorage.pebibytes
-			case .tebibytes: return UnitInformationStorage.tebibytes
-			case .gibibytes: return UnitInformationStorage.gibibytes
-			case .mebibytes: return UnitInformationStorage.mebibytes
-			case .kibibytes: return UnitInformationStorage.kibibytes
-			case .yobibits: return UnitInformationStorage.yobibits
-			case .zebibits: return UnitInformationStorage.zebibits
-			case .exbibits: return UnitInformationStorage.exbibits
-			case .pebibits: return UnitInformationStorage.pebibits
-			case .tebibits: return UnitInformationStorage.tebibits
-			case .gibibits: return UnitInformationStorage.gibibits
-			case .mebibits: return UnitInformationStorage.mebibits
-			case .kibibits: return UnitInformationStorage.kibibits
-			case .megameters: return UnitLength.megameters
-			case .kilometers: return UnitLength.kilometers
-			case .hectometers: return UnitLength.hectometers
-			case .decameters: return UnitLength.decameters
-			case .meters: return UnitLength.meters
-			case .decimeters: return UnitLength.decimeters
-			case .centimeters: return UnitLength.centimeters
-			case .millimeters: return UnitLength.millimeters
-			case .micrometers: return UnitLength.micrometers
-			case .nanometers: return UnitLength.nanometers
-			case .picometers: return UnitLength.picometers
-			case .inches: return UnitLength.inches
-			case .feet: return UnitLength.feet
-			case .yards: return UnitLength.yards
-			case .miles: return UnitLength.miles
-			case .scandinavianMiles: return UnitLength.scandinavianMiles
-			case .lightyears: return UnitLength.lightyears
-			case .nauticalMiles: return UnitLength.nauticalMiles
-			case .fathoms: return UnitLength.fathoms
-			case .furlongs: return UnitLength.furlongs
-			case .astronomicalUnits: return UnitLength.astronomicalUnits
-			case .parsecs: return UnitLength.parsecs
-			case .lux: return UnitIlluminance.lux
-			case .kilograms: return UnitMass.kilograms
-			case .grams: return UnitMass.grams
-			case .decigrams: return UnitMass.decigrams
-			case .centigrams: return UnitMass.centigrams
-			case .milligrams: return UnitMass.milligrams
-			case .micrograms: return UnitMass.micrograms
-			case .nanograms: return UnitMass.nanograms
-			case .picograms: return UnitMass.picograms
-			case .ounces: return UnitMass.ounces
-			case .pounds: return UnitMass.pounds
-			case .stones: return UnitMass.stones
-			case .metricTons: return UnitMass.metricTons
-			case .shortTons: return UnitMass.shortTons
-			case .carats: return UnitMass.carats
-			case .ouncesTroy: return UnitMass.ouncesTroy
-			case .slugs: return UnitMass.slugs
-			case .terawatts: return UnitPower.terawatts
-			case .gigawatts: return UnitPower.gigawatts
-			case .megawatts: return UnitPower.megawatts
-			case .kilowatts: return UnitPower.kilowatts
-			case .watts: return UnitPower.watts
-			case .milliwatts: return UnitPower.milliwatts
-			case .microwatts: return UnitPower.microwatts
-			case .nanowatts: return UnitPower.nanowatts
-			case .picowatts: return UnitPower.picowatts
-			case .femtowatts: return UnitPower.femtowatts
-			case .horsepower: return UnitPower.horsepower
-			case .newtonsPerMetersSquared: return UnitPressure.newtonsPerMetersSquared
-			case .gigapascals: return UnitPressure.gigapascals
-			case .megapascals: return UnitPressure.megapascals
-			case .kilopascals: return UnitPressure.kilopascals
-			case .hectopascals: return UnitPressure.hectopascals
-			case .inchesOfMercury: return UnitPressure.inchesOfMercury
-			case .bars: return UnitPressure.bars
-			case .millibars: return UnitPressure.millibars
-			case .millimetersOfMercury: return UnitPressure.millimetersOfMercury
-			case .poundsForcePerSquareInch: return UnitPressure.poundsForcePerSquareInch
-			case .metersPerSecond: return UnitSpeed.metersPerSecond
-			case .kilometersPerHour: return UnitSpeed.kilometersPerHour
-			case .milesPerHour: return UnitSpeed.milesPerHour
-			case .knots: return UnitSpeed.knots
-			case .kelvin: return UnitTemperature.kelvin
-			case .celsius: return UnitTemperature.celsius
-			case .fahrenheit: return UnitTemperature.fahrenheit
-			case .megaliters: return UnitVolume.megaliters
-			case .kiloliters: return UnitVolume.kiloliters
-			case .liters: return UnitVolume.liters
-			case .deciliters: return UnitVolume.deciliters
-			case .centiliters: return UnitVolume.centiliters
-			case .milliliters: return UnitVolume.milliliters
-			case .cubicKilometers: return UnitVolume.cubicKilometers
-			case .cubicMeters: return UnitVolume.cubicMeters
-			case .cubicDecimeters: return UnitVolume.cubicDecimeters
-			case .cubicCentimeters: return UnitVolume.cubicCentimeters
-			case .cubicMillimeters: return UnitVolume.cubicMillimeters
-			case .cubicInches: return UnitVolume.cubicInches
-			case .cubicFeet: return UnitVolume.cubicFeet
-			case .cubicYards: return UnitVolume.cubicYards
-			case .cubicMiles: return UnitVolume.cubicMiles
-			case .acreFeet: return UnitVolume.acreFeet
-			case .bushels: return UnitVolume.bushels
-			case .teaspoons: return UnitVolume.teaspoons
-			case .tablespoons: return UnitVolume.tablespoons
-			case .fluidOunces: return UnitVolume.fluidOunces
-			case .cups: return UnitVolume.cups
-			case .pints: return UnitVolume.pints
-			case .quarts: return UnitVolume.quarts
-			case .gallons: return UnitVolume.gallons
-			case .imperialTeaspoons: return UnitVolume.imperialTeaspoons
-			case .imperialTablespoons: return UnitVolume.imperialTablespoons
-			case .imperialFluidOunces: return UnitVolume.imperialFluidOunces
-			case .imperialPints: return UnitVolume.imperialPints
-			case .imperialQuarts: return UnitVolume.imperialQuarts
-			case .imperialGallons: return UnitVolume.imperialGallons
-			case .metricCups: return UnitVolume.metricCups
-			case .degreesPerSecond: return UnitAngularSpeed.degreesPerSecond
-			case .radiansPerSecond: return UnitAngularSpeed.radiansPerSecond
-			case .revolutionsPerSecond: return UnitAngularSpeed.revolutionsPerSecond
-			case .revolutionsPerMinute: return UnitAngularSpeed.revolutionsPerMinute
+			case .becquerel: UnitActivity.becquerel
+			case .curie: UnitActivity.curie
+			case .rutherford: UnitActivity.rutherford
+			case .m: UnitLength.meters
+			case .J: UnitEnergy.joules
+			case .Hz: UnitFrequency.hertz
+			case .s: UnitDuration.seconds
+			case .ergs: UnitEnergy.ergs
+			case .particles: UnitAmount.particles
+			case .atoms: UnitAmount.atoms
+			case .beings: UnitAmount.beings
+			case .people: UnitAmount.people
+			case .things: UnitAmount.things
+			case .moles: UnitAmount.moles
+			case .farads: UnitElectricCapacitance.farads
+			case .siemens: UnitElectricConductance.siemens
+			case .henries: UnitElectricInductance.henries
+			case .newtons: UnitForce.newtons
+			case .grays: UnitIonizingRadiation.grays
+			case .sieverts: UnitIonizingRadiation.sieverts
+			case .candelas: UnitLuminousIntensity.candelas
+			case .lumens: UnitLuminousFlux.lumens
+			case .webers: UnitMagneticFlux.webers
+			case .teslas: UnitMagneticFluxDensity.teslas
+			case .gauss: UnitMagneticFluxDensity.gauss
+			case .barns: UnitArea.barns
+			case .days: UnitDuration.days
+			case .years: UnitDuration.years
+			case .britishThermalUnits: UnitEnergy.britishThermalUnits
+			case .electronvolts: UnitEnergy.electronvolts
+			case .angstroms: UnitLength.angstroms
+			case .pascals: UnitPressure.pascals
+			case .atmosphericPressure: UnitPressure.atmosphericPressure
+			case .rankine: UnitTemperature.rankine
+			case .metersPerSecondSquared: UnitAcceleration.metersPerSecondSquared
+			case .gravity: UnitAcceleration.gravity
+			case .degrees: UnitAngle.degrees
+			case .arcMinutes: UnitAngle.arcMinutes
+			case .arcSeconds: UnitAngle.arcSeconds
+			case .radians: UnitAngle.radians
+			case .gradians: UnitAngle.gradians
+			case .revolutions: UnitAngle.revolutions
+			case .cycles: UnitAngle.cycles
+			case .squareMegameters: UnitArea.squareMegameters
+			case .squareKilometers: UnitArea.squareKilometers
+			case .squareMeters: UnitArea.squareMeters
+			case .squareCentimeters: UnitArea.squareCentimeters
+			case .squareMillimeters: UnitArea.squareMillimeters
+			case .squareMicrometers: UnitArea.squareMicrometers
+			case .squareNanometers: UnitArea.squareNanometers
+			case .squareInches: UnitArea.squareInches
+			case .squareFeet: UnitArea.squareFeet
+			case .squareYards: UnitArea.squareYards
+			case .squareMiles: UnitArea.squareMiles
+			case .acres: UnitArea.acres
+			case .ares: UnitArea.ares
+			case .hectares: UnitArea.hectares
+			case .gramsPerLiter: UnitConcentrationMass.gramsPerLiter
+			case .milligramsPerDeciliter: UnitConcentrationMass.milligramsPerDeciliter
+			case .partsPerMillion: UnitDispersion.partsPerMillion
+			case .hours: UnitDuration.hours
+			case .minutes: UnitDuration.minutes
+			case .seconds: UnitDuration.seconds
+			case .milliseconds: UnitDuration.milliseconds
+			case .microseconds: UnitDuration.microseconds
+			case .nanoseconds: UnitDuration.nanoseconds
+			case .picoseconds: UnitDuration.picoseconds
+			case .coulombs: UnitElectricCharge.coulombs
+			case .megaampereHours: UnitElectricCharge.megaampereHours
+			case .kiloampereHours: UnitElectricCharge.kiloampereHours
+			case .ampereHours: UnitElectricCharge.ampereHours
+			case .milliampereHours: UnitElectricCharge.milliampereHours
+			case .microampereHours: UnitElectricCharge.microampereHours
+			case .megaamperes: UnitElectricCurrent.megaamperes
+			case .kiloamperes: UnitElectricCurrent.kiloamperes
+			case .amperes: UnitElectricCurrent.amperes
+			case .milliamperes: UnitElectricCurrent.milliamperes
+			case .microamperes: UnitElectricCurrent.microamperes
+			case .megavolts: UnitElectricPotentialDifference.megavolts
+			case .kilovolts: UnitElectricPotentialDifference.kilovolts
+			case .volts: UnitElectricPotentialDifference.volts
+			case .millivolts: UnitElectricPotentialDifference.millivolts
+			case .microvolts: UnitElectricPotentialDifference.microvolts
+			case .megaohms: UnitElectricResistance.megaohms
+			case .kiloohms: UnitElectricResistance.kiloohms
+			case .ohms: UnitElectricResistance.ohms
+			case .milliohms: UnitElectricResistance.milliohms
+			case .microohms: UnitElectricResistance.microohms
+			case .kilojoules: UnitEnergy.kilojoules
+			case .joules: UnitEnergy.joules
+			case .kilocalories: UnitEnergy.kilocalories
+			case .calories: UnitEnergy.calories
+			case .kilowattHours: UnitEnergy.kilowattHours
+			case .terahertz: UnitFrequency.terahertz
+			case .gigahertz: UnitFrequency.gigahertz
+			case .megahertz: UnitFrequency.megahertz
+			case .kilohertz: UnitFrequency.kilohertz
+			case .hertz: UnitFrequency.hertz
+			case .millihertz: UnitFrequency.millihertz
+			case .microhertz: UnitFrequency.microhertz
+			case .nanohertz: UnitFrequency.nanohertz
+			case .framesPerSecond: UnitFrequency.framesPerSecond
+			case .litersPer100Kilometers: UnitFuelEfficiency.litersPer100Kilometers
+			case .milesPerImperialGallon: UnitFuelEfficiency.milesPerImperialGallon
+			case .milesPerGallon: UnitFuelEfficiency.milesPerGallon
+			case .bytes: UnitInformationStorage.bytes
+			case .bits: UnitInformationStorage.bits
+			case .nibbles: UnitInformationStorage.nibbles
+			case .yottabytes: UnitInformationStorage.yottabytes
+			case .zettabytes: UnitInformationStorage.zettabytes
+			case .exabytes: UnitInformationStorage.exabytes
+			case .petabytes: UnitInformationStorage.petabytes
+			case .terabytes: UnitInformationStorage.terabytes
+			case .gigabytes: UnitInformationStorage.gigabytes
+			case .megabytes: UnitInformationStorage.megabytes
+			case .kilobytes: UnitInformationStorage.kilobytes
+			case .yottabits: UnitInformationStorage.yottabits
+			case .zettabits: UnitInformationStorage.zettabits
+			case .exabits: UnitInformationStorage.exabits
+			case .petabits: UnitInformationStorage.petabits
+			case .terabits: UnitInformationStorage.terabits
+			case .gigabits: UnitInformationStorage.gigabits
+			case .megabits: UnitInformationStorage.megabits
+			case .kilobits: UnitInformationStorage.kilobits
+			case .yobibytes: UnitInformationStorage.yobibytes
+			case .zebibytes: UnitInformationStorage.zebibytes
+			case .exbibytes: UnitInformationStorage.exbibytes
+			case .pebibytes: UnitInformationStorage.pebibytes
+			case .tebibytes: UnitInformationStorage.tebibytes
+			case .gibibytes: UnitInformationStorage.gibibytes
+			case .mebibytes: UnitInformationStorage.mebibytes
+			case .kibibytes: UnitInformationStorage.kibibytes
+			case .yobibits: UnitInformationStorage.yobibits
+			case .zebibits: UnitInformationStorage.zebibits
+			case .exbibits: UnitInformationStorage.exbibits
+			case .pebibits: UnitInformationStorage.pebibits
+			case .tebibits: UnitInformationStorage.tebibits
+			case .gibibits: UnitInformationStorage.gibibits
+			case .mebibits: UnitInformationStorage.mebibits
+			case .kibibits: UnitInformationStorage.kibibits
+			case .megameters: UnitLength.megameters
+			case .kilometers: UnitLength.kilometers
+			case .hectometers: UnitLength.hectometers
+			case .decameters: UnitLength.decameters
+			case .meters: UnitLength.meters
+			case .decimeters: UnitLength.decimeters
+			case .centimeters: UnitLength.centimeters
+			case .millimeters: UnitLength.millimeters
+			case .micrometers: UnitLength.micrometers
+			case .nanometers: UnitLength.nanometers
+			case .picometers: UnitLength.picometers
+			case .inches: UnitLength.inches
+			case .feet: UnitLength.feet
+			case .yards: UnitLength.yards
+			case .miles: UnitLength.miles
+			case .scandinavianMiles: UnitLength.scandinavianMiles
+			case .lightyears: UnitLength.lightyears
+			case .nauticalMiles: UnitLength.nauticalMiles
+			case .fathoms: UnitLength.fathoms
+			case .furlongs: UnitLength.furlongs
+			case .astronomicalUnits: UnitLength.astronomicalUnits
+			case .parsecs: UnitLength.parsecs
+			case .lux: UnitIlluminance.lux
+			case .kilograms: UnitMass.kilograms
+			case .grams: UnitMass.grams
+			case .decigrams: UnitMass.decigrams
+			case .centigrams: UnitMass.centigrams
+			case .milligrams: UnitMass.milligrams
+			case .micrograms: UnitMass.micrograms
+			case .nanograms: UnitMass.nanograms
+			case .picograms: UnitMass.picograms
+			case .ounces: UnitMass.ounces
+			case .pounds: UnitMass.pounds
+			case .stones: UnitMass.stones
+			case .metricTons: UnitMass.metricTons
+			case .shortTons: UnitMass.shortTons
+			case .carats: UnitMass.carats
+			case .ouncesTroy: UnitMass.ouncesTroy
+			case .slugs: UnitMass.slugs
+			case .terawatts: UnitPower.terawatts
+			case .gigawatts: UnitPower.gigawatts
+			case .megawatts: UnitPower.megawatts
+			case .kilowatts: UnitPower.kilowatts
+			case .watts: UnitPower.watts
+			case .milliwatts: UnitPower.milliwatts
+			case .microwatts: UnitPower.microwatts
+			case .nanowatts: UnitPower.nanowatts
+			case .picowatts: UnitPower.picowatts
+			case .femtowatts: UnitPower.femtowatts
+			case .horsepower: UnitPower.horsepower
+			case .newtonsPerMetersSquared: UnitPressure.newtonsPerMetersSquared
+			case .gigapascals: UnitPressure.gigapascals
+			case .megapascals: UnitPressure.megapascals
+			case .kilopascals: UnitPressure.kilopascals
+			case .hectopascals: UnitPressure.hectopascals
+			case .inchesOfMercury: UnitPressure.inchesOfMercury
+			case .bars: UnitPressure.bars
+			case .millibars: UnitPressure.millibars
+			case .millimetersOfMercury: UnitPressure.millimetersOfMercury
+			case .poundsForcePerSquareInch: UnitPressure.poundsForcePerSquareInch
+			case .metersPerSecond: UnitSpeed.metersPerSecond
+			case .kilometersPerHour: UnitSpeed.kilometersPerHour
+			case .milesPerHour: UnitSpeed.milesPerHour
+			case .knots: UnitSpeed.knots
+			case .kelvin: UnitTemperature.kelvin
+			case .celsius: UnitTemperature.celsius
+			case .fahrenheit: UnitTemperature.fahrenheit
+			case .megaliters: UnitVolume.megaliters
+			case .kiloliters: UnitVolume.kiloliters
+			case .liters: UnitVolume.liters
+			case .deciliters: UnitVolume.deciliters
+			case .centiliters: UnitVolume.centiliters
+			case .milliliters: UnitVolume.milliliters
+			case .cubicKilometers: UnitVolume.cubicKilometers
+			case .cubicMeters: UnitVolume.cubicMeters
+			case .cubicDecimeters: UnitVolume.cubicDecimeters
+			case .cubicCentimeters: UnitVolume.cubicCentimeters
+			case .cubicMillimeters: UnitVolume.cubicMillimeters
+			case .cubicInches: UnitVolume.cubicInches
+			case .cubicFeet: UnitVolume.cubicFeet
+			case .cubicYards: UnitVolume.cubicYards
+			case .cubicMiles: UnitVolume.cubicMiles
+			case .acreFeet: UnitVolume.acreFeet
+			case .bushels: UnitVolume.bushels
+			case .teaspoons: UnitVolume.teaspoons
+			case .tablespoons: UnitVolume.tablespoons
+			case .fluidOunces: UnitVolume.fluidOunces
+			case .cups: UnitVolume.cups
+			case .pints: UnitVolume.pints
+			case .quarts: UnitVolume.quarts
+			case .gallons: UnitVolume.gallons
+			case .imperialTeaspoons: UnitVolume.imperialTeaspoons
+			case .imperialTablespoons: UnitVolume.imperialTablespoons
+			case .imperialFluidOunces: UnitVolume.imperialFluidOunces
+			case .imperialPints: UnitVolume.imperialPints
+			case .imperialQuarts: UnitVolume.imperialQuarts
+			case .imperialGallons: UnitVolume.imperialGallons
+			case .metricCups: UnitVolume.metricCups
+			case .degreesPerSecond: UnitAngularSpeed.degreesPerSecond
+			case .radiansPerSecond: UnitAngularSpeed.radiansPerSecond
+			case .revolutionsPerSecond: UnitAngularSpeed.revolutionsPerSecond
+			case .revolutionsPerMinute: UnitAngularSpeed.revolutionsPerMinute
 		}
 	}
 }

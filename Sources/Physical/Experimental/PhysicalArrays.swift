@@ -3,129 +3,6 @@ import Accelerate
 
 //____________________________________________________________/ NOT GENERATED
 
-public extension Array where Element == Double {
-	static func * (left: Array, right: Double) -> Array {
-		var out = left
-		cblas_dscal(Int32(out.count), right, &out, 1)
-		
-		return out
-	}
-	
-	static func * (left: Double, right: Array) -> Array {
-		var out = right
-		cblas_dscal(Int32(out.count), left, &out, 1)
-		
-		return out
-	}
-	
-	static func / (left: Array, right: Double) -> Array {
-		var out = left
-		cblas_dscal(Int32(out.count), 1 / right, &out, 1)
-		
-		return out
-	}
-	
-	static func + (left: Array, right: Array) -> Array? {
-		guard left.count == right.count else { return nil }
-		
-		var out = right
-		cblas_daxpy(Int32(out.count), 1, left, 1, &out, 1)
-		
-		return out
-	}
-	
-	static func +! (left: Array, right: Array) -> Array {
-		var out = right
-		cblas_daxpy(Int32(out.count), 1, left, 1, &out, 1)
-		
-		return out
-	}
-	
-	static func - (left: Array, right: Array) -> Array? {
-		guard left.count == right.count else { return nil }
-		
-		var out = left
-		cblas_daxpy(Int32(out.count), -1, right, 1, &out, 1)
-		
-		return out
-	}
-	
-	static func -! (left: Array, right: Array) -> Array {
-		var out = left
-		cblas_daxpy(Int32(out.count), -1, right, 1, &out, 1)
-		
-		return out
-	}
-	
-	static func + (left: Array, right: Double) -> Array {
-		var out = [Double](repeating: right, count: left.count)
-		cblas_daxpy(Int32(out.count), 1, left, 1, &out, 1)
-		
-		return out
-	}
-	
-	static func + (left: Double, right: Array) -> Array {
-		var out = [Double](repeating: left, count: right.count)
-		cblas_daxpy(Int32(out.count), 1, right, 1, &out, 1)
-		
-		return out
-	}
-	
-	static func - (left: Double, right: Array) -> Array {
-		var out = right
-		var x = [Double](repeating: left, count: out.count)
-		catlas_daxpby(Int32(out.count), 1, &x, 1, -1, &out, 1)
-		return out
-	}
-	
-	static func - (left: Array, right: Double) -> Array {
-		left + (-right)
-	}
-	
-	static func ⨁ (left: Array, right: Array) -> Array? {
-		left + right
-	}
-	
-	static func ⨀ (left: Array, right: Array) -> Array {
-//		guard left.count == right.count else { return nil }
-		
-		var out = [Double](repeating: 0, count: left.count)
-		vDSP_vmulD(left, 1, right, 1, &out, 1, vDSP_Length(left.count))
-		return out
-	}
-	
-	static func .* (left: Array, right: Array) -> Array {
-		left ⨀ right
-	}
-	
-	static func • (left: Array, right: Array) -> Double {
-		cblas_ddot(1, left, 1, right, 1)
-	}
-	
-	// the Following COULD be generated, but is small enough to hard-code
-	
-	func sum() -> Double {
-		vDSP.sum(self)
-	}
-	
-	func mean() -> Double {
-		vDSP.mean(self)
-	}
-	
-	func minimum() -> Double {
-		vDSP.minimum(self)
-	}
-	
-	func maximum() -> Double {
-		vDSP.maximum(self)
-	}
-	
-	var sigfigs: Int {
-		self.map { $0.sigfigs }.max() ?? 0
-	}
-
-}
-
 public func vectorize(_ array: [Physical]) -> Physical? {
 	if let item = array.first {
 		
@@ -223,6 +100,10 @@ public extension Physical {
 	
 	static func ⨀ (left: Physical, right: Physical) -> Physical {
 		return preMultiply(left, right, elementWise: true)
+	}
+	
+	static func ./ (left: Physical, right: Physical) -> Physical {
+		return preMultiply(left, right ^ -1, elementWise: true)
 	}
 	
 	func slidingWindowAverage(windowLength: Int) -> Physical {
@@ -732,5 +613,6 @@ public extension Array where Element == Double {
 	var events: Physical { Physical(values: self, unit: UnitAmount.events) }
 	var years: Physical { Physical(values: self, unit: UnitDuration.years) }
 	var pascals: Physical { Physical(values: self, unit: UnitPressure.pascals) }
+	var rankine: Physical { Physical(values: self, unit: UnitTemperature.rankine) }
 }
 

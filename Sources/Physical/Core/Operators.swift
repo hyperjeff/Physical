@@ -16,6 +16,7 @@ infix operator ∠	: MultiplicationPrecedence
 infix operator ×	: MultiplicationPrecedence
 infix operator •	: MultiplicationPrecedence
 infix operator √	: MultiplicationPrecedence
+infix operator ↑    : MultiplicationPrecedence
 
 infix operator ⨁	: AdditionPrecedence
 infix operator ⨁!	: AdditionPrecedence
@@ -45,6 +46,9 @@ infix operator <	: ComparisonPrecedence
 
 infix operator &&	: LogicalConjunctionPrecedence
 infix operator ¬	: LogicalConjunctionPrecedence
+infix operator ∩ 	: LogicalConjunctionPrecedence
+infix operator ^^ 	: LogicalConjunctionPrecedence
+infix operator ⊻	: LogicalConjunctionPrecedence
 
 postfix operator %
 postfix operator /
