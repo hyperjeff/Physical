@@ -1,6 +1,6 @@
 import Foundation
 
-extension Physical: Equatable, Comparable, Hashable {
+extension Physical: Equatable, Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(value)
 		hasher.combine(values)
@@ -22,8 +22,9 @@ extension Physical: Equatable, Comparable, Hashable {
 		
 		if (left !~ rightA) || (left !~ rightB) { return false }
 		
-		return (rightA < left && left < rightB) ||
-		(rightB < left && left < rightA)
+		return
+			(rightA < left && left < rightB) ||
+			(rightB < left && left < rightA)
 	}
 	
 	/// Test for equality
@@ -41,16 +42,41 @@ extension Physical: Equatable, Comparable, Hashable {
 			return false
 		}
 		
+		if left.hasDBValue || right.hasDBValue {
+			return (left.hasDBValue ? left.dereferencedValue : left) == (right.hasDBValue ? right.dereferencedValue : right)
+		}
 		
-		// FIXME: vector arrays don't seem to actually compare values at all!
+		switch (left.kindOfQuantity, right.kindOfQuantity) {
+			case (nil, nil): break
+			case let (leftKind, nil):
+				switch leftKind {
+					case .ratio(denominator: _): break
+					default: return false
+				}
+				
+			case let (nil, rightKind):
+				switch rightKind {
+					case .ratio(denominator: _): break
+					default: return false
+				}
+			
+			case let (leftKind, rightKind):
+				switch (leftKind, rightKind) {
+					case (.difference, .difference): break
+//					case let (.decibel(leftRef, _), .decibel(rightRef, _)):
+//						if leftRef != rightRef { return false }
+//					case let (.standardDecibel(leftDB), .standardDecibel(rightDB)):
+//						if leftDB != rightDB { return false }
+					default: return false
+				}
+		}
 		
 		if let lvs = left.values {
 			if let rvs = right.values {
 				if lvs.count != rvs.count { return false }
 				
-				// next line needs to be fixed, using ≐ equivalent
-				
-				if lvs != rvs { return false }
+				// TODO: the following only works when sigfigs are less than 10 currently
+				return lvs.equal(with: rvs, toSigFigs: Swift.min(lvs.sigfigs, rvs.sigfigs))
 			}
 			else {
 				return false
@@ -63,11 +89,37 @@ extension Physical: Equatable, Comparable, Hashable {
 		}
 		
 		if left ⧖ right {
+			if left.hasDBValue && right.hasDBValue {
+				return left.dereferencedValue ≐ right.dereferencedValue
+			}
+			
 			return left ≐ right
 		}
 		
 		var l = left
 		var r = right
+		
+		var recheck = false
+		
+		if left.units.count == 1, let baseDimension = left.units.first?.key as? Dimension {
+			let baseTransfer = left.to(baseDimension)
+			if baseTransfer.isAThing {
+				l = baseTransfer
+				recheck = true
+			}
+		}
+		
+		if right.units.count == 1, let baseDimension = right.units.first?.key as? Dimension {
+			let baseTransfer = right.to(baseDimension)
+			if baseTransfer.isAThing {
+				r = baseTransfer
+				recheck = true
+			}
+		}
+		
+		if recheck && l ⧖ r {
+			return l ≐ r
+		}
 		
 		l.decomposeMixedUnits()
 		r.decomposeMixedUnits()
@@ -87,11 +139,6 @@ extension Physical: Equatable, Comparable, Hashable {
 		}
 		
 		return true
-		/*
-		 let lesserSigfigs = (l.sigfigs < r.sigfigs ? l.sigfigs : r.sigfigs)
-		 
-		 return (l.value.toSigfigs(lesserSigfigs) == r.value.toSigfigs(lesserSigfigs))
-		 */
 	}
 	
 	public static func == (left: Physical, right: Double) -> Bool {
@@ -110,49 +157,4 @@ extension Physical: Equatable, Comparable, Hashable {
 		left = left / right
 	}
 	
-	public static func < (left: Physical, right: Physical) -> Bool {
-		if left.isNotAThing || right.isNotAThing {
-			return false
-		}
-		
-		if left ~ right {
-			if left ⧖ right {
-				return left.value < right.value
-			}
-			else {
-				var (lnew, rnew) = (left, right)
-				lnew.convertToFundamentalUnits()
-				rnew.convertToFundamentalUnits()
-				
-				return lnew.value < rnew.value
-			}
-		}
-		
-		return false
-	}
-	
-	public static func <= (left: Physical, right: Physical) -> Bool {
-		if left.isNotAThing || right.isNotAThing {
-			return false
-		}
-		
-		if left ~ right {
-			if left ⧖ right {
-				return left.value <= right.value
-			}
-			else {
-				var (lnew, rnew) = (left, right)
-				lnew.convertToFundamentalUnits()
-				rnew.convertToFundamentalUnits()
-				
-				return lnew.value <= rnew.value
-			}
-		}
-		
-		return false
-	}
-	
-	public static func > (left: Physical, right: Physical) -> Bool {
-		right < left
-	}
 }
