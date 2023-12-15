@@ -6,7 +6,7 @@ Physical is a Units of Measurement system for the Swift programming language, bu
 
 The project aims to make use of the developments in Dimensional Analysis and Unit/Measurement research to make writing code more appropriate for both trivial and complex real world calculations. Even if you don't think you are making such calculations in your code, you probably are. This can be your friend to help maintain readable, debuggable code.
 
-The more real-world code that uses this package, the better we can optimize the whole system. Please file requests, ideally with real code, submit pull requests, and bring up areas that could improvement.
+The more real-world code that uses this package, the better we can optimize the whole system. Please file requests, ideally with real (or hoped-for) code, submit pull requests, and bring up areas that could improvement.
 
 ### Highlights:
 
@@ -196,6 +196,105 @@ sin(θ₃)                        // 0.95106
 
 _Note:_ The degree symbol is `°` (`⇧⌥8` on a US Standard keyboard) and not `º` (`⌥0`).
 
+### Temperatures
+
+Special considerations must be given to temperature algebra because there are several scales (Celcius and Fahrenheit) that do not have a common zero temperature reference. Thankfully they are at least all linearly related. But there's also not just one zero-based scaling, there are two: Kelvin and Rankine, both supported, though Kelvin is the SI standard reference.
+
+One can easily convert between them, but various algebraic operations will prevent equations from having a unique meaning, and these sums will become `notAThing`.
+
+```swift
+2.kelvin → .celsius            // -271.2.celsius
+25.celsius → .fahrenheit       // 77 °F
+
+2 * 100.kelvin                 // 200 K
+2 * 100.celsius                // Not a Thing
+
+500.kelvin ^ 4                 // 6.25e10 K⁴ 
+500.fahrenheit ^ 4             // Not a Thing
+
+30.fahrenheit < 30.celsius     // true
+```
+
+Temperature differences are treated as different kinds of quantities, which expands their meaningful use. A temperature can be either explicitly designated as a difference or implicitly via a subtraction.
+
+```swift
+50.celsius - 20.celsius                              // 30.celsius
+
+50.celsius - 20.celsius == 30.kelvin                 // false
+50.celsius - 20.celsius == 30.kelvin.difference      // true
+50.celsius - 20.celsius == 54.fahrenheit.difference  // true
+
+50.fahrenheit + 30.celsius                           // Not a Thing
+50.fahrenheit + 30.celsius.difference                // 104 °F
+
+let a = [68.12, 72.22, 120.5].celsius
+let b = [30.31, 71.81, 90.33].celsius
+		
+a - b → .fahrenheit               // [68.06, 0.738, 54.31] ∆°F
+```
+
+
+### Decibels
+
+Decibels are supported, and are _always_ set relative to a reference value. The system supports many standard dB measures as well as allowing you to use arbitrary reference values. (There are no "pure" dB values.) A decibel is _not_ considered unitless, as it represents a physical measure, relative to a reference value. One can freely convert back and forth as is convenient,  but one may not use them in contexts where their unwrapped value wouldn't also make sense.
+
+Keeping track of the factor of 2 for power vs non-power ratios is done automatically. (If you use custom non-power-based ratios, these will use the standard factor of 10 log₁₀(ratio) for calculations.)
+
+Some standard measures in common use:
+
+```swift
+1.pascals.dBSPL              // 93.98 dB SPL
+30.watts.dBm                 // 44.77 dBm
+30.watts.dBW                 // 14.77 dBW
+```
+
+One may use custom reference values as follows. (Reference values for custom dB measures shown in parentheses.)
+
+```swift
+let pressure = 43e-3.pascals
+let dBPressure = pressure.dB(reference: 4e-3.newtons.perSquareMeter)   // 20.63 dB (0.004 N/m²)
+
+let energy = 10.watts
+let dBEnergy = energy.dB(reference: 37.horsepower)                     // -34.41 dB (37 hp)
+```
+
+Physical values that correspond to a dB measure as well as the reference value can be queried.
+
+```swift
+12.dBm.dBReference                                      // 1 mW
+12.dBm.dereferencedValue                                // 3.981 mW
+
+12.dBK.dBReference                                      // 1 K
+12.dBK.dereferencedValue                                // 3.981 K
+
+8.dBm.ratio                                             // 6.3096
+8.dBSPL.ratio                                           // 2.5119
+
+8.dBm ~ Power.self                                      // true
+14.dBSPL ~ Pressure.self                                // true
+```
+
+Decibel algebra works like normal algebra, and can mix with physical measures to quickly be useful in real world scenarios.
+
+```swift
+0.7.dBW - 21.dBW + 13.dBW                               // -7.3 dBW
+10.watts + 0.7.dBW - 21.dBW + 13.dBW                    // 1.862 W
+
+1.W + 10.mW.dB(reference: 1.mW)                         // 10 W
+1.W + 10.mW.dB(reference: 2.mW)                         //  5 W
+
+10.dB(reference: 1.mW) + 10.dB(reference: 2.mW)         // 23.01 dBm
+
+√(24.dBm * 600.ohms) → .volts                           // 12.28 V
+
+12.dBSWL + 4.dBK                                        // Not a Thing
+```
+
+There is much more to say on this topic.
+
+_Current issues:_ There is an issue with the negative `-` operation that requires numbers for decibels to be put in parentheses. For now be careful to include them or you'll get bad but working numbers. Ex: `(-161).dBK`.
+
+
 ### Arrays, Ramps, Indices
 
 Physical can work to describe whole arrays at once, also providing acceleration on calculations done on them for free. As well, a `ramp` function is included, akin to Numpy's `linspace` function. One can treat arrays an n-dimensional vectors as well, with support for rotating (for now) 2-d arrays.
@@ -266,7 +365,7 @@ func orbitalRadiusOfChargeInMagneticField(
 	velocity: Speed,
 	charge: ElectricCharge,
 	magneticFluxDensity: MagneticFluxDensity) -> Length? {
-			
+
 	Length(mass * velocity / (charge * magneticFluxDensity))
 }
 ```
