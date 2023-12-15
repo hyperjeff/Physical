@@ -33,10 +33,10 @@ public enum TieredNumber: Equatable, Comparable, CustomStringConvertible {
 	
 	public var isPositive: Bool {
 		switch self {
-			case let .integer(i): return (0 <= i)
-			case let .fraction(a, b): return (0 <= a*b)
-			case let .real(d): return (0 <= d)
-//			case .zero: return false
+			case let .integer(i): (0 <= i)
+			case let .fraction(a, b): (0 <= a*b)
+			case let .real(d): (0 <= d)
+//			case .zero: false
 		}
 	}
 	
@@ -50,18 +50,18 @@ public enum TieredNumber: Equatable, Comparable, CustomStringConvertible {
 	// purely for debugging:
 	public func kind() -> String {
 		switch self {
-			case .integer(_): return "Int"
-			case let .fraction(a, b): return "Fraction: \(a), \(b)"
-			case .real(_): return "Double"
+			case .integer(_): "Int"
+			case let .fraction(a, b): "Fraction: \(a), \(b)"
+			case .real(_): "Double"
 		}
 	}
 	
 	public var isZero: Bool {
 		switch self {
-			case let .integer(i): return (0 == i)
-			case let .real(d): return (0 == d)
-			case let .fraction(a, _): return (0 == a)
-//			case .zero: return true
+			case let .integer(i): (0 == i)
+			case let .real(d): (0 == d)
+			case let .fraction(a, _): (0 == a)
+//			case .zero: true
 		}
 	}
 	
@@ -71,10 +71,10 @@ public enum TieredNumber: Equatable, Comparable, CustomStringConvertible {
 	
 	public var realValue: Double {
 		switch self {
-			case let .integer(i): return Double(i)
-			case let .fraction(a, b): return Double(a)/Double(b)
-			case let .real(d): return d
-//			case .zero: return 0
+			case let .integer(i): Double(i)
+			case let .fraction(a, b): Double(a)/Double(b)
+			case let .real(d): d
+//			case .zero: 0
 		}
 	}
 	
@@ -95,64 +95,62 @@ public enum TieredNumber: Equatable, Comparable, CustomStringConvertible {
 	public static func == (left: TieredNumber, right: TieredNumber) -> Bool {
 		switch (left, right) {
 			case (let .integer(a), let .integer(b)):
-				return (a==b)
+				(a==b)
 				
 			case (let .fraction(a, b), let .fraction(c, d)):
-				return (a == 0 && c == 0) || (a==c && b==d)
+				(a == 0 && c == 0) || (a==c && b==d)
 				
 			case (let .real(a), let .real(b)):
 				// doesn't really handle extreme numbers and zero
-				return (a==b)
+				(a==b)
 				
 //			case (.zero, .zero): return true
-			default: return false
+			default: false
 		}
 	}
 	
 	public static func + (left: TieredNumber, right: TieredNumber) -> TieredNumber {
 		switch (left, right) {
 			case (let .integer(c), let .integer(e)):
-				return .integer(c + e)
+				.integer(c + e)
 			case (let .fraction(c1, c2), let .integer(e)):
-				return .fraction(c1 + e * c2, c2).fractionCheck()
+				.fraction(c1 + e * c2, c2).fractionCheck()
 			case (let .real(c), let .integer(e)):
-				return .real(c + Double(e))
+				.real(c + Double(e))
 			case (let .integer(c), let .fraction(e1, e2)):
-				return .fraction(c * e2 + e1, e2).fractionCheck()
+				.fraction(c * e2 + e1, e2).fractionCheck()
 			case (let .fraction(c1, c2), let .fraction(e1, e2)):
-				return .fraction(e2 * c1 + e1 * c2, c2 * e2).fractionCheck()
+				.fraction(e2 * c1 + e1 * c2, c2 * e2).fractionCheck()
 			case (let .real(c), let .fraction(e1, e2)):
-				return .real(c + (Double(e1) / Double(e2)))
+				.real(c + (Double(e1) / Double(e2)))
 			case (let .integer(c), let .real(e)):
-				return .real(e + Double(c))
+				.real(e + Double(c))
 			case (let .fraction(c1, c2), let .real(e)):
-				return .real(e + (Double(c1) / Double(c2)))
+				.real(e + (Double(c1) / Double(c2)))
 			case (let .real(c), let .real(e)):
-				return .real(c + e)
-//			case (.zero, let x): return x
-//			case (let x, .zero): return x
+				.real(c + e)
+//			case (.zero, let x): x
+//			case (let x, .zero): x
 		}
 		
 	}
 	
 	public static func * (left: TieredNumber, right: TieredNumber) -> TieredNumber {
 		switch (left, right) {
-			case let (.integer(c), .integer(e)):
-				return .integer(c * e)
-				
+			case let (.integer(c), .integer(e)): .integer(c * e)
 			case let (.fraction(c1, c2), .integer(e)):
-				return TieredNumber.fraction(c1 * e, c2).fractionCheck()
+				TieredNumber.fraction(c1 * e, c2).fractionCheck()
 			case let (.integer(c), .fraction(e1, e2)):
-				return TieredNumber.fraction(c * e1, e2).fractionCheck()
+				TieredNumber.fraction(c * e1, e2).fractionCheck()
 			case let (.fraction(c1, c2), .fraction(e1, e2)):
-				return TieredNumber.fraction(e1 * c1, c2 * e2).fractionCheck()
+				TieredNumber.fraction(e1 * c1, c2 * e2).fractionCheck()
 			
 			// no coming back from being rational -- but probably some rules of thumb later could work
-			case let (.real(c),          .integer(e)):       return .real(c * Double(e))
-			case let (.real(c),          .fraction(e1, e2)): return .real((c * Double(e1)) / Double(e2))
-			case let (.integer(c),       .real(e)):          return .real(e * Double(c))
-			case let (.fraction(c1, c2), .real(e)):          return .real((e * Double(c1)) / Double(c2))
-			case let (.real(c),          .real(e)):          return .real(c * e)
+			case let (.real(c),          .integer(e)):       .real(c * Double(e))
+			case let (.real(c),          .fraction(e1, e2)): .real((c * Double(e1)) / Double(e2))
+			case let (.integer(c),       .real(e)):          .real(e * Double(c))
+			case let (.fraction(c1, c2), .real(e)):          .real((e * Double(c1)) / Double(c2))
+			case let (.real(c),          .real(e)):          .real(c * e)
 		}
 		
 	}
@@ -202,31 +200,31 @@ public enum TieredNumber: Equatable, Comparable, CustomStringConvertible {
 	
 	public static prefix func - (right: TieredNumber) -> TieredNumber {
 		switch right {
-			case let .integer(i): return .integer(-i)
-			case let .fraction(a, b): return .fraction(-a, b)
-			case let .real(r): return .real(-r)
+			case let .integer(i): .integer(-i)
+			case let .fraction(a, b): .fraction(-a, b)
+			case let .real(r): .real(-r)
 		}
 	}
 	
 	public static func * (left: TieredNumber, right: Double) -> TieredNumber {
 		switch left {
-			case let .integer(i): return TieredNumber(Double(i) * right)
-			case let .fraction(a, b): return TieredNumber(Double(a) * right / Double(b))
-			case let .real(r): return .real(r * right)
+			case let .integer(i): TieredNumber(Double(i) * right)
+			case let .fraction(a, b): TieredNumber(Double(a) * right / Double(b))
+			case let .real(r): .real(r * right)
 		}
 	}
 	
 	public static func < (left: TieredNumber, right: TieredNumber) -> Bool {
 		switch (left, right) {
-			case let (.integer(i), .integer(j)): return i < j
-			case let (.real(r), .real(s)): return r < s
-			case let (.integer(i), .real(s)): return Double(i) < s
-			case let (.real(r), .integer(j)): return r < Double(j)
-			case let (.fraction(a, b), .fraction(c, d)): return a * d < b * c
-			case let (.fraction(a, b), .integer(j)): return a < b * j
-			case let (.fraction(a, b), .real(s)): return Double(a) < Double(b) * s
-			case let (.integer(i), .fraction(c, d)): return i * d < c
-			case let (.real(r), .fraction(c, d)): return r * Double(d) < Double(c)
+			case let (.integer(i), .integer(j)): i < j
+			case let (.real(r), .real(s)): r < s
+			case let (.integer(i), .real(s)): Double(i) < s
+			case let (.real(r), .integer(j)): r < Double(j)
+			case let (.fraction(a, b), .fraction(c, d)): a * d < b * c
+			case let (.fraction(a, b), .integer(j)): a < b * j
+			case let (.fraction(a, b), .real(s)): Double(a) < Double(b) * s
+			case let (.integer(i), .fraction(c, d)): i * d < c
+			case let (.real(r), .fraction(c, d)): r * Double(d) < Double(c)
 		}
 	}
 	
@@ -269,17 +267,17 @@ public enum TieredNumber: Equatable, Comparable, CustomStringConvertible {
 
 public func pow(_ x: Double, exponent: TieredNumber) -> Double {
 	switch exponent {
-		case let .integer(i): return pow(x, Double(i))
-		case let .fraction(a, b): return pow(x, Double(a)/Double(b))
-		case let .real(d): return pow(x, Double(d))
+		case let .integer(i): pow(x, Double(i))
+		case let .fraction(a, b): pow(x, Double(a)/Double(b))
+		case let .real(d): pow(x, Double(d))
 	}
 }
 
 public func abs(_ t: TieredNumber) -> TieredNumber {
 	switch t {
-		case let .integer(i): return .integer(abs(i))
-		case let .fraction(a, b): return .fraction(abs(a), abs(b))
-		case let .real(r): return .real(abs(r))
+		case let .integer(i): .integer(abs(i))
+		case let .fraction(a, b): .fraction(abs(a), abs(b))
+		case let .real(r): .real(abs(r))
 	}
 }
 

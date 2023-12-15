@@ -44,23 +44,23 @@ public extension Physical {
 	
 	static func standardSymbol(_ symbol: SpecialPhysicalSymbols) -> Physical {
 		switch symbol {
-			case .α, .alpha: return Physical.Constants.fineStructure
-			case .c: return Physical.Constants.lightSpeed
-			case .e: return Physical.Constants.elementaryCharge
-			case .ε, .epsilon: return Physical.Constants.vacuumElectricPermittivity
-			case .G: return Physical.Constants.gravitation
-			case .g: return Physical.Constants.Earth.surfaceGravity
-			case .h: return Physical.Constants.planck
-			case .hbar: return Physical.Constants.reducedPlanck
-			case .kB: return Physical.Constants.boltzmann
-			case .me: return Physical.Constants.Particle.Electron.mass
-			case .mp: return Physical.Constants.Particle.Proton.mass
-			case .mu, .μ: return Physical.Constants.vacuumMagneticPermeability
-			case .N: return Physical.Constants.avogadro
-			case .R: return Physical.Constants.rydberg
-			case .sigma, .σ: return Physical.Constants.stefanBoltzmann
-			case .Z: return Physical.Constants.vacuumImpedance
-				//			case "ke": return Constants.coulomb ← add!
+			case .α, .alpha: Physical.Constants.fineStructure
+			case .c: Physical.Constants.lightSpeed
+			case .e: Physical.Constants.elementaryCharge
+			case .ε, .epsilon: Physical.Constants.vacuumElectricPermittivity
+			case .G: Physical.Constants.gravitation
+			case .g: Physical.Constants.Earth.surfaceGravity
+			case .h: Physical.Constants.planck
+			case .hbar: Physical.Constants.reducedPlanck
+			case .kB: Physical.Constants.boltzmann
+			case .me: Physical.Constants.Particle.Electron.mass
+			case .mp: Physical.Constants.Particle.Proton.mass
+			case .mu, .μ: Physical.Constants.vacuumMagneticPermeability
+			case .N: Physical.Constants.avogadro
+			case .R: Physical.Constants.rydberg
+			case .sigma, .σ: Physical.Constants.stefanBoltzmann
+			case .Z: Physical.Constants.vacuumImpedance
+//			case "ke": Constants.coulomb ← add!
 		}
 	}
 	

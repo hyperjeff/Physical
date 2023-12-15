@@ -6,30 +6,30 @@ public extension Dimension {
 	func baseUnitCheck() -> Dimension? {
 		switch self {
 			// existing dimensions:
-			case is UnitAngle: return UnitAngle.baseUnit()
-			case is UnitArea: return UnitArea.baseUnit()
-			case is UnitDuration: return UnitDuration.baseUnit()
-			case is UnitEnergy: return UnitEnergy.baseUnit()
-			case is UnitLength: return UnitLength.baseUnit()
-			case is UnitMass: return UnitMass.baseUnit()
-			case is UnitPressure: return UnitPressure.baseUnit()
-			case is UnitTemperature: return UnitTemperature.baseUnit()
+			case is UnitAngle: UnitAngle.baseUnit()
+			case is UnitArea: UnitArea.baseUnit()
+			case is UnitDuration: UnitDuration.baseUnit()
+			case is UnitEnergy: UnitEnergy.baseUnit()
+			case is UnitLength: UnitLength.baseUnit()
+			case is UnitMass: UnitMass.baseUnit()
+			case is UnitPressure: UnitPressure.baseUnit()
+			case is UnitTemperature: UnitTemperature.baseUnit()
 			
 			// fully custom dimensions:
-			case is UnitActivity: return UnitActivity.baseUnit()
-			case is UnitAmount: return UnitAmount.baseUnit()
-			case is UnitAngularSpeed: return UnitAngularSpeed.baseUnit()
-			case is UnitElectricCapacitance: return UnitElectricCapacitance.baseUnit()
-			case is UnitElectricConductance: return UnitElectricConductance.baseUnit()
-			case is UnitElectricInductance: return UnitElectricInductance.baseUnit()
-			case is UnitForce: return UnitForce.baseUnit()
-			case is UnitIonizingRadiation: return UnitIonizingRadiation.baseUnit()
-			case is UnitLuminousIntensity: return UnitLuminousIntensity.baseUnit()
-			case is UnitLuminousFlux: return UnitLuminousFlux.baseUnit()
-			case is UnitMagneticFlux: return UnitMagneticFlux.baseUnit()
-			case is UnitMagneticFluxDensity: return UnitMagneticFluxDensity.baseUnit()
+			case is UnitActivity: UnitActivity.baseUnit()
+			case is UnitAmount: UnitAmount.baseUnit()
+			case is UnitAngularSpeed: UnitAngularSpeed.baseUnit()
+			case is UnitElectricCapacitance: UnitElectricCapacitance.baseUnit()
+			case is UnitElectricConductance: UnitElectricConductance.baseUnit()
+			case is UnitElectricInductance: UnitElectricInductance.baseUnit()
+			case is UnitForce: UnitForce.baseUnit()
+			case is UnitIonizingRadiation: UnitIonizingRadiation.baseUnit()
+			case is UnitLuminousIntensity: UnitLuminousIntensity.baseUnit()
+			case is UnitLuminousFlux: UnitLuminousFlux.baseUnit()
+			case is UnitMagneticFlux: UnitMagneticFlux.baseUnit()
+			case is UnitMagneticFluxDensity: UnitMagneticFluxDensity.baseUnit()
 				
-			default: return nil
+			default: nil
 		}
 	}
 }
