@@ -25,6 +25,7 @@ final class PhysicalTests: XCTestCase {
     func testAdditionSigfigs() {
 		XCTAssert((3.4.mm + 10.mm.sigfigs(2)) == 13.mm)
 		
+		XCTAssertEqual(4.8.squareMeters, 4.8.meters(2))
 		XCTAssertEqual(3.4.squareMeters + 1.42.squareMeters, 4.8.squareMeters)
 		XCTAssertEqual(3.4.meters(2) + 1.42.squareMeters, 4.8.squareMeters)
 		XCTAssertEqual(36.6.squareFeet + 1.4.squareMeters, 4.8.squareMeters)
@@ -234,8 +235,7 @@ final class PhysicalTests: XCTestCase {
 		let Δt = (finalTemp - aluminumPlatTemp) → .celsius
 		
 		let diameterSquared = holeDiameter ^ 2
-		
-		let finalDiameter = √(diameterSquared * (1 + 2 * α * Δt))
+		let finalDiameter = √(diameterSquared * (1 + 2 * (α * Δt)))
 		
 		XCTAssert(finalDiameter.sigfigs(3) == 8.01.inches)
 	}
@@ -396,13 +396,13 @@ final class PhysicalTests: XCTestCase {
 	func testTemperature() {
 		Physical.Globals.shared.sigfigs = 3
 		
-		XCTAssertEqual(2 * 30.℃, 60.℃)
-		XCTAssertEqual(2 * 30.℉, 60.℉)
+		XCTAssert((2 * 30.℃).isNotAThing)
+		XCTAssert((2 * 30.℉).isNotAThing)
 		XCTAssertEqual(2 * 30.K, 60.K)
 		
-		XCTAssertEqual((30.℃ - 5.℃), 25.℃)
-		XCTAssertEqual((30.℉ - 5.℉), 25.℉)
-		XCTAssertEqual((30.K - 5.K), 25.K)
+		XCTAssertEqual((30.℃ - 5.℃), 25.℃.difference)
+		XCTAssertEqual((30.℉ - 5.℉), 25.℉.difference)
+		XCTAssertEqual((30.K - 5.K), 25.K.difference)
 		
 		// Addition of different non-zero'd units not allowed
 		
@@ -416,10 +416,14 @@ final class PhysicalTests: XCTestCase {
 		XCTAssert((50.℉ / 30.K).isNotAThing)
 		XCTAssert((50.K / 30.℃).isNotAThing)
 		
-		XCTAssertEqual((50.℉ / 10.℉), 5.constant)
-		XCTAssertEqual((50.℃ / 10.℃), 5.constant)
-		XCTAssertEqual((50.K / 10.K), 5.constant)
+		XCTAssertEqual((50.fahrenheit.difference / 10.fahrenheit.difference), 5.constant)
 		
+//		XCTAssertEqual((50.℉ / 10.℉), 5.constant)
+//		XCTAssertEqual((50.℃ / 10.℃), 5.constant)
+		
+		XCTAssertEqual((50.K / 10.K), 5.constant)
+		XCTAssertEqual((50.rankine / 10.rankine), 5.constant)
+
 		// The other scenario is when units show up with negative exponents
 		
 		XCTAssert((150.℉ * 23.8e-6.celsius(-1)).isNotAThing)
@@ -434,7 +438,7 @@ final class PhysicalTests: XCTestCase {
 	}
 	
 	func testPVeqNRT() {
-		let P = 1.atm
+		let P = 1.atm                // ← kg / m s2
 		let V = 0.100.cubicMeters
 		let N = 0.00420.moles
 		
@@ -471,38 +475,38 @@ final class PhysicalTests: XCTestCase {
 		XCTAssertEqual(volumeOneMoleNaCl, 4.48e-29.m³ )
 		XCTAssertEqual(ionDistance, 2.82e-10.m )
 	}
-
-  // Reproduces Issue #2
-  func testDescription() {
-    var length = 5.meters
-    XCTAssertEqual(length.description, "5 m")
-    XCTAssertEqual(length.unitDescription, "m")
-    XCTAssertEqual(length.dimensionalDescription, "L")
-    length = 14.millimeters
-    XCTAssertEqual(length.description, "14 mm")
-    XCTAssertEqual(length.unitDescription, "mm")
-    XCTAssertEqual(length.dimensionalDescription, "L")
-    length = 8.feet
-    XCTAssertEqual(length.description, "8 ft")
-    XCTAssertEqual(length.unitDescription, "ft")
-    XCTAssertEqual(length.dimensionalDescription, "L")
-
-    var area = 2.feet.feet
-    XCTAssertEqual(area.description, "2 ft²")
-    XCTAssertEqual(area.unitDescription, "ft²")
-    XCTAssertEqual(area.dimensionalDescription, "L²")
-    area = 6.meters(2)
-    XCTAssertEqual(area.description, "6 m²")
-    XCTAssertEqual(area.unitDescription, "m²")
-    XCTAssertEqual(area.dimensionalDescription, "L²")
-
-    var lengthArray = [13, 19].kilometers
-    XCTAssertEqual(lengthArray.description, "[13, 19] km")
-    XCTAssertEqual(lengthArray.unitDescription, "km")
-    XCTAssertEqual(lengthArray.dimensionalDescription, "L")
-    lengthArray = [20, 21].miles
-    XCTAssertEqual(lengthArray.description, "[20, 21] mi")
-    XCTAssertEqual(lengthArray.unitDescription, "mi")
-    XCTAssertEqual(lengthArray.dimensionalDescription, "L")
-  }
+	
+	// Reproduces Issue #2
+	func testDescription() {
+		var length = 5.meters
+		XCTAssertEqual(length.description, "5 m")
+		XCTAssertEqual(length.unitDescription, "m")
+		XCTAssertEqual(length.dimensionalDescription, "L")
+		length = 14.millimeters
+		XCTAssertEqual(length.description, "14 mm")
+		XCTAssertEqual(length.unitDescription, "mm")
+		XCTAssertEqual(length.dimensionalDescription, "L")
+		length = 8.feet
+		XCTAssertEqual(length.description, "8 ft")
+		XCTAssertEqual(length.unitDescription, "ft")
+		XCTAssertEqual(length.dimensionalDescription, "L")
+		
+		var area = 2.feet.feet
+		XCTAssertEqual(area.description, "2 ft²")
+		XCTAssertEqual(area.unitDescription, "ft²")
+		XCTAssertEqual(area.dimensionalDescription, "L²")
+		area = 6.meters(2)
+		XCTAssertEqual(area.description, "6 m²")
+		XCTAssertEqual(area.unitDescription, "m²")
+		XCTAssertEqual(area.dimensionalDescription, "L²")
+		
+		var lengthArray = [13, 19].kilometers
+		XCTAssertEqual(lengthArray.description, "[13, 19] km")
+		XCTAssertEqual(lengthArray.unitDescription, "km")
+		XCTAssertEqual(lengthArray.dimensionalDescription, "L")
+		lengthArray = [20, 21].miles
+		XCTAssertEqual(lengthArray.description, "[20, 21] mi")
+		XCTAssertEqual(lengthArray.unitDescription, "mi")
+		XCTAssertEqual(lengthArray.dimensionalDescription, "L")
+	}
 }
