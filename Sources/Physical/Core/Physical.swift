@@ -5,7 +5,7 @@ public struct Physical: Collection {
 	
 	public var value: Double = 0
 	public var values: [Double]?
-	public var sigfigs: Int = 16 // ← 0, infinity or an optional?
+	public var sigfigs: Int = 16
 	internal var standardDeviationRaw: Double = 0
 	
 	internal var invertSuffixes = false
@@ -16,10 +16,11 @@ public struct Physical: Collection {
 	// more experimental stuff here:
 	
 	public var tags: [String : TieredNumber] = [:]
-	public var metadata = Metadata()
-	public var kindOfQuantity: KindOfQuantity?
 	
-	// for Collection
+	public var kindOfQuantity: KindOfQuantity?
+	public var preDBSelf: AnyObject?
+	
+	// for Collections
 	
 	public typealias ValuesType = [Physical]
 	public typealias Index = ValuesType.Index
