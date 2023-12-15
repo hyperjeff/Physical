@@ -34,10 +34,6 @@ extension Physical: Equatable, Hashable {
 	/// - Returns: Checks for "physical" equality, within the tolerance of their known significant digits.
 	public static func == (left: Physical, right: Physical) -> Bool {
 		
-		// Policy: Should not-things be equal to other not-things? note: NaN == NaN in Swift
-		//		if left.isNotAThing && right.isNotAThing {
-		//			return true
-		//		} else
 		if left.isNotAThing || right.isNotAThing {
 			return false
 		}
@@ -63,10 +59,6 @@ extension Physical: Equatable, Hashable {
 			case let (leftKind, rightKind):
 				switch (leftKind, rightKind) {
 					case (.difference, .difference): break
-//					case let (.decibel(leftRef, _), .decibel(rightRef, _)):
-//						if leftRef != rightRef { return false }
-//					case let (.standardDecibel(leftDB), .standardDecibel(rightDB)):
-//						if leftDB != rightDB { return false }
 					default: return false
 				}
 		}
